@@ -1,0 +1,32 @@
+.DS_Store
+**/.DS_Store
+
+node_modules/
+www/
+
+# Xcode user-specific files
+**/xcuserdata/
+**/*.xcuserstate
+
+# Build artifacts
+DerivedData/
+build/
+
+# Secrets / credentials (keep .env.example in repo as template)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+GoogleService-Info.plist
+**/*credentials*.json
+Secrets/
+artifacts/

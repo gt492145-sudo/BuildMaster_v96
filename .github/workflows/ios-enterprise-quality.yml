@@ -1,0 +1,41 @@
+name: iOS Enterprise Quality Gate
+
+on:
+  pull_request:
+    paths:
+      - "LiDARRangefinder/**"
+      - ".github/workflows/ios-enterprise-quality.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "LiDARRangefinder/**"
+      - ".github/workflows/ios-enterprise-quality.yml"
+
+jobs:
+  ios-quality-gate:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build iOS app (simulator)
+        working-directory: LiDARRangefinder/LiDARRangefinder
+        run: |
+          xcodebuild \
+            -project "LiDARRangefinder.xcodeproj" \
+            -scheme "LiDARRangefinder" \
+            -destination "generic/platform=iOS Simulator" \
+            -configuration Debug \
+            build
+
+      - name: Security baseline check
+        run: |
+          if grep -En "NSAllowsArbitraryLoads[[:space:]]*=[[:space:]]*YES" "LiDARRangefinder/LiDARRangefinder/LiDARRangefinder.xcodeproj/project.pbxproj"; then
+            echo "NSAllowsArbitraryLoads must not be enabled"
+            exit 1
+          fi
+          grep -REn "X-Client-Nonce|X-Client-Timestamp|X-Body-SHA256|X-DeviceCheck-Token" "LiDARRangefinder/LiDARRangefinder" --include="*.swift"

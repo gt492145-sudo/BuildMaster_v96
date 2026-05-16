@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "SITE_MARKER_V7.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "width" : 0.40000000000000002
+  }
+}
