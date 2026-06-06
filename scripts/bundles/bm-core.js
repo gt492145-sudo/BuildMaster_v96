@@ -281,6 +281,10 @@
             ? stakeModule.getStakeSupportingNodes()
             : [];
         stakeSupportingNodes.forEach((node) => setNodeVisibility(node, mode === 'stake'));
+        document.body.dataset.workMode = mode;
+        if (mode === 'stake') {
+            scrollToModeSection('stake');
+        }
         return mode;
     }
 
@@ -1500,6 +1504,9 @@
         applyUserLevel();
         ensureWorkModeSectionOrder();
         applyWorkMode();
+        if (getCurrentWorkMode() === 'stake') {
+            scrollToWorkModeSection('stake');
+        }
         applyCalcSubPage();
         applyAutoContrastMode();
         applyContrastMode();
@@ -1655,6 +1662,16 @@
     }
 
     function applyUserLevel() {
+        if (FREE_PUBLIC_APP_UI) {
+            document.body.setAttribute('data-user-level', 'pro');
+            safeStorage.set(localStorage, USER_LEVEL_KEY, 'pro');
+            [['levelBasicBtn', false], ['levelStandardBtn', false], ['levelProBtn', true]].forEach(([id, active]) => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('active', !!active);
+            });
+            if (typeof applyAiCoachMode === 'function') applyAiCoachMode();
+            return;
+        }
         const normalized = normalizePersistedUserLevel(safeStorage.get(localStorage, USER_LEVEL_KEY, getGrantedUserLevel()));
         safeStorage.set(localStorage, USER_LEVEL_KEY, normalized);
         document.body.setAttribute('data-user-level', normalized);

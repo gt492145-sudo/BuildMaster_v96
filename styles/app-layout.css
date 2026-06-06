@@ -111,6 +111,12 @@
     body[data-work-mode="calc"][data-calc-page="2"] .calc-subpage-block-1 { display: none !important; }
     body[data-work-mode="calc"][data-calc-page="1"] .main-layout { flex-direction: column; }
     body[data-work-mode="calc"][data-calc-page="1"] .calc-panel { flex: 1 1 100%; max-width: none; }
+    body[data-work-mode="stake"] .main-layout { flex-direction: column; }
+    body[data-work-mode="stake"] .calc-panel { flex: 1 1 100%; max-width: none; }
+    body[data-work-mode="stake"] #stakeModePage .level-only-pro { display: block !important; }
+    body[data-work-mode="stake"] #stakeModePage .bim-actions.level-only-pro { display: flex !important; flex-wrap: wrap; }
+    body[data-work-mode="calc"] .work-mode-only-stake { display: none !important; }
+    body[data-work-mode="stake"] .work-mode-only-calc { display: none !important; }
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .mode-btn { border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(16, 29, 48, 0.52); color: #e8f5ff; font-weight: 700; padding: 8px 12px; cursor: pointer; transition: 0.2s; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     .mode-btn:hover { background: rgba(36, 61, 92, 0.72); transform: translateY(-1px); }

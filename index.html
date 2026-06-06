@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=v960logo">
 <link rel="icon" href="favicon.ico?v=v960logo">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v9606-two-pages">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9606-stake-fix">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v831">
 <link rel="stylesheet" href="styles/app-panels.css?v=v9605-chat-bubble">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
@@ -207,7 +207,7 @@
 </div>
 
 <div class="main-layout">
-    <div class="drawing-panel calc-subpage-block calc-subpage-block-2">
+    <div class="drawing-panel work-mode-only-calc calc-subpage-block calc-subpage-block-2">
         <div class="tool-bar">
             <div class="group-title calc-subpage-block calc-subpage-block-2" style="flex:1 1 100%; margin:0 0 4px; border:0; padding:0;">第2頁｜圖面量測與全功能計算</div>
             <div class="tool-group tool-group--file">
@@ -293,7 +293,7 @@
     </div>
 
     <div class="calc-panel">
-        <section class="level-only-pro first-page-pro-tools calc-subpage-block calc-subpage-block-2">
+        <section class="level-only-pro first-page-pro-tools work-mode-only-calc calc-subpage-block calc-subpage-block-2">
         <div class="group-title">即時功能總控</div>
         <div class="control-grid">
             <button id="btnDemoMode" class="tool-btn" onclick="toggleDemoMode()">Demo模式: 開</button>
@@ -316,7 +316,7 @@
         </div>
         </section>
 
-        <section class="level-only-pro first-page-pro-tools calc-subpage-block calc-subpage-block-2">
+        <section class="level-only-pro first-page-pro-tools work-mode-only-calc calc-subpage-block calc-subpage-block-2">
         <div class="group-title">全域 QA 等級總覽</div>
         <div class="bim-grid">
             <div class="bim-card">BIM QA 等級<strong id="qaLevelBim">-</strong></div>
@@ -346,13 +346,13 @@
         </section>
 
         <!-- 固定規則：放樣內容只放在第四頁 -->
-        <section id="stakeModePage" class="level-only-pro">
+        <section id="stakeModePage" class="work-mode-only-stake">
         <div class="group-title">
-            第四頁｜BIM 模型檢核與放樣
+            放樣模式｜BIM 模型檢核與放樣
             <span style="font-size: 0.6em; color: #98c8ff;">QA v1</span>
         </div>
         <div class="bim-actions" style="margin-top:8px; margin-bottom:8px;">
-            <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')">↩️ 回第三頁看圖/估價</button>
+            <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')">↩️ 回計算模式</button>
         </div>
         <div class="input-row">
             <div class="input-wrapper">
@@ -622,11 +622,11 @@
                 </table>
             </div>
         </div>
-        <div id="stakeProjectTitle" class="group-title">
+        <div id="stakeProjectTitle" class="group-title work-mode-only-stake">
             專案與位置設定
-            <span style="font-size: 0.6em; color: #666;">第四頁放樣專用</span>
+            <span style="font-size: 0.6em; color: #666;">放樣專用</span>
         </div>
-        <div id="stakeProjectMetaRow" class="input-row">
+        <div id="stakeProjectMetaRow" class="input-row work-mode-only-stake">
             <div class="input-wrapper"><label>工地建案名稱</label><input type="text" id="project_name" value="" placeholder="請輸入建案名稱"></div>
             <div class="input-wrapper"><label>樓層/分區標籤</label><input type="text" id="floor_tag" placeholder="如: 1F, B1, 基礎"></div>
         </div>
@@ -1190,7 +1190,7 @@
     <div class="coach-avatar" aria-hidden="true">🐣</div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9606-two-pages"></script>
+<script src="scripts/bundles/bm-core.js?v=v9606-stake-fix"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
 <script src="scripts/bundles/bm-calc.js?v=v960"></script>
 <script src="scripts/features/app-shell.js?v=v9605-guest"></script>
