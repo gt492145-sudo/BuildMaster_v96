@@ -1,11 +1,11 @@
-# App Store Connect 對齊清單（V9.6 · build 9605）
+# App Store Connect 對齊清單（V9.6 · build 9606）
 
 ## 必須一致（Xcode ↔ Connect）
 
 | 項目 | App Store Connect | Xcode（Documents 專案） |
 |------|-------------------|-------------------------|
 | 版本 Version | **9.6** | MARKETING_VERSION = **9.6** |
-| 建置 Build | **9605**（上傳後選這個） | CURRENT_PROJECT_VERSION = **9605** |
+| 建置 Build | **9606**（上傳後選這個） | CURRENT_PROJECT_VERSION = **9606** |
 | Bundle ID | **tw.buildmaster.constructionmaster** | tw.buildmaster.constructionmaster.LiDARRangefinder |
 | 送審 Xcode 專案 | — | `~/Documents/LiDARRangefinder/LiDARRangefinder.xcodeproj` |
 
@@ -39,7 +39,7 @@
 - 備註（英文，可直接貼）：
 
 ```text
-This build (V9.6 / 9605) is the Construction Master calculation workspace.
+This build (V9.6 / 9606) is the Construction Master calculation workspace.
 
 - Launch: WebView opens https://gt492145-sudo.github.io/BuildMaster_v96/index.html
 - No login required. Users enter the main workspace immediately.
@@ -139,7 +139,7 @@ Thank you.
 | 6 | 切换到「放样模式」 | 进入放样工作区 | ☐ |
 | 7 | 全程无需输入账号密码 | 无卡住、无 404 主页 | ☐ |
 
-测完后在 Connect 选 build **9605**，取消「需要登入」，贴上方的英文审查备注。
+测完后在 Connect 选 build **9606**，取消「需要登入」，贴上方的英文审查备注。
 
 ---
 
@@ -148,6 +148,6 @@ Thank you.
 - [x] GitHub Pages 已 push（免登入、两页计算+放样、泡泡聊天、访客身份）
 - [ ] Google Sites 隐私页已手动贴上「本机聊天」段落
 - [ ] iPad 清安装实测 7 项全部打勾
-- [ ] Xcode Archive 来自 **Documents/LiDARRangefinder**，Build **9605**
-- [ ] Connect 选 build **9605** 送审
+- [ ] Xcode Archive 来自 **Documents/LiDARRangefinder**，Build **9606**
+- [ ] Connect 选 build **9606** 送审
 - [ ] 取消「需要登入」
