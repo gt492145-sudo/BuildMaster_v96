@@ -367,33 +367,79 @@
         background: rgba(16, 48, 80, 0.28);
     }
     .member-chat-message-list {
-        min-height: 96px;
-        max-height: 230px;
+        min-height: 120px;
+        max-height: 280px;
         overflow-y: auto;
+        overflow-x: hidden;
         border: 1px solid rgba(162, 211, 255, 0.18);
-        border-radius: 10px;
-        padding: 8px;
-        background: rgba(3, 14, 27, 0.4);
+        border-radius: 14px;
+        padding: 12px 10px;
+        background: linear-gradient(180deg, rgba(4, 16, 30, 0.72), rgba(8, 24, 42, 0.55));
         margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
-    .member-chat-msg {
-        margin-bottom: 8px;
-        padding: 7px 8px;
-        border-radius: 10px;
-        background: rgba(25, 57, 90, 0.28);
+    .member-chat-row {
+        display: flex;
+        width: 100%;
     }
-    .member-chat-msg.me {
-        border: 1px solid rgba(111, 212, 174, 0.44);
-        background: rgba(24, 86, 70, 0.34);
+    .member-chat-row.me {
+        justify-content: flex-end;
     }
-    .member-chat-meta {
-        font-size: 0.7em;
-        color: #a6c2e4;
-        margin-bottom: 2px;
+    .member-chat-row.other {
+        justify-content: flex-start;
+    }
+    .member-chat-bubble-wrap {
+        display: flex;
+        flex-direction: column;
+        max-width: min(82%, 420px);
+        gap: 4px;
+    }
+    .member-chat-row.me .member-chat-bubble-wrap {
+        align-items: flex-end;
+    }
+    .member-chat-row.other .member-chat-bubble-wrap {
+        align-items: flex-start;
+    }
+    .member-chat-sender {
+        font-size: 0.68em;
+        color: #8eb8dc;
+        padding: 0 6px;
+        line-height: 1.2;
+    }
+    .member-chat-bubble {
+        position: relative;
+        padding: 10px 12px 8px;
+        border-radius: 18px;
+        word-break: break-word;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+    .member-chat-row.me .member-chat-bubble {
+        border-bottom-right-radius: 6px;
+        background: linear-gradient(135deg, rgba(46, 164, 122, 0.92), rgba(24, 118, 92, 0.88));
+        border: 1px solid rgba(132, 255, 204, 0.34);
+    }
+    .member-chat-row.other .member-chat-bubble {
+        border-bottom-left-radius: 6px;
+        background: linear-gradient(135deg, rgba(36, 72, 112, 0.92), rgba(22, 46, 78, 0.9));
+        border: 1px solid rgba(132, 186, 255, 0.28);
     }
     .member-chat-text {
-        color: #eef6ff;
-        word-break: break-word;
+        color: #f4fbff;
+        font-size: 0.92em;
+        line-height: 1.45;
+        white-space: pre-wrap;
+    }
+    .member-chat-time {
+        margin-top: 4px;
+        font-size: 0.62em;
+        color: rgba(232, 245, 255, 0.72);
+        text-align: right;
+        line-height: 1.2;
+    }
+    .member-chat-row.other .member-chat-time {
+        color: rgba(198, 220, 244, 0.68);
     }
     .security-watermark { position: fixed; right: 10px; bottom: 10px; z-index: 9997; pointer-events: none; opacity: 0.36; font-size: 11px; color: #d5e7ff; background: rgba(8, 16, 28, 0.55); border: 1px dashed rgba(173, 216, 255, 0.3); border-radius: 6px; padding: 5px 8px; letter-spacing: 0.3px; }
     .price-input { border-color: var(--money) !important; color: var(--money) !important; font-weight: bold; }

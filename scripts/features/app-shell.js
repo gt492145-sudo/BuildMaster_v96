@@ -706,8 +706,14 @@
         }
         body.innerHTML = rows.map((row) => {
             const me = row.sender === getCurrentMemberChatIdentity();
-            const cls = me ? ' me' : '';
-            return `<div class="member-chat-msg${cls}"><div class="member-chat-meta">${escapeHTML(String(row.sender || '訪客'))}｜${escapeHTML(String(row.time || ''))}</div><div class="member-chat-text">${escapeHTML(String(row.text || ''))}</div></div>`;
+            const rowCls = me ? 'member-chat-row me' : 'member-chat-row other';
+            const sender = escapeHTML(String(row.sender || '訪客'));
+            const time = escapeHTML(String(row.time || ''));
+            const text = escapeHTML(String(row.text || ''));
+            const senderLine = me
+                ? ''
+                : `<div class="member-chat-sender">${sender}</div>`;
+            return `<div class="${rowCls}"><div class="member-chat-bubble-wrap">${senderLine}<div class="member-chat-bubble"><div class="member-chat-text">${text}</div><div class="member-chat-time">${time}</div></div></div></div>`;
         }).join('');
         body.scrollTop = body.scrollHeight;
     }
