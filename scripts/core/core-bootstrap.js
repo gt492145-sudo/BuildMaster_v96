@@ -8,6 +8,7 @@
     const AUTH_TOKEN_KEY = 'bm_69:auth_token';
     const API_BASE_URL_KEY = 'bm_69:api_base_url';
     const LOCAL_OFFLINE_DEMO_KEY = 'bm_69:local_offline_demo';
+    const FREE_PUBLIC_APP_UI = true;
     const LOCAL_OFFLINE_BASIC_ENTITLEMENTS = {
         calcCore: true,
         dataSync: false
@@ -43,6 +44,19 @@
     function isCapacitorShell() {
         try {
             return !!(typeof window !== 'undefined' && window.Capacitor);
+        } catch (_e) {
+            return false;
+        }
+    }
+    function isIosReviewRuntime() {
+        try {
+            const cap = typeof window !== 'undefined' ? window.Capacitor : null;
+            if (cap && typeof cap.getPlatform === 'function' && String(cap.getPlatform()) === 'ios') return true;
+            if (typeof navigator === 'undefined') return false;
+            const ua = String(navigator.userAgent || '');
+            const platform = String(navigator.platform || '');
+            const hasAppleTouch = Number(navigator.maxTouchPoints || 0) > 1;
+            return /iPad|iPhone|iPod/i.test(ua) || (/MacIntel/i.test(platform) && hasAppleTouch);
         } catch (_e) {
             return false;
         }
@@ -611,7 +625,9 @@
             if (response.status === 401 && options.skipAuth !== true) {
                 clearBackendSession(true);
                 updateBillingStatusChip();
-                showSecurityLock('登入已失效或通行證已過期，請重新驗證。');
+                if (!shouldSkipLoginGate()) {
+                    showSecurityLock('登入已失效或通行證已過期，請重新驗證。');
+                }
             }
             throw error;
         }
@@ -1890,7 +1906,17 @@
 
     function isPublishedTestHost() {
         return location.hostname === 'gt492145-sudo.github.io'
-            && location.pathname.startsWith('/BuildMaster_v69/');
+            && (location.pathname.startsWith('/BuildMaster_v96/')
+                || location.pathname.startsWith('/BuildMaster_v69/'));
+    }
+
+    function shouldSkipLoginGate() {
+        if (!FREE_PUBLIC_APP_UI) return false;
+        try {
+            if (typeof isIosReviewRuntime === 'function' && isIosReviewRuntime()) return true;
+            if (isPublishedTestHost()) return true;
+        } catch (_e) {}
+        return false;
     }
 
     function isLocalOfflineBypassAllowed() {
@@ -2230,7 +2256,13 @@
             return true;
         }
 
-        showSecurityLock('請輸入後端存取碼或會員密碼以啟用系統。');
+        if (shouldSkipLoginGate()) {
+            applyLocalOfflineDemoSession({ full: true });
+            hideSecurityLock();
+            return true;
+        }
+
+        showSecurityLock('請輸入帳號或密碼以進入（可留空帳號僅用密碼）。');
         const input = document.getElementById('securityCodeInput');
         const memberInput = document.getElementById('securityMemberInput');
         if (input) {

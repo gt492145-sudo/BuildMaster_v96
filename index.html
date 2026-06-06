@@ -38,10 +38,10 @@
 <div id="securityLock" class="security-lock">
     <div class="security-panel">
         <h3>Construction Master 保護模式</h3>
-        <p id="securityMessage">請輸入存取碼以啟用系統。</p>
-        <input id="securityMemberInput" class="security-input" type="text" placeholder="會員帳號（僅會員登入時填；存取碼登入請留空）">
-        <input id="securityCodeInput" class="security-input" type="password" placeholder="存取碼或會員密碼">
-        <button class="tool-btn" style="width:100%;">解鎖並進入</button>
+        <p id="securityMessage">歡迎使用 Construction Master。本版免登入，可直接進入工作區。</p>
+        <input id="securityMemberInput" class="security-input" type="text" placeholder="帳號（選填）">
+        <input id="securityCodeInput" class="security-input" type="password" placeholder="密碼（選填；僅會員登入時填）">
+        <button class="tool-btn" style="width:100%;">登入並進入</button>
         <button type="button" id="securitySelfDeleteBtn" class="tool-btn security-self-delete-btn">刪除我的會員帳號</button>
         <p class="security-onboarding-hint security-self-delete-hint">僅適用<strong>會員帳號</strong>：請先填上方「會員帳號」與「會員密碼」，再按此鈕；將永久刪除該帳號與雲端工作區，無法復原（存取碼登入無此帳號可刪）。</p>
         <div id="securityHint" class="security-hint"></div>
@@ -49,21 +49,7 @@
         <button type="button" id="securityOfflineDemoBtn" class="tool-btn security-offline-demo-btn" hidden>先略過登入，進主流程（本機／不接後端）</button>
         <button type="button" id="securityFullDemoBtn" class="tool-btn security-full-demo-btn" hidden>測試全功能（會員3／不接後端）</button>
         <p class="security-onboarding-hint">登入後右上方可開「解說員」與「新手導覽」，邊用邊有白話說明。</p>
-        <p class="security-onboarding-hint security-api-url-hint"><strong>若顯示找不到網址／404／HTTP 501：</strong>純靜態託管（GitHub Pages、Live Server、<code>python -m http.server</code>）沒有真正的 API，POST 常會變成 <strong>501</strong>，與資料庫無關。請啟動專案內 Node <code>server</code> 後用 <code>http://127.0.0.1:8787/index.html</code> 開啟；或於 Application → Local Storage 設 <code>bm_69:api_base_url</code> = <code>http://127.0.0.1:8787</code>（勿重複加 <code>/api</code>）。更新腳本後若仍舊訊息，請關閉分頁、在 Application 取消註冊 Service Worker 後再開。Stripe 導回網址、設定說明中的 API 根網址，必須與你實際使用的<strong>完整公開網址</strong>一致。對外公開隱私權政策請以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites 版本</a> 為準，並與本頁版本說明同步維護。<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內隱私權頁</a>。<strong>[備注：往後原生App完成後會做陸續更新進去這個版本]</strong></p>
-        <div class="billing-block">
-            <div class="billing-block-title">付費開通（網頁 Stripe／iOS Apple 內購）</div>
-            <p class="billing-block-desc">網頁版可使用 <strong>Stripe</strong>：付款完成後回到本站，若網址帶 <code>stripe_session</code> 或 <code>session_id</code> 會自動兌換登入通行證。會員訂製方案採固定價格：月繳 NT$199、年繳 NT$1990。</p>
-            <p class="billing-block-desc billing-block-desc--tight"><strong>iOS／iPadOS App</strong> 不提供外部付款或 Session ID 兌換；請使用 Apple App 內購開通。登入後標題列會顯示「通行證至 …」。</p>
-            <div id="billingTiersHost" class="billing-tiers-host"></div>
-            <div id="billingStripeSessionPreview" class="billing-stripe-session-preview" hidden aria-live="polite">
-                <span class="billing-stripe-session-preview-label">已貼上的 Session ID</span>
-                <code id="billingStripeSessionPreviewValue" class="billing-stripe-session-preview-code"></code>
-            </div>
-            <div class="billing-manual-row">
-                <input id="billingStripeSessionInput" class="security-input billing-stripe-session-input" type="text" placeholder="手動貼上 Stripe Session ID（cs_…）" autocomplete="off" spellcheck="false">
-                <button type="button" id="billingStripeRedeemBtn" class="tool-btn billing-redeem-btn">兌換付款</button>
-            </div>
-        </div>
+        <p class="security-onboarding-hint security-api-url-hint"><strong>若顯示找不到網址／404：</strong>請確認 App 或瀏覽器開啟的是 <code>BuildMaster_v96</code> 正式網址。本版為<strong>免費計算 App</strong>，開啟後直接進入主工作區，無需登入。對外公開隱私權政策請以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites 版本</a> 為準。<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內隱私權頁</a>。</p>
     </div>
 </div>
 <div id="securityWatermark" class="security-watermark"></div>
@@ -76,7 +62,8 @@
         <div class="header-subtitle">
             <span class="live-badge">正式版 LIVE</span>
             <span class="live-badge">V9.6 放樣整合版</span>
-            <span class="header-meta-chip">圖面觸控優先</span>
+            <span class="header-meta-chip">本版：計算工作區</span>
+            <span class="header-meta-chip" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
             <span id="billingStatusChip" class="header-meta-chip billing-status-chip" hidden></span>
         </div>
     </div>
@@ -1195,7 +1182,7 @@
     <div class="coach-avatar" aria-hidden="true">🐣</div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v960"></script>
+<script src="scripts/bundles/bm-core.js?v=v9604"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
 <script src="scripts/bundles/bm-calc.js?v=v960"></script>
 <script src="scripts/features/app-shell.js?v=v960-first-page-chat"></script>

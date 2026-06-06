@@ -225,6 +225,16 @@
     }
 
     async function initBillingPanel() {
+        if (typeof window !== 'undefined' && window.FREE_PUBLIC_APP_UI) {
+            document.querySelectorAll('.billing-block').forEach((el) => { el.hidden = true; });
+            const chip = document.getElementById('billingStatusChip');
+            if (chip) chip.hidden = true;
+            return;
+        }
+        if (isIosReviewRuntime()) {
+            document.querySelectorAll('.billing-block').forEach((el) => { el.hidden = true; });
+            return;
+        }
         const tiersHost = document.getElementById('billingTiersHost');
         if (tiersHost) {
             const catalog = await fetchCatalog();
