@@ -43,7 +43,7 @@ This build (V9.6 / 9605) is the Construction Master calculation workspace.
 
 - Launch: WebView opens https://gt492145-sudo.github.io/BuildMaster_v96/index.html
 - No login required. Users enter the main workspace immediately.
-- Page 1 = simple calc + local demo group chat (bubble UI); Page 2 = full features + blueprint; Page 3 = advanced; Page 4 = staking mode.
+- Page 1 = simple calc + local demo group chat (bubble UI); Page 2 = full features + blueprint + advanced tools; Page 3 = staking mode.
 - Group chat on Page 1 is a LOCAL demo only (messages stored on device, not a live multi-user server). Default channel: "群組大廳". Sender shows as "訪客" (Guest) without login. Type a message in the quick input and press Enter to test.
 - NOT in this version: native AR/LiDAR at app launch (future update).
 - Free app; no in-app purchase UI.
@@ -56,7 +56,7 @@ Please test on iPad with a clean install. No demo account required.
 ```text
 V9.6 更新：
 • 免登入即可使用計算工作區
-• 第1頁：簡單試算＋本機群組聊天（泡泡對話）；第2頁：圖面全功能；第3頁：進階試算；第4頁：放樣
+• 第1頁：簡單試算＋本機群組聊天（泡泡對話）；第2頁：圖面全功能（含進階試算）；第3頁：放樣
 • 修正 iPad 登入卡住問題
 • 本版為免費計算 App；原生 AR／LiDAR 將於後續版本加入
 ```
@@ -69,9 +69,8 @@ Construction Master 是面向工地與工程現場的計算與試算工具。
 
 本版（V9.6）提供：
 • 第1頁：簡單工程試算與本機群組聊天（泡泡對話，不需登入）
-• 第2頁：圖面量測與完整計算功能
-• 第3頁：進階試算與 IBM 相關工具
-• 第4頁：BIM 放樣與 QA 工作區
+• 第2頁：圖面量測、完整計算與進階試算（含 IBM 相關工具）
+• 第3頁：BIM 放樣與 QA 工作區
 
 第1頁聊天為裝置本機示範，非雲端即時多人聊天室。
 
@@ -85,7 +84,7 @@ Construction Master 是面向工地與工程現場的計算與試算工具。
 
 ## 行銷宣傳文字（Promotional Text · 170 字內）
 
-Construction Master V9.6：工程計算與試算工作區。第1頁簡單+本機聊天、第2頁全功能量圖、第3頁進階、第4頁放樣。免費免登入；原生 AR／LiDAR 後續更新。
+Construction Master V9.6：工程計算與試算工作區。第1頁簡單+本機聊天、第2頁全功能量圖（含進階）、第3頁放樣。免費免登入；原生 AR／LiDAR 後續更新。
 
 ---
 
@@ -99,7 +98,7 @@ Thank you for the feedback on build 9.6.
 We fixed the iPad login issue and clarified scope:
 
 1. Login: the app no longer requires a password on launch. Users enter the main workspace immediately via WebView.
-2. Pages: Page 1 simple calc + local demo group chat (bubble UI); Page 2 full features; Page 3 advanced; Page 4 staking. Native AR/LiDAR is not enabled in this version.
+2. Pages: Page 1 simple calc + local demo group chat (bubble UI); Page 2 full features (including advanced tools); Page 3 staking mode. Native AR/LiDAR is not enabled in this version.
 3. Group chat: local device demo only (not a live server chat). No account needed. On Page 1, type a message and press Enter — messages appear as chat bubbles under "群組大廳".
 4. Payments: free build with no in-app purchase UI.
 
@@ -133,11 +132,11 @@ Thank you.
 | # | 步骤 | 预期结果 | 通过 |
 |---|------|----------|------|
 | 1 | 全新安装后打开 App | 直接进入工作区，**不出现**密码锁屏卡住 | ☐ |
-| 2 | 确认顶部有「第1页／第2页／第3页」 | 可切换，页面内容随页变化 | ☐ |
+| 2 | 确认顶部有「第1页／第2页」 | 可切换，页面内容随页变化 | ☐ |
 | 3 | 第1页 → 聊天快速输入框输入「测试」按 Enter | 出现绿色右側泡泡，身份为「访客」 | ☐ |
 | 4 | 点「开启会员聊天群组」 | 面板打开，显示「目前身份：访客」 | ☐ |
 | 5 | 切换到第2页 | 出现图面／全功能区域 | ☐ |
-| 6 | 切换到「放样模式」 | 进入放样工作区（第4页） | ☐ |
+| 6 | 切换到「放样模式」 | 进入放样工作区 | ☐ |
 | 7 | 全程无需输入账号密码 | 无卡住、无 404 主页 | ☐ |
 
 测完后在 Connect 选 build **9605**，取消「需要登入」，贴上方的英文审查备注。
@@ -146,7 +145,7 @@ Thank you.
 
 ## 送审前 Checklist
 
-- [x] GitHub Pages 已 push（免登入、三页、泡泡聊天、访客身份）
+- [x] GitHub Pages 已 push（免登入、两页计算+放样、泡泡聊天、访客身份）
 - [ ] Google Sites 隐私页已手动贴上「本机聊天」段落
 - [ ] iPad 清安装实测 7 项全部打勾
 - [ ] Xcode Archive 来自 **Documents/LiDARRangefinder**，Build **9605**

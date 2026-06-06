@@ -32,7 +32,7 @@
 
     function normalizeCalcSubPage(page) {
         const n = Number(page);
-        if (n === 2 || n === 3) return n;
+        if (n >= 2) return 2;
         return 1;
     }
 
@@ -57,15 +57,12 @@
     }
 
     function getCalcAdvancedAnchor() {
-        return document.querySelector('.calc-subpage-block-3 .group-title')
+        return document.getElementById('calcMeasureCluster')
             || document.getElementById(CALC_ADVANCED_ID);
     }
 
     function getCalcScrollTarget(subPage) {
         const page = normalizeCalcSubPage(subPage != null ? subPage : readStoredCalcSubPage());
-        if (page === 3) {
-            return getCalcAdvancedAnchor() || getCalcSection();
-        }
         if (page === 2) {
             return document.querySelector('.drawing-panel') || getCalcSection();
         }
@@ -73,7 +70,7 @@
     }
 
     function updateCalcSubPageButtons(activePage) {
-        [1, 2, 3].forEach((page) => {
+        [1, 2].forEach((page) => {
             const btn = document.getElementById(`calcPage${page}Btn`);
             if (!btn) return;
             btn.classList.toggle('active', page === activePage);

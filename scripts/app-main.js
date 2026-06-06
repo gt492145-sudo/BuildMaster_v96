@@ -50,7 +50,6 @@
         bindTapAction(document.getElementById('workStakeBtn'), () => setWorkMode('stake'));
         bindTapAction(document.getElementById('calcPage1Btn'), () => setCalcSubPage(1));
         bindTapAction(document.getElementById('calcPage2Btn'), () => setCalcSubPage(2));
-        bindTapAction(document.getElementById('calcPage3Btn'), () => setCalcSubPage(3));
         bindTapAction(document.getElementById('coachToggle'), () => toggleCoachMode());
         bindTapAction(document.getElementById('aiCoachToggle'), () => toggleAiCoachMode());
         bindTapAction(document.getElementById('btnWarRoom'), () => toggleWarRoom());
