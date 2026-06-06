@@ -7,24 +7,27 @@
     body.network-lite { background-image: linear-gradient(rgba(6, 10, 18, 0.3), rgba(6, 10, 18, 0.3)); }
     header { background: linear-gradient(180deg, rgba(10, 16, 30, 0.72), rgba(10, 16, 30, 0.5)); padding: 14px 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(120, 180, 255, 0.22); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28); backdrop-filter: blur(16px) saturate(128%); }
     .logo-img { width: 84px; height: 84px; border-radius: 50%; border: 2px solid var(--highlight); margin-right: 16px; object-fit: cover; box-shadow: 0 0 14px rgba(255, 152, 0, 0.35); flex: 0 0 auto; }
+    .logo-img.logo-blackhole-photo {
+        width: 92px;
+        height: 92px;
+        border-radius: 22%;
+        border: 2px solid rgba(158, 234, 255, 0.82);
+        box-shadow:
+            0 0 0 1px rgba(195, 244, 255, 0.18),
+            inset 0 12px 18px rgba(214, 243, 255, 0.12),
+            inset 0 -18px 24px rgba(4, 10, 24, 0.46),
+            0 0 18px rgba(90, 214, 255, 0.34),
+            0 0 30px rgba(255, 152, 0, 0.18);
+    }
     .logo-blackhole-photo {
         position: relative;
         overflow: hidden;
         isolation: isolate;
         background-color: #040b14;
-        background-image: url('../logo-app.png?v=v960logo');
+        background-image: url('../logo-app.png?v=v960logo2');
         background-repeat: no-repeat;
-        background-size: auto 110%;
-        background-position: center 47%;
-        border-color: rgba(158, 234, 255, 0.82);
-        box-shadow:
-            0 0 0 1px rgba(195, 244, 255, 0.18),
-            inset 0 12px 18px rgba(214, 243, 255, 0.12),
-            inset 0 -18px 24px rgba(4, 10, 24, 0.46),
-            inset 10px 0 16px rgba(10, 18, 34, 0.18),
-            inset -10px 0 16px rgba(10, 18, 34, 0.18),
-            0 0 18px rgba(90, 214, 255, 0.34),
-            0 0 30px rgba(255, 152, 0, 0.18);
+        background-size: cover;
+        background-position: center center;
         filter: saturate(1.16) brightness(1.08) contrast(1.14);
     }
     .blackhole-accretion-cloud,
@@ -37,7 +40,7 @@
         position: absolute;
         pointer-events: none;
         inset: 0;
-        border-radius: 50%;
+        border-radius: 22%;
     }
     .logo-blackhole-photo::before {
         background:
