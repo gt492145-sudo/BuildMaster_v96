@@ -49,8 +49,16 @@
         .touch-coach { right: 10px; top: 74px; gap: 8px; }
         .coach-avatar { width: 50px; height: 50px; font-size: 26px; }
         .coach-bubble { max-width: 220px; font-size: 0.8em; padding: 9px 10px; }
-        .logo-img { width: 62px; height: 62px; margin-right: 10px; }
-        .logo-blackhole-photo { background-size: auto 114%; background-position: center 48%; }
+        .logo-img { width: 72px; height: 72px; margin-right: 10px; }
+        .logo-img.logo-blackhole-photo {
+            width: 72px;
+            height: 72px;
+            border-radius: 22%;
+        }
+        .logo-blackhole-photo {
+            background-size: cover;
+            background-position: center center;
+        }
         .header-title { font-size: 1.05em; letter-spacing: 0.5px; }
         .header-subtitle { gap: 6px; }
         .header-meta-chip { font-size: 0.64em; }
