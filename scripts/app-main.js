@@ -43,9 +43,6 @@
         };
 
     function bindPrimaryHeaderActions() {
-        bindTapAction(document.getElementById('levelBasicBtn'), () => setUserLevel('1'));
-        bindTapAction(document.getElementById('levelStandardBtn'), () => setUserLevel('2'));
-        bindTapAction(document.getElementById('levelProBtn'), () => setUserLevel('3'));
         bindTapAction(document.getElementById('workCalcBtn'), () => setWorkMode('calc'));
         bindTapAction(document.getElementById('workStakeBtn'), () => setWorkMode('stake'));
         bindTapAction(document.getElementById('calcPage1Btn'), () => setCalcSubPage(1));
