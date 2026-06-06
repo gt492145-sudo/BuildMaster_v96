@@ -1663,6 +1663,7 @@
 
     function applyUserLevel() {
         if (FREE_PUBLIC_APP_UI) {
+            document.body.setAttribute('data-free-public', '1');
             document.body.setAttribute('data-user-level', 'pro');
             safeStorage.set(localStorage, USER_LEVEL_KEY, 'pro');
             [['levelBasicBtn', false], ['levelStandardBtn', false], ['levelProBtn', true]].forEach(([id, active]) => {

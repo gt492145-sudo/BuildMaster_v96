@@ -1,9 +1,14 @@
-    body[data-user-level="basic"] .level-hide-basic { display: none !important; }
-    body[data-user-level="basic"] .level-only-standard { display: none !important; }
-    body[data-user-level="basic"] .level-only-pro { display: none !important; }
-    /* 图面区改由 app-layout.css 依 calc-page 控制；勿在此对 basic 全局隐藏 drawing-panel */
-    body[data-user-level="basic"] .first-page-pro-tools { display: none !important; }
-    body[data-user-level="basic"] .calc-panel { flex: 1 1 100%; max-width: none; }
+    /* 免費公開版：會員標籤只在第1頁簡化；第2頁全功能與放樣不受 basic/standard/pro 標籤隱藏 */
+    body[data-free-public="1"][data-work-mode="calc"][data-calc-page="1"] .level-hide-basic,
+    body[data-free-public="1"][data-work-mode="calc"][data-calc-page="1"] .level-only-standard,
+    body[data-free-public="1"][data-work-mode="calc"][data-calc-page="1"] .level-only-pro,
+    body[data-free-public="1"][data-work-mode="calc"][data-calc-page="1"] .first-page-pro-tools { display: none !important; }
+    body[data-free-public="1"][data-work-mode="calc"][data-calc-page="1"] .calc-panel { flex: 1 1 100%; max-width: none; }
+    body:not([data-free-public="1"])[data-user-level="basic"] .level-hide-basic { display: none !important; }
+    body:not([data-free-public="1"])[data-user-level="basic"] .level-only-standard { display: none !important; }
+    body:not([data-free-public="1"])[data-user-level="basic"] .level-only-pro { display: none !important; }
+    body:not([data-free-public="1"])[data-user-level="basic"] .first-page-pro-tools { display: none !important; }
+    body:not([data-free-public="1"])[data-user-level="basic"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-user-level="standard"] .level-only-basic { display: none !important; }
     body[data-user-level="standard"] .level-only-pro { display: none !important; }
     body[data-user-level="pro"] .level-only-basic { display: none !important; }
