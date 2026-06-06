@@ -630,9 +630,21 @@
         localStorage.setItem(MEMBER_CHAT_LOGS_KEY, JSON.stringify(map && typeof map === 'object' ? map : {}));
     }
 
+    function normalizeMemberChatDisplayName(value) {
+        const raw = String(value || '').trim();
+        const account = normalizeMemberAccount(raw);
+        if (!account || account === 'local' || account === 'local-pro') return '訪客';
+        if (raw === 'local' || raw === 'local-pro') return '訪客';
+        return account || raw || '訪客';
+    }
+
     function getCurrentMemberChatIdentity() {
         const account = normalizeMemberAccount(backendSessionState && backendSessionState.account);
-        return account || '訪客';
+        return normalizeMemberChatDisplayName(account);
+    }
+
+    function isCurrentMemberChatSender(sender) {
+        return normalizeMemberChatDisplayName(sender) === getCurrentMemberChatIdentity();
     }
 
     function updateMemberChatIdentity(friendCount = null) {
@@ -705,9 +717,9 @@
             return;
         }
         body.innerHTML = rows.map((row) => {
-            const me = row.sender === getCurrentMemberChatIdentity();
+            const me = isCurrentMemberChatSender(row.sender);
             const rowCls = me ? 'member-chat-row me' : 'member-chat-row other';
-            const sender = escapeHTML(String(row.sender || '訪客'));
+            const sender = escapeHTML(normalizeMemberChatDisplayName(row.sender));
             const time = escapeHTML(String(row.time || ''));
             const text = escapeHTML(String(row.text || ''));
             const senderLine = me

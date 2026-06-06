@@ -646,7 +646,7 @@
                 <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" placeholder="第一頁會員聊天群組：輸入訊息後快速送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
                 <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()">快速送出</button>
             </div>
-            <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息會送到「群組大廳」，也可開啟會員聊天面板管理好友對話。</div>
+            <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息會送到「群組大廳」（本機泡泡對話，不需登入；換裝置不會同步）。也可開啟下方面板管理好友對話。</div>
             <div class="free-war-room-actions">
                 <button type="button" class="tool-btn free-war-room-btn" onclick="toggleMemberChatPanel(true)">開啟會員聊天群組</button>
                 <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()">開啟戰情室</button>
@@ -657,7 +657,7 @@
                 <strong>👥 會員聊天群組</strong>
                 <span id="memberChatStatus" class="member-chat-status">好友 0</span>
             </div>
-            <div id="memberChatIdentity" class="member-chat-identity">目前身份：未登入會員帳號</div>
+            <div id="memberChatIdentity" class="member-chat-identity">目前身份：訪客</div>
             <div class="member-chat-tools">
                 <input type="text" id="memberChatFriendInput" class="security-input member-chat-input" placeholder="輸入好友帳號（例：engineer02）">
                 <button type="button" class="tool-btn member-chat-btn" onclick="addMemberChatFriend()">加入好友</button>
@@ -1194,7 +1194,7 @@
 <script src="scripts/bundles/bm-core.js?v=v9605"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
 <script src="scripts/bundles/bm-calc.js?v=v960"></script>
-<script src="scripts/features/app-shell.js?v=v9605-chat-bubble"></script>
+<script src="scripts/features/app-shell.js?v=v9605-guest"></script>
 <script src="scripts/features/materials-weather.js?v=v960"></script>
 <script src="scripts/features/measurement-logs.js?v=v960"></script>
 <script src="scripts/features/bim-qa.js?v=v960"></script>
