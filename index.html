@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=v960logo">
 <link rel="icon" href="favicon.ico?v=v960logo">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v960">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9605">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v831">
 <link rel="stylesheet" href="styles/app-panels.css?v=v836">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
@@ -75,6 +75,11 @@
     <div class="work-switch">
         <button id="workCalcBtn" class="work-btn active">🧮 計算模式</button>
         <button id="workStakeBtn" class="work-btn">📍 放樣模式</button>
+    </div>
+    <div class="calc-page-switch work-mode-only-calc">
+        <button type="button" id="calcPage1Btn" class="calc-page-btn active" aria-pressed="true">第1頁 簡單+聊天</button>
+        <button type="button" id="calcPage2Btn" class="calc-page-btn" aria-pressed="false">第2頁 全功能</button>
+        <button type="button" id="calcPage3Btn" class="calc-page-btn" aria-pressed="false">第3頁 進階</button>
     </div>
     <div class="header-actions">
         <button id="coachToggle" class="mode-btn">解說員: 開</button>
@@ -203,8 +208,9 @@
 </div>
 
 <div class="main-layout">
-    <div class="drawing-panel">
+    <div class="drawing-panel calc-subpage-block calc-subpage-block-2 calc-subpage-block-3">
         <div class="tool-bar">
+            <div class="group-title calc-subpage-block calc-subpage-block-2" style="flex:1 1 100%; margin:0 0 4px; border:0; padding:0;">第2頁｜圖面量測與全功能計算</div>
             <div class="tool-group tool-group--file">
                 <span class="tool-group-label">圖紙</span>
                 <input type="file" id="fileInput" class="mobile-toolbar-core toolbar-file-input" accept="image/*" onchange="loadImg(event)">
@@ -288,7 +294,7 @@
     </div>
 
     <div class="calc-panel">
-        <section class="level-only-pro first-page-pro-tools">
+        <section class="level-only-pro first-page-pro-tools calc-subpage-block calc-subpage-block-2">
         <div class="group-title">即時功能總控</div>
         <div class="control-grid">
             <button id="btnDemoMode" class="tool-btn" onclick="toggleDemoMode()">Demo模式: 開</button>
@@ -311,7 +317,7 @@
         </div>
         </section>
 
-        <section class="level-only-pro first-page-pro-tools">
+        <section class="level-only-pro first-page-pro-tools calc-subpage-block calc-subpage-block-2">
         <div class="group-title">全域 QA 等級總覽</div>
         <div class="bim-grid">
             <div class="bim-card">BIM QA 等級<strong id="qaLevelBim">-</strong></div>
@@ -630,12 +636,12 @@
 
         <!-- 固定規則：第1~3頁只保留計算內容 -->
         <section id="calcModePage">
-        <div id="freeWarRoomCard" class="free-war-room-card">
+        <div id="freeWarRoomCard" class="free-war-room-card calc-subpage-block calc-subpage-block-1">
             <div class="free-war-room-card-head">
                 <strong>💬 第一頁交流入口（免費）</strong>
                 <span id="freeWarRoomStatus" class="free-war-room-status">戰情室：離線</span>
             </div>
-            <p class="free-war-room-card-note">第一頁只保留一般計算、會員聊天群組與戰情室；高階 AI、圖紙判讀與進階估算請登入會員等級後使用。</p>
+            <p class="free-war-room-card-note">第1頁：簡單試算＋會員聊天群組。圖面量測與完整工程功能請切到第2頁。</p>
             <div class="member-chat-quick-row">
                 <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" placeholder="第一頁會員聊天群組：輸入訊息後快速送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
                 <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()">快速送出</button>
@@ -646,7 +652,7 @@
                 <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()">開啟戰情室</button>
             </div>
         </div>
-        <div id="memberChatPanel" class="member-chat-panel" hidden>
+        <div id="memberChatPanel" class="member-chat-panel calc-subpage-block calc-subpage-block-1" hidden>
             <div class="member-chat-panel-head">
                 <strong>👥 會員聊天群組</strong>
                 <span id="memberChatStatus" class="member-chat-status">好友 0</span>
@@ -666,7 +672,7 @@
                 <button type="button" class="tool-btn member-chat-btn" onclick="sendMemberChatMessage()">送出訊息</button>
             </div>
         </div>
-        <div id="stakeMemberWrap" class="member-wrap level-hide-basic work-mode-only-calc">
+        <div id="stakeMemberWrap" class="member-wrap level-hide-basic work-mode-only-calc calc-subpage-block calc-subpage-block-2">
             <div class="bim-note" style="margin-top:0;">會員管理（後端）：可新增會員帳號、更新密碼。下方勾選<strong>僅管控 IBM Quantum／後端雲端呼叫</strong>（第四頁「⚛️ IBM 雲端放樣」按鈕）；<strong>一般放樣流程不由這裡控制</strong>，依會員等級。（請以具管理權限的帳號登入，例如預設 owner；僅存取碼無法寫入後台。）</div>
             <div class="input-row">
                 <div class="input-wrapper">
@@ -693,15 +699,15 @@
                 </table>
             </div>
         </div>
-        <div class="group-title">
-            第1頁｜一般計算＋會員聊天＋戰情室（免費）
-            <span style="font-size: 0.6em; color: #98c8ff;">免費第一頁只保留一般計算、會員聊天群組與戰情室入口</span>
+        <div class="group-title calc-subpage-block calc-subpage-block-1">
+            第1頁｜簡單計算＋群組聊天
+            <span style="font-size: 0.6em; color: #98c8ff;">聊天、試算與清單；全功能圖面量測請切第2頁</span>
         </div>
-        <button class="tool-btn level-only-standard" style="width: 100%; margin-bottom: 15px; border-color: #e91e63; color: #ffb1c2; font-size: 1.1em; padding: 10px;" onclick="startVoiceAgent()">
+        <button class="tool-btn level-only-standard calc-subpage-block calc-subpage-block-2" style="width: 100%; margin-bottom: 15px; border-color: #e91e63; color: #ffb1c2; font-size: 1.1em; padding: 10px;" onclick="startVoiceAgent()">
             🎙️ 呼叫工地語音助理 (點我說話)
         </button>
-        <div class="group-title">工種規格選擇</div>
-        <div class="input-row">
+        <div class="group-title calc-subpage-block calc-subpage-block-1">工種規格選擇</div>
+        <div class="input-row calc-subpage-block calc-subpage-block-1">
             <div class="input-wrapper">
                 <select id="calcType" onchange="updateUI()">
                     <optgroup label="模板與混凝土">
@@ -728,8 +734,8 @@
             <div class="input-wrapper"><input type="text" id="customName" placeholder="部位名稱 (如: C2柱)"></div>
         </div>
 
-        <div class="group-title level-hide-basic">材料單價查詢（試算表）</div>
-        <div class="input-row level-hide-basic">
+        <div class="group-title level-hide-basic calc-subpage-block calc-subpage-block-2">材料單價查詢（試算表）</div>
+        <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
                 <label>地區資料來源</label>
                 <select id="regionSelect" onchange="handleRegionChange(this.value)">
@@ -748,7 +754,7 @@
                 <button class="tool-btn" style="width:100%;" onclick="autoDetectRegion()">📍 抓目前工地並套用</button>
             </div>
         </div>
-        <div class="input-row level-hide-basic">
+        <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
                 <label>工地即時天氣</label>
                 <div id="siteWeatherInfo" class="bim-note" style="margin-top:4px;">天氣：尚未更新</div>
@@ -762,7 +768,7 @@
                 <div class="bim-note" style="margin-top:4px; color:#9ad4ff;">已啟用自動更新（不會自動跳出權限）</div>
             </div>
         </div>
-        <div class="input-row level-hide-basic">
+        <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
                 <label>搜尋材料關鍵字</label>
                 <input type="text" id="materialSearch" placeholder="例如：模板、混凝土、鋼筋..." oninput="filterMaterialCatalog(this.value)">
@@ -774,40 +780,40 @@
                 </select>
             </div>
         </div>
-        <div class="material-quick-bar level-hide-basic">
+        <div class="material-quick-bar level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div id="materialCountChip" class="material-chip">資料筆數：<strong>0</strong></div>
             <div id="materialPriceChip" class="material-chip">目前單價：<strong>尚未選取</strong></div>
             <div id="materialRegionChip" class="material-chip">地區：<strong>全台共用</strong>（預設）</div>
             <div id="materialSourceChip" class="material-chip">資料來源：<strong>未同步</strong></div>
             <button class="tool-btn" style="margin-left:auto;" onclick="applySelectedMaterialPrice()">📌 套用到單價欄</button>
         </div>
-        <div class="bim-note level-only-basic" style="margin-top:6px; color:#ffd3a3;">
+        <div class="bim-note level-only-basic calc-subpage-block calc-subpage-block-2" style="margin-top:6px; color:#ffd3a3;">
             會員1（基礎）不顯示 3D 深層掃描與價目表模組。
         </div>
 
-        <div class="group-title">
+        <div class="group-title calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             尺寸與預算預覽
-            <button class="tool-btn level-only-standard" style="margin-left:auto; border-color:#00d2d3; color:#00d2d3; font-size: 0.8em;" onclick="connectLaserRuler()">
+            <button class="tool-btn level-only-standard calc-subpage-block calc-subpage-block-2" style="margin-left:auto; border-color:#00d2d3; color:#00d2d3; font-size: 0.8em;" onclick="connectLaserRuler()">
                 🔫 連線雷射尺
             </button>
         </div>
-        <div class="input-row">
+        <div class="input-row calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <div class="input-wrapper"><label id="lbl_v1">長 / 寬A (m)</label><input type="number" id="v1" step="0.01" min="0" oninput="previewCalc()" onblur="normalizeDimensionInputDisplay('v1')"></div>
             <div class="input-wrapper"><label id="lbl_v2">寬 / 寬B (m)</label><input type="number" id="v2" step="0.01" min="0" oninput="previewCalc()" onblur="normalizeDimensionInputDisplay('v2')"></div>
         </div>
-        <div class="input-row">
+        <div class="input-row calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <div class="input-wrapper"><label id="lbl_v3">高 / 深 (m)</label><input type="number" id="v3" step="0.01" min="0" oninput="previewCalc()" onblur="normalizeDimensionInputDisplay('v3')"></div>
             <div class="input-wrapper">
                 <label id="lbl_qty">數量 (N)</label>
                 <div style="display: flex; gap: 5px;">
                     <input type="number" id="qty" value="1" min="0" oninput="previewCalc()" style="flex: 1;">
-                    <button class="tool-btn level-only-pro" style="border-color: #9c27b0; color: #e1bee7; padding: 0 10px; font-weight: bold;" onclick="startEdgeAIVision()">
+                    <button class="tool-btn level-only-pro calc-subpage-block calc-subpage-block-2" style="border-color: #9c27b0; color: #e1bee7; padding: 0 10px; font-weight: bold;" onclick="startEdgeAIVision()">
                         👁️ AI 盤點
                     </button>
                 </div>
             </div>
         </div>
-        <div id="templateFormulaPanel" class="bim-rule-wrap" style="margin-top:10px; display:none;">
+        <div id="templateFormulaPanel" class="bim-rule-wrap calc-subpage-block calc-subpage-block-2" style="margin-top:10px; display:none;">
             <div class="action-cluster-header">
                 <div>
                     <div class="action-cluster-title">模板扣減與補正</div>
@@ -889,13 +895,13 @@
                 </div>
             </div>
         </div>
-        <div class="input-row">
+        <div class="input-row calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
                 <label>AI 盤點類別白名單（逗號分隔，留空=全部）</label>
                 <input type="text" id="aiVisionClassFilter" placeholder="例如: person,cell phone,bottle">
             </div>
         </div>
-        <div class="input-row" style="margin-top: 15px; border: 1px dashed var(--money); padding: 10px; border-radius: 6px;">
+        <div class="input-row calc-subpage-block calc-subpage-block-2" style="margin-top: 15px; border: 1px dashed var(--money); padding: 10px; border-radius: 6px;">
             <div class="input-wrapper">
                 <label id="lbl_extraWaste">額外損耗 (%)</label>
                 <input type="number" id="extraWasteRate" placeholder="混凝土可另外加損耗" min="0" max="40" step="0.1" value="0" oninput="previewCalc()">
@@ -906,7 +912,7 @@
             </div>
         </div>
 
-        <div class="preview-bar">
+        <div class="preview-bar calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <div class="preview-bar-head">
                 <span class="preview-bar-kicker">即時算力</span>
                 <span id="prev_unit" class="preview-unit-chip">單位</span>
@@ -914,7 +920,7 @@
             <div class="preview-bar-main" id="prev_qty">0.00</div>
             <div class="preview-bar-sub" id="prev_cost">$ 0</div>
         </div>
-        <div class="preview-summary-grid">
+        <div class="preview-summary-grid calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <div class="preview-summary-card">
                 <span class="preview-summary-label">基準數量</span>
                 <strong id="prevBaseQtyCard">0.000</strong>
@@ -932,18 +938,20 @@
                 <strong id="prevCostCard">$ 0</strong>
             </div>
         </div>
-        <div class="bim-note" style="margin-top:6px; color:#b9d8ef;">
+        <div class="bim-note calc-subpage-block calc-subpage-block-1 calc-subpage-block-2" style="margin-top:6px; color:#b9d8ef;">
             價格說明：小計 = 計價數量 × 單價。鋼筋以 Kg 計價、模板以 M² 計價、混凝土/土方以 M³ 計價。
         </div>
 
-        <button id="addBtn" class="btn-add" onclick="calculateAndAdd()">🚀 吸入計算清單</button>
+        <button id="addBtn" class="btn-add calc-subpage-block calc-subpage-block-1 calc-subpage-block-2" onclick="calculateAndAdd()">🚀 吸入計算清單</button>
         
-        <table>
+        <table class="calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <thead><tr><th>樓層</th><th>項目</th><th>數量(基準/合計)</th><th>單價</th><th>公式</th><th>金額(基準/合計)</th><th>操作</th></tr></thead>
             <tbody id="listBody"></tbody>
         </table>
 
-        <div id="calcAdvancedPage" class="group-title level-only-pro">計算第三頁｜IBM 自動計算與進階試算（會員3 專用）</div>
+        <div class="calc-subpage-block calc-subpage-block-3">
+        <div class="group-title level-only-pro">第3頁｜進階試算與 IBM 自動計算</div>
+        <div id="calcAdvancedPage" class="group-title level-only-pro" hidden aria-hidden="true">計算第三頁｜IBM 自動計算與進階試算（會員3 專用）</div>
         <div id="calcMeasureCluster" class="action-cluster action-cluster--accent level-only-pro" style="margin-bottom:10px;">
             <div class="action-cluster-header">
                 <div>
@@ -1142,10 +1150,11 @@
             </div>
         </div>
 
-        <div class="btn-group">
+        <div class="btn-group calc-subpage-block calc-subpage-block-3">
             <button class="btn-export" onclick="exportToCSV()">📥 匯出商用報表 (Excel)</button>
             <button class="btn-export level-hide-basic" onclick="exportMeasureQaReport()">🧪 匯出量圖QA報告</button>
             <button class="btn-clear" onclick="clearAll()">🗑️ 重新開始</button>
+        </div>
         </div>
         </section>
     </div>
@@ -1164,7 +1173,7 @@
     <div class="coach-bubble">
         <button class="coach-close" onclick="hideCoach(true)" aria-label="關閉解說員">x</button>
         <div class="coach-title">解說員</div>
-        <div id="coachText">哈囉，現在是新版導覽：第1到3頁做計算，第4頁做放樣；你點到哪一組，我就解說哪一組。</div>
+        <div id="coachText">哈囉，現在是新版導覽：第1頁簡單+聊天、第2頁全功能、第3頁進階試算，第4頁放樣；你點到哪一組，我就解說哪一組。</div>
         <div class="coach-ai-row">
             <input id="coachAiInput" class="coach-ai-input" type="text" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
             <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()">問AI</button>
@@ -1182,7 +1191,7 @@
     <div class="coach-avatar" aria-hidden="true">🐣</div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9604"></script>
+<script src="scripts/bundles/bm-core.js?v=v9605"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
 <script src="scripts/bundles/bm-calc.js?v=v960"></script>
 <script src="scripts/features/app-shell.js?v=v960-first-page-chat"></script>
@@ -1190,6 +1199,6 @@
 <script src="scripts/features/measurement-logs.js?v=v960"></script>
 <script src="scripts/features/bim-qa.js?v=v960"></script>
 <script src="scripts/features/calc-engine.js?v=v960-area-preview"></script>
-<script src="scripts/app-main.js?v=v960-first-page-chat"></script>
+<script src="scripts/app-main.js?v=v9605"></script>
 </body>
 </html>

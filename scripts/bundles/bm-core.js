@@ -28,17 +28,72 @@
 (function initBuildMasterCalcPagesModule() {
     const CALC_SECTION_ID = 'calcModePage';
     const CALC_ADVANCED_ID = 'calcAdvancedPage';
+    const CALC_SUBPAGE_STORAGE_KEY = 'bm_69:calc_subpage';
+
+    function normalizeCalcSubPage(page) {
+        const n = Number(page);
+        if (n === 2 || n === 3) return n;
+        return 1;
+    }
+
+    function readStoredCalcSubPage() {
+        try {
+            return normalizeCalcSubPage(localStorage.getItem(CALC_SUBPAGE_STORAGE_KEY) || '1');
+        } catch (_e) {
+            return 1;
+        }
+    }
+
+    function writeStoredCalcSubPage(page) {
+        const normalized = normalizeCalcSubPage(page);
+        try {
+            localStorage.setItem(CALC_SUBPAGE_STORAGE_KEY, String(normalized));
+        } catch (_e) {}
+        return normalized;
+    }
 
     function getCalcSection() {
         return document.getElementById(CALC_SECTION_ID);
     }
 
     function getCalcAdvancedAnchor() {
-        return document.getElementById(CALC_ADVANCED_ID);
+        return document.querySelector('.calc-subpage-block-3 .group-title')
+            || document.getElementById(CALC_ADVANCED_ID);
     }
 
-    function getCalcScrollTarget() {
-        return getCalcAdvancedAnchor() || getCalcSection();
+    function getCalcScrollTarget(subPage) {
+        const page = normalizeCalcSubPage(subPage != null ? subPage : readStoredCalcSubPage());
+        if (page === 3) {
+            return getCalcAdvancedAnchor() || getCalcSection();
+        }
+        if (page === 2) {
+            return document.querySelector('.drawing-panel') || getCalcSection();
+        }
+        return document.getElementById('freeWarRoomCard') || getCalcSection();
+    }
+
+    function updateCalcSubPageButtons(activePage) {
+        [1, 2, 3].forEach((page) => {
+            const btn = document.getElementById(`calcPage${page}Btn`);
+            if (!btn) return;
+            btn.classList.toggle('active', page === activePage);
+            btn.setAttribute('aria-pressed', page === activePage ? 'true' : 'false');
+        });
+    }
+
+    function applyCalcSubPage(page, options = {}) {
+        const normalized = writeStoredCalcSubPage(page);
+        document.body.setAttribute('data-calc-page', String(normalized));
+        updateCalcSubPageButtons(normalized);
+        if (options.scroll !== false) {
+            const target = getCalcScrollTarget(normalized);
+            if (target && typeof target.scrollIntoView === 'function') {
+                requestAnimationFrame(() => {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+        }
+        return normalized;
     }
 
     window.BuildMasterCalcPagesModule = {
@@ -46,9 +101,13 @@
             calcSection: CALC_SECTION_ID,
             calcAdvanced: CALC_ADVANCED_ID
         },
+        normalizeCalcSubPage,
+        readStoredCalcSubPage,
+        writeStoredCalcSubPage,
         getCalcSection,
         getCalcAdvancedAnchor,
-        getCalcScrollTarget
+        getCalcScrollTarget,
+        applyCalcSubPage
     };
 }());
 
@@ -1444,6 +1503,7 @@
         applyUserLevel();
         ensureWorkModeSectionOrder();
         applyWorkMode();
+        applyCalcSubPage();
         applyAutoContrastMode();
         applyContrastMode();
         applySunlightMode();
@@ -1679,6 +1739,19 @@
             if (stakeBtn) stakeBtn.classList.toggle('active', mode === 'stake');
         }
         document.body.dataset.workMode = mode;
+    }
+
+    function applyCalcSubPage(page, options) {
+        const calcModule = window.BuildMasterCalcPagesModule;
+        if (calcModule && typeof calcModule.applyCalcSubPage === 'function') {
+            return calcModule.applyCalcSubPage(page, options);
+        }
+        document.body.setAttribute('data-calc-page', '1');
+        return 1;
+    }
+
+    function setCalcSubPage(page) {
+        applyCalcSubPage(page, { scroll: true });
     }
 
     function loadFeatureFlags() {
