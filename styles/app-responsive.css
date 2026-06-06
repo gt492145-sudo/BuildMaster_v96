@@ -497,6 +497,7 @@
             backdrop-filter: blur(7px);
         }
         .mobile-test-log.collapsed .mobile-test-log-body { display: none; }
+        .mobile-test-log.collapsed .mobile-test-log-filter-wrap { display: none; }
         .mobile-test-log.collapsed {
             width: auto;
             max-width: calc(100vw - 20px);

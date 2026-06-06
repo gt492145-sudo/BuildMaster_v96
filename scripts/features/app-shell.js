@@ -913,7 +913,50 @@
         const body = document.getElementById('mobileTestLogBody');
         if (!body) return;
         body.innerHTML = '';
+        const filter = document.getElementById('mobileTestLogFilter');
+        if (filter) filter.value = '';
         appendMobileTestLog('已清除測試紀錄');
+    }
+
+    function filterMobileTestLog(keyword) {
+        const body = document.getElementById('mobileTestLogBody');
+        if (!body) return;
+        const query = String(keyword || '').trim().toLowerCase();
+        body.querySelectorAll('.mobile-test-log-item').forEach(row => {
+            const text = (row.textContent || '').toLowerCase();
+            row.hidden = query ? !text.includes(query) : false;
+        });
+    }
+
+    async function copyMobileTestLog() {
+        const body = document.getElementById('mobileTestLogBody');
+        if (!body) return;
+        const lines = Array.from(body.querySelectorAll('.mobile-test-log-item:not([hidden])'))
+            .map(row => (row.textContent || '').trim())
+            .filter(Boolean);
+        if (!lines.length) {
+            showToast('尚無可複製的測試紀錄');
+            return;
+        }
+        const text = lines.join('\n');
+        try {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            showToast('已複製測試紀錄');
+        } catch (_error) {
+            showToast('複製失敗，請手動選取紀錄');
+        }
     }
 
     function showToast(m) {
