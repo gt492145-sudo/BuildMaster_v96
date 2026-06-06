@@ -172,12 +172,24 @@
             } catch (_e) {}
         }
         if (typeof applyWorkMode === 'function') applyWorkMode();
-        if (typeof scrollToWorkModeSection === 'function') scrollToWorkModeSection('calc');
+        if (typeof setCalcSubPage === 'function') {
+            setCalcSubPage(2);
+        } else if (typeof applyCalcSubPage === 'function') {
+            applyCalcSubPage(2, { scroll: false });
+        }
+        const anchor = document.getElementById('calcMeasureCluster') || document.getElementById('calcAdvancedPage');
+        if (anchor && typeof anchor.scrollIntoView === 'function') {
+            requestAnimationFrame(() => {
+                anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        } else if (typeof scrollToWorkModeSection === 'function') {
+            scrollToWorkModeSection('calc');
+        }
     }
 
     function ensureCalcAdvancedPageReady(missingMessage) {
         if (!document.getElementById('advAutoInterpretGate')) {
-            showToast(missingMessage || '第三頁計算區尚未載入');
+            showToast(missingMessage || '第2頁全功能區尚未載入');
             return false;
         }
         focusCalcAdvancedPage();
@@ -1229,7 +1241,7 @@
     }
 
     async function startBackendAutoInterpretLearning() {
-        if (!ensureCalcAdvancedPageReady('第三頁 AI 看圖區尚未載入')) return;
+        if (!ensureCalcAdvancedPageReady('第2頁全功能 AI 看圖區尚未載入')) return;
         if (!(await ensureFeatureAccess('blueprintAutoInterpret', '後台自動學習僅開放會員3（專家）'))) return;
         if (!img.src || !currentBlueprintUploadState || !currentBlueprintUploadState.dataUrl) {
             return showToast('請先上傳手機圖、電腦截圖或正式藍圖，再啟動後台學習');
@@ -3033,7 +3045,7 @@
     }
 
     async function runGuidedPrecisionAutoInterpret() {
-        if (!ensureCalcAdvancedPageReady('第三頁精準辨識區尚未載入')) return;
+        if (!ensureCalcAdvancedPageReady('第2頁全功能精準辨識區尚未載入')) return;
         if (!(await ensureFeatureAccess('guidedPrecisionAuto', '極強精準辨識僅開放會員3（專家）'))) return;
         if (autoInterpretBusy) return showToast('單一運算進行中，請稍候完成');
         if (!img.src) return showToast('請先上傳圖紙再做極強精準辨識');
@@ -3118,8 +3130,8 @@
     }
 
     async function autoInterpretBlueprintAndCalculate() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做看圖自動判讀')) return;
-        if (!ensureCalcAdvancedPageReady('第三頁自動計算區尚未載入')) return;
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做看圖自動判讀')) return;
+        if (!ensureCalcAdvancedPageReady('第2頁全功能自動計算區尚未載入')) return;
         if (!(await ensureFeatureAccess('blueprintAutoInterpret', '看圖自動判讀僅開放會員3（專家）'))) return;
         if (autoInterpretBusy) return showToast('單一運算進行中，請稍候完成');
         if (!img.src) return showToast('請先上傳圖紙再做自動判讀');
@@ -3329,8 +3341,8 @@
     }
 
     async function runAutoBlueprintPlusBIM() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做 IBM 自動計算')) return;
-        if (!ensureCalcAdvancedPageReady('第三頁自動計算區尚未載入')) return;
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做 IBM 自動計算')) return;
+        if (!ensureCalcAdvancedPageReady('第2頁全功能自動計算區尚未載入')) return;
         if (!(await ensureFeatureAccess('autoBlueprintBim', '此功能僅限會員3（專家）'))) {
             return;
         }
@@ -4772,8 +4784,8 @@
     }
 
     async function startSmartCalibration() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做智慧定比例')) return;
-        if (!(await ensureFeatureAccess('smartCalibration', '智慧定比例僅開放會員3（專家）第三頁使用'))) return;
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做智慧定比例')) return;
+        if (!(await ensureFeatureAccess('smartCalibration', '智慧定比例僅開放會員3（專家）第2頁全功能使用'))) return;
         if (is3DView) return showToast('請先關閉 3D 檢視再做智慧定比例');
         if (!img.src) return showToast('請先上傳圖紙再做智慧定比例');
         measureQaStats.calibrationStarts += 1;
@@ -4782,8 +4794,8 @@
     }
 
     async function startSmartMeasure() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做智慧量圖')) return;
-        if (!(await ensureFeatureAccess('smartMeasure', '智慧量圖僅開放會員3（專家）第三頁使用'))) return;
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做智慧量圖')) return;
+        if (!(await ensureFeatureAccess('smartMeasure', '智慧量圖僅開放會員3（專家）第2頁全功能使用'))) return;
         if (is3DView) return showToast('請先關閉 3D 檢視再做智慧量圖');
         if (!img.src) return showToast('請先上傳圖紙再做智慧量圖');
         if (!scalePixelsPerUnit) return showToast('請先設定比例！');
