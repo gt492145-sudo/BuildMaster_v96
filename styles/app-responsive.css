@@ -41,8 +41,24 @@
         .calc-panel { overflow: visible; }
     }
     @media (min-width: 993px) {
-        .main-layout { flex-direction: column !important; overflow: auto; min-height: auto; }
+        header { align-items: center; }
+        .logo-img.logo-blackhole-photo { align-self: center; flex-shrink: 0; }
+        .main-layout { flex-direction: column !important; overflow: auto; min-height: 0; flex: 1 1 auto; }
         .drawing-panel { min-height: 44vh; border-right: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel {
+            min-height: clamp(460px, 58vh, 760px);
+            height: clamp(460px, 58vh, 760px);
+            flex: 0 0 auto;
+        }
+        body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .tool-bar {
+            max-height: 38%;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        body[data-work-mode="calc"][data-calc-page="2"] #canvas-container {
+            flex: 1 1 0;
+            min-height: 280px;
+        }
         .calc-panel { overflow: visible; padding-top: 8px; }
     }
     @media (max-width: 768px) {
@@ -61,8 +77,11 @@
             border-radius: 22%;
         }
         .logo-blackhole-photo {
-            background-size: cover;
-            background-position: center center;
+            padding: 4px;
+        }
+        .logo-blackhole-photo .logo-photo {
+            object-fit: contain;
+            object-position: center center;
         }
         .header-title { font-size: 1.05em; letter-spacing: 0.5px; }
         .header-subtitle { gap: 6px; }

@@ -23,12 +23,22 @@
         position: relative;
         overflow: hidden;
         isolation: isolate;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
         background-color: #040b14;
-        background-image: url('../logo-app.png?v=v960logo2');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center center;
-        filter: saturate(1.16) brightness(1.08) contrast(1.14);
+        filter: saturate(1.08) brightness(1.04) contrast(1.08);
+    }
+    .logo-blackhole-photo .logo-photo {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+        object-position: center center;
+        border-radius: 18%;
     }
     .blackhole-accretion-cloud,
     .blackhole-jet {
@@ -44,22 +54,22 @@
     }
     .logo-blackhole-photo::before {
         background:
-            radial-gradient(circle at 50% 35%, rgba(236, 248, 255, 0.28) 0%, rgba(123, 225, 255, 0.15) 16%, rgba(8, 16, 32, 0) 38%),
-            radial-gradient(circle at 50% 74%, rgba(4, 8, 18, 0) 38%, rgba(4, 8, 18, 0.28) 68%, rgba(3, 6, 16, 0.68) 100%);
+            radial-gradient(circle at 50% 35%, rgba(236, 248, 255, 0.22) 0%, rgba(123, 225, 255, 0.1) 16%, rgba(8, 16, 32, 0) 38%),
+            radial-gradient(circle at 50% 74%, rgba(4, 8, 18, 0) 38%, rgba(4, 8, 18, 0.18) 68%, rgba(3, 6, 16, 0.42) 100%);
         mix-blend-mode: screen;
-        opacity: 0.94;
+        opacity: 0.72;
     }
     .logo-blackhole-photo::after {
         inset: 8%;
         background:
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 30%, rgba(154, 231, 255, 0.16) 48%, rgba(255, 178, 90, 0.18) 58%, rgba(255, 255, 255, 0) 74%),
-            conic-gradient(from 180deg at 50% 52%, rgba(255, 174, 84, 0) 0deg, rgba(255, 190, 96, 0.18) 62deg, rgba(145, 231, 255, 0.16) 148deg, rgba(255, 175, 84, 0.08) 228deg, rgba(255, 190, 96, 0.18) 322deg, rgba(255, 174, 84, 0) 360deg);
-        border: 1px solid rgba(170, 236, 255, 0.18);
+            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 30%, rgba(154, 231, 255, 0.12) 48%, rgba(255, 178, 90, 0.12) 58%, rgba(255, 255, 255, 0) 74%),
+            conic-gradient(from 180deg at 50% 52%, rgba(255, 174, 84, 0) 0deg, rgba(255, 190, 96, 0.12) 62deg, rgba(145, 231, 255, 0.1) 148deg, rgba(255, 175, 84, 0.06) 228deg, rgba(255, 190, 96, 0.12) 322deg, rgba(255, 174, 84, 0) 360deg);
+        border: 1px solid rgba(170, 236, 255, 0.16);
         box-shadow:
-            inset 0 0 20px rgba(95, 214, 255, 0.16),
-            0 0 12px rgba(255, 172, 76, 0.14);
+            inset 0 0 16px rgba(95, 214, 255, 0.12),
+            0 0 10px rgba(255, 172, 76, 0.1);
         mix-blend-mode: screen;
-        opacity: 0.76;
+        opacity: 0.58;
     }
     .header-brand { display: flex; flex-direction: column; gap: 5px; min-width: 240px; }
     .header-kicker { font-size: 0.7em; letter-spacing: 1.8px; text-transform: uppercase; color: #91d7ff; font-weight: 700; }
@@ -109,8 +119,10 @@
     body[data-work-mode="calc"][data-calc-page="1"] .calc-subpage-block-2 { display: none !important; }
     body[data-work-mode="calc"][data-calc-page="1"] .drawing-panel { display: none !important; }
     body[data-work-mode="calc"][data-calc-page="2"] .calc-subpage-block-1 { display: none !important; }
-    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel { display: flex !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel { display: flex !important; flex-direction: column; }
     body[data-work-mode="calc"][data-calc-page="2"] .main-layout { flex-direction: column; }
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .tool-bar { flex: 0 0 auto; }
+    body[data-work-mode="calc"][data-calc-page="2"] #canvas-container { flex: 1 1 auto; min-height: 320px; }
     body[data-work-mode="calc"][data-calc-page="2"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-free-public="1"][data-work-mode="calc"][data-calc-page="2"] .level-hide-basic,
     body[data-free-public="1"][data-work-mode="calc"][data-calc-page="2"] .level-only-standard,

@@ -13,13 +13,13 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=v960logo">
 <link rel="icon" href="favicon.ico?v=v960logo">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v9606">
-<link rel="stylesheet" href="styles/blueprint-core.css?v=v831">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9606-desktop">
+<link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
 <link rel="stylesheet" href="styles/app-panels.css?v=v9606-chat-bubble">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v831">
 <link rel="stylesheet" href="styles/weather-effects.css?v=v831">
-<link rel="stylesheet" href="styles/app-responsive.css?v=v9606">
+<link rel="stylesheet" href="styles/app-responsive.css?v=v9606-desktop">
 </head>
 <body>
 
@@ -55,7 +55,9 @@
 <div id="securityWatermark" class="security-watermark"></div>
 
 <header>
-    <div class="logo-img logo-blackhole-photo" role="img" aria-label="Construction Master logo"></div>
+    <div class="logo-img logo-blackhole-photo" role="img" aria-label="Construction Master logo">
+        <img class="logo-photo" src="logo-app.png?v=v960logo2" alt="" decoding="async">
+    </div>
     <div class="header-brand">
         <div class="header-kicker">Premium Touch Workspace</div>
         <div class="header-title">Construction Master <span class="header-version">V9.6</span></div>
@@ -261,7 +263,11 @@
                 <span id="scale-info" class="toolbar-status-chip toolbar-status-chip--warm mobile-toolbar-core">比例: 未設定</span>
             </div>
         </div>
-        <div id="canvas-container">
+        <div id="canvas-container" data-empty="true" aria-label="尚未上傳圖紙">
+            <div class="canvas-empty-state">
+                <strong>上傳圖紙開始量測</strong>
+                <span>按上方「選擇檔案」載入 JPG／PNG 圖面，再定比例與測量。</span>
+            </div>
             <div class="blueprint-workspace-meta" aria-hidden="true">
                 <span class="blueprint-workspace-chip">Premium Touch</span>
                 <span class="blueprint-workspace-chip blueprint-workspace-chip--muted">單指依狀態滑頁或拖圖</span>
