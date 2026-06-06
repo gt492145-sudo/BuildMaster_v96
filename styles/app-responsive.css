@@ -1,7 +1,7 @@
     body[data-user-level="basic"] .level-hide-basic { display: none !important; }
     body[data-user-level="basic"] .level-only-standard { display: none !important; }
     body[data-user-level="basic"] .level-only-pro { display: none !important; }
-    body[data-user-level="basic"] .drawing-panel { display: none !important; }
+    /* 图面区改由 app-layout.css 依 calc-page 控制；勿在此对 basic 全局隐藏 drawing-panel */
     body[data-user-level="basic"] .first-page-pro-tools { display: none !important; }
     body[data-user-level="basic"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-user-level="standard"] .level-only-basic { display: none !important; }

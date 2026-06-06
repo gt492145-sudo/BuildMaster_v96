@@ -109,6 +109,28 @@
     body[data-work-mode="calc"][data-calc-page="1"] .calc-subpage-block-2 { display: none !important; }
     body[data-work-mode="calc"][data-calc-page="1"] .drawing-panel { display: none !important; }
     body[data-work-mode="calc"][data-calc-page="2"] .calc-subpage-block-1 { display: none !important; }
+    /* 第2頁全功能：不受 basic 會員標籤限制（免費 App 切到第2頁應看到完整工作區） */
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel { display: flex !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .level-hide-basic { display: inline-flex !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .toolbar-status-chip.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] .drawing-panel .toolbar-status-chip.level-hide-basic { display: inline-flex !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] .first-page-pro-tools,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .level-hide-basic,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .level-only-standard,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .group-title.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .bim-note.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .action-cluster.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .bim-rule-wrap.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .precision-review-panel.level-only-pro { display: block !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .input-row.level-hide-basic,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .input-row.level-only-pro,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .material-quick-bar.level-hide-basic,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .bim-actions.level-only-pro { display: flex !important; flex-wrap: wrap; }
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage button.level-only-standard,
+    body[data-work-mode="calc"][data-calc-page="2"] #calcModePage .tool-btn.level-only-pro { display: inline-flex !important; }
+    body[data-work-mode="calc"][data-calc-page="2"] .main-layout { flex-direction: column; }
     body[data-work-mode="calc"][data-calc-page="1"] .main-layout { flex-direction: column; }
     body[data-work-mode="calc"][data-calc-page="1"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-work-mode="stake"] .main-layout { flex-direction: column; }
