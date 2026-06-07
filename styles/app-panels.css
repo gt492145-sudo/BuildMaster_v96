@@ -1,20 +1,20 @@
     }
-    .group-title { color: var(--highlight); font-weight: 800; margin-top: 10px; border-left: 0; padding-left: 0; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.2px; }
+    .group-title { color: var(--highlight-soft, #f0c878); font-weight: 800; margin-top: 12px; border-left: 3px solid rgba(230, 160, 69, 0.55); padding-left: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.2px; }
     .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .input-wrapper { flex: 1; }
-    .input-wrapper label { display: block; font-size: 0.75em; color: var(--text-subtle); margin-bottom: 4px; }
-    .input-wrapper input, .input-wrapper select { width: 100%; padding: 11px 12px; background: rgba(10, 20, 36, 0.7); border: 1px solid rgba(255,255,255,0.16); color: white; border-radius: 10px; box-sizing: border-box; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
-    .input-wrapper input:focus, .input-wrapper select:focus { border-color: rgba(94, 203, 255, 0.5); outline: none; box-shadow: 0 0 0 3px rgba(94, 203, 255, 0.12); }
+    .input-wrapper label { display: block; font-size: 0.75em; color: var(--text-subtle); margin-bottom: 4px; letter-spacing: 0.2px; }
+    .input-wrapper input, .input-wrapper select { width: 100%; padding: 11px 12px; background: rgba(8, 16, 28, 0.62); border: 1px solid var(--line-soft, rgba(148, 188, 220, 0.14)); color: #f2f6fa; border-radius: var(--radius-sm, 10px); box-sizing: border-box; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .input-wrapper input:focus, .input-wrapper select:focus { border-color: rgba(110, 201, 235, 0.45); outline: none; box-shadow: var(--shadow-focus, 0 0 0 3px rgba(110, 201, 235, 0.16)); }
     .material-quick-bar { display: flex; gap: 10px; align-items: center; margin-top: 8px; margin-bottom: 12px; }
-    .material-chip { padding: 7px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: #dce8f7; font-size: 0.8em; }
-    .material-chip strong { color: #ffd08b; }
+    .material-chip { padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line-soft, rgba(148, 188, 220, 0.14)); background: rgba(255,255,255,0.04); color: #d0e0ef; font-size: 0.8em; }
+    .material-chip strong { color: var(--highlight-soft, #f0c878); }
     .material-chip.material-chip-warning { border-color: rgba(255, 132, 132, 0.55); background: rgba(255, 72, 72, 0.14); color: #ffd8d8; }
     .material-chip.material-chip-warning strong { color: #ffe6a7; }
     .bim-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 6px 0 8px; }
     .control-grid { display: grid; grid-template-columns: repeat(6, minmax(96px, 1fr)); gap: 8px; margin: 8px 0; }
     .status-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 6px 11px; font-size: 0.74em; color: #cfe4f8; background: rgba(255,255,255,0.02); box-shadow: none; }
     .bim-card { border: 0; border-radius: 0; padding: 8px 6px; font-size: 0.76em; color: #d9e8f6; background: transparent; box-shadow: none; }
-    .bim-card strong { display: block; font-size: 1.24em; color: #ffd287; margin-top: 6px; letter-spacing: 0.2px; }
+    .bim-card strong { display: block; font-size: 1.24em; color: var(--highlight-soft, #f0c878); margin-top: 6px; letter-spacing: 0.2px; }
     .bim-note { font-size: 0.78em; color: var(--text-subtle); margin-top: 6px; }
     .precision-review-panel {
         margin-top: 8px;
@@ -145,15 +145,15 @@
         align-items: center;
         gap: 10px;
         padding: 6px 12px;
-        border-top: 1px solid rgba(148, 200, 255, 0.32);
-        border-bottom: 1px solid rgba(148, 200, 255, 0.32);
-        background: rgba(8, 16, 30, 0.92);
-        backdrop-filter: blur(7px) saturate(115%);
+        border-top: 1px solid var(--glass-border, rgba(126, 200, 232, 0.16));
+        border-bottom: 1px solid var(--glass-border, rgba(126, 200, 232, 0.16));
+        background: rgba(9, 17, 30, 0.72);
+        backdrop-filter: blur(10px) saturate(115%);
     }
     .global-weather-ticker .ticker-label {
         flex: 0 0 auto;
         font-size: 0.76em;
-        color: #9ad4ff;
+        color: var(--accent, #6ec9eb);
         font-weight: 700;
     }
     .global-weather-ticker .weather-news-marquee {
