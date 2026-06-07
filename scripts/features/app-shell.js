@@ -223,7 +223,33 @@
 
         const message = resolveCoachMessage(target);
         if (message) return speakCoach(message);
-        askAiCoachFromTarget(target);
+        if (aiCoachState.enabled && !aiCoachState.busy) {
+            askAiCoachFromTarget(target);
+            return;
+        }
+        const fallback = getGenericCoachFallback(target);
+        if (fallback) speakCoach(fallback);
+    }
+
+    function getGenericCoachFallback(target) {
+        const el = target.closest('button, [role="button"], a[href], input, select, textarea, label, .tool-btn, .mode-btn, .drawer-item, .calc-page-btn, .member-chat-btn');
+        if (el) {
+            if (el.closest('#touchCoach') || el.closest('#coachGuidePanel')) return '';
+            const label = String(el.innerText || el.value || el.placeholder || el.getAttribute('aria-label') || el.id || '')
+                .trim()
+                .replace(/\s+/g, ' ')
+                .slice(0, 40);
+            if (label) {
+                return `「${label}」：點這裡可執行對應功能。需要逐步帶操作時，可開右上角「新手導覽」。`;
+            }
+        }
+        const titled = target.closest('.group-title, .drawer-header, .input-wrapper, .member-chat-panel, .mobile-drawer');
+        if (titled) {
+            const heading = titled.querySelector('.group-title, .drawer-header') || (titled.classList.contains('group-title') ? titled : null);
+            const title = String((heading && heading.innerText) || titled.getAttribute('aria-label') || '').trim().slice(0, 32);
+            if (title) return `這裡是「${title}」相關區塊，可按附近按鈕操作。`;
+        }
+        return '此區塊可進行操作；若不確定用途，建議先開「新手導覽」逐步了解。';
     }
 
     function resolveCoachMessage(target) {
@@ -306,6 +332,28 @@
         if (target.closest('#coachAiInput')) return '可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按問AI。';
         if (target.closest('#coachAiAskBtn')) return '送出你輸入的問題給 AI 解說員，回覆會顯示在氣泡中。';
         if (target.closest('#coachGuideBtn')) return '點這裡可重跑新手導覽，系統會一步一步帶你操作。';
+        if (target.closest('#contrastToggle')) return '高對比模式：加強文字與按鈕對比，夜間或戶外較好辨識。';
+        if (target.closest('#contrastAutoToggle')) return '自動高對比：傍晚到清晨自動切換，白天恢復一般模式。';
+        if (target.closest('#calcPage1Btn')) return '第1頁：簡單試算＋群組聊天，適合快速估價與留言。';
+        if (target.closest('#calcPage2Btn')) return '第2頁：全功能計算，含材料價目、量圖輔助與進階工具。';
+        if (target.closest('#btnWarRoom') || target.closest('#btnCtrlWarRoom')) return '戰情室：連線後可同步雲端資料列；離線時仍可本機試算。';
+        if (target.closest('#btnCtrlVoice')) return '語音助理總開關：開啟後可在藍圖頁用麥克風口述尺寸自動填欄。';
+        if (target.closest('#btnCtrlAiVision')) return 'AI 盤點總開關：控制 AI 看圖辨識相關按鈕是否顯示。';
+        if (target.closest('#btnCtrlLaser')) return '藍牙雷射尺總開關：關閉後隱藏連線雷射尺相關功能。';
+        if (target.closest('#btnWarRoomRows')) return '控制是否在清單中顯示戰情室雲端資料列。';
+        if (target.closest('button[onclick="startVoiceAgent()"]')) return '工地語音助理：對著手機說尺寸（如長5寬3高2），系統會自動填入欄位。';
+        if (target.closest('#memberChatQuickInput') || target.closest('.member-chat-quick-send')) return '群組大廳：輸入訊息快速送出，本機泡泡對話，不需登入。';
+        if (target.closest('#memberChatPanel') || target.closest('#memberChatMessageList')) return '會員聊天：可加入好友、切換對象並在本機保存對話紀錄。';
+        if (target.closest('#mobileFuncTab') || target.closest('#mobileFuncDrawer')) return '手機功能抽屜：集中 3D、量測、日照等戰術工具。';
+        if (target.closest('#mobileLeftTab') || target.closest('#mobileLeftDrawer')) return '對位抽屜：手動量測與對位微調工具。';
+        if (target.closest('#globalWeatherTicker')) return '工地氣象快報：顯示目前天氣與施工安全提示。';
+        if (target.closest('button[onclick="fitBlueprintToViewport()"]')) return '適配視圖：把圖紙縮放到最適合螢幕的大小。';
+        if (target.closest('button[onclick="removeLoadedImage()"]')) return '移除目前載入的圖紙，可重新上傳。';
+        if (target.closest('button[onclick="connectLaserRuler()"]')) return '連線藍牙雷射尺，量到的距離可直接帶入量測。';
+        if (target.closest('button[onclick="toggle3DView()"]')) return '3D 檢視：把圖面轉成立體視角觀看。';
+        if (target.closest('button[onclick="toggle360Spin()"]')) return '360 翻轉：自動旋轉 3D 視角。';
+        if (target.closest('button[onclick="reset3DView()"]')) return '重設 3D 視角到預設位置。';
+        if (target.closest('button[onclick="startEdgeAIVision()"]')) return 'AI 視覺點料：用相機或圖面自動辨識構件數量。';
         if (target.closest('#calcType')) return '工種公式選擇區：不同工種會套不同計算公式。';
         if (target.closest('#customName')) return '自訂部位名稱：例如 C2柱、外牆A區。';
         if (target.closest('#v1')) return '尺寸欄 v1：通常是長度或規格。';
