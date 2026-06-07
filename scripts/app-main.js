@@ -59,6 +59,7 @@
     exposeInlineActionHandlers();
     bindPrimaryHeaderActions();
     initMobileFuncDrawer();
+    initMemberChatUI();
     applyQaProfile(currentQaProfile, true);
     applyBimSpecPreset(currentBimSpecPreset, true);
     renderAutoInterpretMemoryPanel();

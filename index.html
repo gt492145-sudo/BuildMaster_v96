@@ -16,7 +16,7 @@
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="styles/app-layout.css?v=v9608-pro">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9608-pro">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9608-chatpro">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v831">
@@ -650,9 +650,10 @@
             </div>
             <p class="free-war-room-card-note">第1頁：簡單試算＋會員聊天群組。圖面量測與完整工程功能請切到第2頁。</p>
             <div class="member-chat-quick-row">
-                <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" placeholder="第一頁會員聊天群組：輸入訊息後快速送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
+                <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" placeholder="群組大廳：輸入訊息，Enter 送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
                 <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()">快速送出</button>
             </div>
+            <div id="memberChatQuickPreview" class="member-chat-quick-preview" aria-live="polite" aria-label="群組聊天預覽"></div>
             <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息會送到「群組大廳」（本機泡泡對話，不需登入；換裝置不會同步）。也可開啟下方面板管理好友對話。</div>
             <div class="free-war-room-actions">
                 <button type="button" class="tool-btn free-war-room-btn" onclick="toggleMemberChatPanel(true)">開啟會員聊天群組</button>
@@ -673,7 +674,7 @@
                 </select>
                 <button type="button" id="memberChatToggleBtn" class="tool-btn member-chat-btn member-chat-btn--ghost" onclick="toggleMemberChatPanel()">收合</button>
             </div>
-            <div id="memberChatMessageList" class="member-chat-message-list">尚無對話，先加入好友或從上方快速送出到群組大廳。</div>
+            <div id="memberChatMessageList" class="member-chat-message-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="群組聊天訊息">尚無對話，先加入好友或從上方快速送出到群組大廳。</div>
             <div class="member-chat-compose">
                 <input type="text" id="memberChatMessageInput" class="security-input member-chat-input" placeholder="輸入聊天訊息">
                 <button type="button" class="tool-btn member-chat-btn" onclick="sendMemberChatMessage()">送出訊息</button>

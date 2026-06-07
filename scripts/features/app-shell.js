@@ -627,6 +627,105 @@
     const MEMBER_CHAT_FRIENDS_KEY = 'bm_69:member_chat_friends';
     const MEMBER_CHAT_LOGS_KEY = 'bm_69:member_chat_logs';
     let memberChatActiveFriend = '';
+    let memberChatAnimateLast = false;
+
+    function hashMemberChatHue(name) {
+        const s = String(name || '訪客');
+        let h = 0;
+        for (let i = 0; i < s.length; i += 1) {
+            h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h) % 360;
+    }
+
+    function getMemberChatAvatarStyle(name) {
+        const hue = hashMemberChatHue(name);
+        return `--chat-avatar-bg: linear-gradient(145deg, hsl(${hue} 38% 34%), hsl(${(hue + 24) % 360} 32% 24%));`;
+    }
+
+    function getMemberChatInitials(name) {
+        const n = normalizeMemberChatDisplayName(name);
+        if (n === '訪客') return '客';
+        const cleaned = n.replace(/[_\-.]/g, ' ').trim();
+        const parts = cleaned.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) return (parts[0].slice(0, 1) + parts[1].slice(0, 1)).toUpperCase();
+        if (/[\u4e00-\u9fff]/.test(cleaned)) return cleaned.slice(0, 1);
+        return cleaned.slice(0, 2).toUpperCase();
+    }
+
+    function getMemberChatDayKey(row) {
+        if (row && row.ts) {
+            return new Date(Number(row.ts)).toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        }
+        return new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    }
+
+    function formatMemberChatDayLabel(dayKey) {
+        const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        if (dayKey === today) return '今天';
+        const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        if (dayKey === yesterday) return '昨天';
+        return dayKey;
+    }
+
+    function createMemberChatMessage(sender, text) {
+        const now = new Date();
+        return {
+            sender,
+            text: String(text || '').trim().slice(0, 280),
+            time: now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
+            ts: now.getTime(),
+            status: 'delivered'
+        };
+    }
+
+    function buildMemberChatBubbleMarkup(row, options = {}) {
+        const compact = !!options.compact;
+        const preview = !!options.preview;
+        const animate = !!options.animate;
+        const me = isCurrentMemberChatSender(row.sender);
+        const displayName = normalizeMemberChatDisplayName(row.sender);
+        const sender = escapeHTML(displayName);
+        const time = escapeHTML(String(row.time || ''));
+        const text = escapeHTML(String(row.text || ''));
+        const tick = escapeHTML(row.status === 'delivered' ? '已送達' : '已送出');
+        const rowCls = [
+            me ? 'member-chat-row me' : 'member-chat-row other',
+            compact ? 'is-compact' : '',
+            animate ? 'is-enter' : ''
+        ].filter(Boolean).join(' ');
+        const avatarStyle = getMemberChatAvatarStyle(displayName);
+        const initials = escapeHTML(getMemberChatInitials(displayName));
+
+        if (preview) {
+            return `<div class="member-chat-preview-row${me ? ' me' : ''}"><div class="member-chat-preview-bubble">${text}</div></div>`;
+        }
+
+        const senderLine = (!me && !compact)
+            ? `<div class="member-chat-sender">${sender}</div>`
+            : '';
+        const avatar = `<div class="member-chat-avatar" style="${avatarStyle}" aria-hidden="true">${initials}</div>`;
+
+        return `<div class="${rowCls}">${avatar}<div class="member-chat-bubble-wrap">${senderLine}<div class="member-chat-bubble"><div class="member-chat-text">${text}</div><div class="member-chat-meta"><span class="member-chat-time">${time}</span><span class="member-chat-tick">${tick}</span></div></div></div></div>`;
+    }
+
+    function renderMemberChatQuickPreview() {
+        const preview = document.getElementById('memberChatQuickPreview');
+        if (!preview) return;
+        const friends = loadMemberChatFriends();
+        const channel = friends.includes('群組大廳') ? '群組大廳' : (friends[0] || '');
+        if (!channel) {
+            preview.innerHTML = '';
+            return;
+        }
+        const logs = loadMemberChatLogs();
+        const rows = Array.isArray(logs[channel]) ? logs[channel] : [];
+        if (!rows.length) {
+            preview.innerHTML = '';
+            return;
+        }
+        preview.innerHTML = rows.slice(-3).map((row) => buildMemberChatBubbleMarkup(row, { preview: true })).join('');
+    }
 
     function getMemberChatFriendListElement() {
         return document.getElementById('memberChatFriendList') || document.getElementById('memberChatFriendSelect');
@@ -756,26 +855,35 @@
         if (!body) return;
         if (!memberChatActiveFriend) {
             body.innerHTML = '<div class="member-chat-empty">請先新增好友並選擇對話對象。</div>';
+            renderMemberChatQuickPreview();
             return;
         }
         const logs = loadMemberChatLogs();
         const rows = Array.isArray(logs[memberChatActiveFriend]) ? logs[memberChatActiveFriend] : [];
         if (!rows.length) {
             body.innerHTML = `<div class="member-chat-empty">與 ${escapeHTML(memberChatActiveFriend)} 尚無對話，輸入訊息後送出。</div>`;
+            renderMemberChatQuickPreview();
             return;
         }
-        body.innerHTML = rows.map((row) => {
+        let lastSender = '';
+        let lastDay = '';
+        const parts = [];
+        rows.forEach((row, index) => {
+            const dayKey = getMemberChatDayKey(row);
+            if (dayKey !== lastDay) {
+                parts.push(`<div class="member-chat-day-divider">${escapeHTML(formatMemberChatDayLabel(dayKey))}</div>`);
+                lastDay = dayKey;
+                lastSender = '';
+            }
             const me = isCurrentMemberChatSender(row.sender);
-            const rowCls = me ? 'member-chat-row me' : 'member-chat-row other';
-            const sender = escapeHTML(normalizeMemberChatDisplayName(row.sender));
-            const time = escapeHTML(String(row.time || ''));
-            const text = escapeHTML(String(row.text || ''));
-            const senderLine = me
-                ? ''
-                : `<div class="member-chat-sender">${sender}</div>`;
-            return `<div class="${rowCls}"><div class="member-chat-bubble-wrap">${senderLine}<div class="member-chat-bubble"><div class="member-chat-text">${text}</div><div class="member-chat-time">${time}</div></div></div></div>`;
-        }).join('');
+            const compact = !me && row.sender === lastSender;
+            lastSender = row.sender;
+            const animate = memberChatAnimateLast && index === rows.length - 1;
+            parts.push(buildMemberChatBubbleMarkup(row, { compact, animate }));
+        });
+        body.innerHTML = parts.join('');
         body.scrollTop = body.scrollHeight;
+        renderMemberChatQuickPreview();
     }
 
     function addMemberChatFriend() {
@@ -814,13 +922,14 @@
         const logs = loadMemberChatLogs();
         const friend = memberChatActiveFriend;
         const friendRows = Array.isArray(logs[friend]) ? logs[friend] : [];
-        const now = new Date().toLocaleTimeString('zh-TW', { hour12: false });
         const sender = getCurrentMemberChatIdentity();
-        friendRows.push({ sender, text, time: now });
+        friendRows.push(createMemberChatMessage(sender, text));
         logs[friend] = friendRows.slice(-120);
         saveMemberChatLogs(logs);
         input.value = '';
+        memberChatAnimateLast = true;
         renderMemberChatMessages();
+        memberChatAnimateLast = false;
     }
 
     function quickSendMemberChatMessage() {
@@ -841,9 +950,8 @@
         const logs = loadMemberChatLogs();
         const friend = memberChatActiveFriend;
         const friendRows = Array.isArray(logs[friend]) ? logs[friend] : [];
-        const now = new Date().toLocaleTimeString('zh-TW', { hour12: false });
         const sender = getCurrentMemberChatIdentity();
-        friendRows.push({ sender, text, time: now });
+        friendRows.push(createMemberChatMessage(sender, text));
         logs[friend] = friendRows.slice(-120);
         saveMemberChatLogs(logs);
         quickInput.value = '';
@@ -852,7 +960,9 @@
             panel.hidden = false;
             panel.classList.add('is-open');
         }
+        memberChatAnimateLast = true;
         renderMemberChatFriends();
+        memberChatAnimateLast = false;
         if (quickHint) {
             quickHint.innerText = `已送出到：${friend}（可在下方會員聊天持續對話）`;
         }
@@ -1459,5 +1569,18 @@
         syncMobileBlueprintStatusCard();
         updateOwnerLockButton();
         appendMobileTestLog('手機測試紀錄面板已啟用');
+    }
+
+    function initMemberChatUI() {
+        const friends = loadMemberChatFriends();
+        if (!friends.length) {
+            saveMemberChatFriends(['群組大廳']);
+        }
+        if (!memberChatActiveFriend) {
+            memberChatActiveFriend = loadMemberChatFriends()[0] || '群組大廳';
+        }
+        updateMemberChatIdentity();
+        renderMemberChatFriends();
+        renderMemberChatQuickPreview();
     }
 
