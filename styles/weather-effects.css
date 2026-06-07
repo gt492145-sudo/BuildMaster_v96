@@ -265,7 +265,7 @@
         background-image: none;
     }
     body.weather-scene-good.bg-wallpaper::after {
-        background: linear-gradient(rgba(6, 18, 24, 0.50), rgba(6, 18, 24, 0.54));
+        background: linear-gradient(rgba(6, 18, 24, 0.28), rgba(6, 18, 24, 0.32));
     }
     body.weather-scene-good .main-layout {
         box-shadow: inset 0 0 0 1px rgba(132, 243, 198, 0.22), 0 14px 34px rgba(35, 129, 109, 0.24);
@@ -287,7 +287,7 @@
         background-image: none;
     }
     body.weather-scene-caution.bg-wallpaper::after {
-        background: linear-gradient(rgba(38, 28, 8, 0.52), rgba(38, 28, 8, 0.56));
+        background: linear-gradient(rgba(38, 28, 8, 0.34), rgba(38, 28, 8, 0.38));
     }
     body.weather-scene-caution .main-layout {
         box-shadow: inset 0 0 0 1px rgba(255, 208, 126, 0.24), 0 14px 34px rgba(146, 102, 42, 0.28);
@@ -309,7 +309,7 @@
         background-image: none;
     }
     body.weather-scene-bad.bg-wallpaper::after {
-        background: linear-gradient(rgba(24, 10, 14, 0.58), rgba(24, 10, 14, 0.62));
+        background: linear-gradient(rgba(24, 10, 14, 0.40), rgba(24, 10, 14, 0.44));
     }
     body.weather-scene-bad .main-layout {
         box-shadow: inset 0 0 0 1px rgba(255, 132, 132, 0.26), 0 14px 38px rgba(128, 32, 32, 0.34);
