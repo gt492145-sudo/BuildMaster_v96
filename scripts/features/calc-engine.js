@@ -695,6 +695,42 @@
         });
     }
 
+    function calculateCoreLocally(type, v1, v2, v3, n, up, isDeduct, extraWasteRate, templateExtras) {
+        const verify = verifyCalculationConsistency(type, v1, v2, v3, n, up, templateExtras);
+        if (!verify.ok) throw new Error('計算校核失敗（雙引擎不一致）');
+        const base = verify.main;
+        let baseRes = Number(base.baseRes || 0);
+        let res = Number(base.res || 0);
+        let adjustFactor = Number(base.adjustFactor || 1);
+        let wasteRate = 0;
+        let wasteRes = 0;
+
+        if (isDeduct) {
+            const baseAbs = Math.abs(baseRes);
+            baseRes = -baseAbs;
+            res = -baseAbs;
+            adjustFactor = 1;
+        } else if (base.cat === 'CEMENT') {
+            wasteRate = Math.min(40, Math.max(0, Number(extraWasteRate) || 0));
+            wasteRes = roundCalc(baseRes * (wasteRate / 100));
+            res = roundCalc(baseRes + wasteRes);
+            adjustFactor = baseRes !== 0 ? roundCalc(res / baseRes, 6) : 1;
+        }
+
+        const baseTotalCost = roundCalc(baseRes * up);
+        const totalCost = roundCalc(res * up);
+        return {
+            ...base,
+            baseRes,
+            res,
+            adjustFactor,
+            wasteRate,
+            wasteRes,
+            baseTotalCost,
+            totalCost
+        };
+    }
+
     async function calculateAndAdd() {
         if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再吸入清單')) return;
         const type = document.getElementById('calcType').value;
@@ -717,7 +753,10 @@
         }
 
         let isDeduct = confirm("這筆是要『扣除』的項目嗎？\n(如窗戶開口請點確定，一般計算點取消)");
+        const templateExtras = getTemplateFormulaExtras();
+        const extraWasteRate = getExtraWasteRateForType(type);
         let result;
+        let usedLocalFallback = false;
         try {
             result = await requestServerCoreCalculation({
                 type,
@@ -727,12 +766,18 @@
                 n,
                 up,
                 isDeduct,
-                extraWasteRate: getExtraWasteRateForType(type),
-                templateExtras: getTemplateFormulaExtras()
+                extraWasteRate,
+                templateExtras
             });
         } catch (error) {
-            console.warn('後端核心計算失敗', error);
-            return showToast((error && error.message) || '後端核心計算失敗');
+            console.warn('後端核心計算失敗，改以前端本機計算', error);
+            try {
+                result = calculateCoreLocally(type, v1, v2, v3, n, up, isDeduct, extraWasteRate, templateExtras);
+                usedLocalFallback = true;
+            } catch (localError) {
+                console.warn('本機核心計算失敗', localError);
+                return showToast((localError && localError.message) || (error && error.message) || '核心計算失敗');
+            }
         }
 
         let baseRes = Number(result.baseRes || 0);
@@ -753,7 +798,6 @@
         const baseTotalCost = Number(result.baseTotalCost || (baseRes * up));
         const totalCost = Number(result.totalCost || (res * up));
         const priceUnit = getPriceUnitByType(type);
-        const templateExtras = getTemplateFormulaExtras();
         const calcFormula = buildCalcFormulaText(type, v1, v2, v3, n, templateExtras);
         const formulaHint = getFormulaVariableHint(type, templateExtras);
         const templateSummary = summarizeTemplateBreakdown(type, result.templateBreakdown);
@@ -788,7 +832,9 @@
         });
         
         saveData(); renderTable(); 
-        showToast(isDeduct ? '✂️ 已執行自動扣除' : '🚀 數據已吸入黑洞！');
+        showToast(isDeduct
+            ? '✂️ 已執行自動扣除'
+            : (usedLocalFallback ? '🚀 數據已吸入（本機計算）' : '🚀 數據已吸入黑洞！'));
     }
 
     function getVisibleCostBaseTotal() {

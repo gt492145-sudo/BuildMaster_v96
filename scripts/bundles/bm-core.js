@@ -2224,8 +2224,11 @@
             showToast('自動測試僅限管理者，會員不可使用');
             return;
         }
-        const unlocked = await ensureOwnerUnlocked('自動測試');
-        if (!unlocked) return;
+        const skipOwnerGate = FREE_PUBLIC_APP_UI && (isPublishedTestHost() || isLocalOfflineBypassAllowed());
+        if (!skipOwnerGate) {
+            const unlocked = await ensureOwnerUnlocked('自動測試');
+            if (!unlocked) return;
+        }
         if (window.__bmAutoTestRunning) {
             showToast('自動測試已在執行中');
             return;
@@ -2238,13 +2241,13 @@
                 : String(Date.now()) + '-' + Math.random().toString(36).slice(2)
         };
         const script = document.createElement('script');
-        script.src = '/bm-auto-test.js?v=' + Date.now();
+        script.src = resolveAppAssetUrl('bm-auto-test.js') + '?v=' + Date.now();
         script.async = true;
         script.onerror = function() {
-            showToast('無法載入 bm-auto-test.js，請確認伺服器已部署此檔');
+            showToast('無法載入 bm-auto-test.js，請確認已部署此檔與 test-blueprint 圖片');
         };
         document.body.appendChild(script);
-        showToast('已載入自動測試腳本');
+        showToast('已載入藍圖自動測試（15 張）');
     }
 
     function toggleWarRoomRows() {
@@ -2358,16 +2361,27 @@
         updateMonkeyControlsVisibility();
     }
 
+    function resolveAppAssetUrl(relativePath) {
+        const rel = String(relativePath || '').replace(/^\//, '');
+        try {
+            return new URL(rel, window.location.href).href;
+        } catch (_e) {
+            return rel;
+        }
+    }
+
     function applyHiddenDevTestUi() {
         if (!HIDE_MONKEY_AND_DESTRUCTIVE_UI) return;
         stopChaosMonkey(true);
         stopDestructiveTest(true);
-        ['mobileMonkeyBtn', 'mobileAutoTestBtn', 'mobileOwnerLockBtn', 'btnChaosMonkey', 'btnDestructiveTest'].forEach(id => {
+        ['mobileMonkeyBtn', 'mobileOwnerLockBtn', 'btnChaosMonkey', 'btnDestructiveTest'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
         const ownerPass = document.querySelector('[data-mobile-action="owner-pass-change"]');
         if (ownerPass) ownerPass.style.display = 'none';
+        const mobileAutoTestBtn = document.getElementById('mobileAutoTestBtn');
+        if (mobileAutoTestBtn) mobileAutoTestBtn.style.display = '';
     }
 
     function updateMonkeyControlsVisibility() {

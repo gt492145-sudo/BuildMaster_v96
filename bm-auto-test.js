@@ -38,8 +38,16 @@
     }
     window.__bmAutoTestRunning = true;
 
+    function assetUrl(name) {
+        try {
+            return new URL(String(name || '').replace(/^\//, ''), window.location.href).href;
+        } catch (_e) {
+            return String(name || '');
+        }
+    }
+
     const IMAGES = [];
-    for (let i = 1; i <= 15; i += 1) IMAGES.push('/test-blueprint-' + i + '.png');
+    for (let i = 1; i <= 15; i += 1) IMAGES.push(assetUrl('test-blueprint-' + i + '.png'));
 
     const TARGET = 95;
     const MAX_ROUNDS = 8;

@@ -1802,15 +1802,17 @@
 
         let imported = 0;
         for (const row of bimEstimateRows) {
-            if (!row.price || row.qty <= 0) continue;
+            const qty = Number(row.effectiveQty ?? row.qty) || 0;
+            if (!row.price || qty <= 0) continue;
             list.push({
                 floor: escapeHTML(floor),
                 name: escapeHTML(`BIM-${formatIfcTypeDisplay(row.ifcType)} [${row.materialName}] [BIM-AUTO]`),
-                res: row.qty,
+                res: qty,
                 up: row.price,
                 totalCost: row.subtotal,
                 cat: inferCategoryFromName(row.materialName),
-                unit: row.unit
+                unit: row.priceUnit || row.unit,
+                sourceQty: row.qty
             });
             imported += 1;
         }
@@ -1841,15 +1843,17 @@
         const floor = document.getElementById('floor_tag').value.trim() || 'BIM';
         let imported = 0;
         for (const row of bimEstimateRows) {
-            if (!row.price || row.qty <= 0) continue;
+            const qty = Number(row.effectiveQty ?? row.qty) || 0;
+            if (!row.price || qty <= 0) continue;
             list.push({
                 floor: escapeHTML(floor),
                 name: escapeHTML(`BIM-${formatIfcTypeDisplay(row.ifcType)} [${row.materialName}]`),
-                res: row.qty,
+                res: qty,
                 up: row.price,
                 totalCost: row.subtotal,
                 cat: inferCategoryFromName(row.materialName),
-                unit: row.unit
+                unit: row.priceUnit || row.unit,
+                sourceQty: row.qty
             });
             imported += 1;
         }
