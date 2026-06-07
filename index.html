@@ -146,10 +146,10 @@
             <span>🗑️ 移除圖紙</span>
         </div>
 
-        <div class="drawer-item" id="mobileOwnerLockBtn" data-mobile-action="owner-lock">
+        <div class="drawer-item" id="mobileOwnerLockBtn" data-mobile-action="owner-lock" hidden>
             <span>🐒 猴子權限：未設定</span>
         </div>
-        <div class="drawer-item" data-mobile-action="owner-pass-change">
+        <div class="drawer-item" data-mobile-action="owner-pass-change" hidden>
             <span>🔁 更改猴子密碼</span>
         </div>
 
@@ -165,10 +165,10 @@
             <span>☀️ 戶外高亮：關</span>
         </div>
 
-        <div class="drawer-item" id="mobileMonkeyBtn" data-mobile-action="toggle-chaos" style="display:none;">
+        <div class="drawer-item" id="mobileMonkeyBtn" data-mobile-action="toggle-chaos" hidden>
             <span>🐒 混沌猴子</span>
         </div>
-        <div class="drawer-item" id="mobileAutoTestBtn" data-mobile-action="start-bm-autotest" style="display:none;">
+        <div class="drawer-item" id="mobileAutoTestBtn" data-mobile-action="start-bm-autotest" hidden>
             <span>🤖 藍圖自動測試（15 張）</span>
         </div>
 
@@ -303,8 +303,8 @@
             <button id="btnCtrlLaser" class="tool-btn" onclick="toggleFeatureFlag('laser')">雷射尺: 開</button>
             <button id="btnCtrlWarRoom" class="tool-btn" onclick="toggleFeatureFlag('warRoom')">戰情室: 開</button>
             <button id="btnQaStress" class="tool-btn" style="border-color:#ffd166; color:#ffe4a1;" onclick="toggleQaStressTest()">QA 壓力測試: 關</button>
-            <button id="btnDestructiveTest" class="tool-btn" style="border-color:#e74c3c; color:#ffb3b3;" onclick="toggleDestructiveTest()">無限制破壞測試: 關</button>
-            <button id="btnChaosMonkey" type="button" class="tool-btn" style="border-color:#ff9f43; color:#ffd6aa; display:none;" onclick="toggleChaosMonkey()">🐒 混沌猴子: 關</button>
+            <button id="btnDestructiveTest" class="tool-btn" style="border-color:#e74c3c; color:#ffb3b3; display:none;" hidden onclick="toggleDestructiveTest()">無限制破壞測試: 關</button>
+            <button id="btnChaosMonkey" type="button" class="tool-btn" style="border-color:#ff9f43; color:#ffd6aa; display:none;" hidden onclick="toggleChaosMonkey()">🐒 混沌猴子: 關</button>
             <button class="tool-btn" style="border-color:#ff7675; color:#ffd0ce;" onclick="stopAllRealtimeFeatures()">⛔ 一鍵停止即時功能</button>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">

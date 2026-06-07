@@ -9,6 +9,7 @@
     const API_BASE_URL_KEY = 'bm_69:api_base_url';
     const LOCAL_OFFLINE_DEMO_KEY = 'bm_69:local_offline_demo';
     const FREE_PUBLIC_APP_UI = true;
+    const HIDE_MONKEY_AND_DESTRUCTIVE_UI = true;
     const LOCAL_OFFLINE_BASIC_ENTITLEMENTS = {
         calcCore: true,
         dataSync: false
@@ -1462,16 +1463,25 @@
         }
         const destBtn = document.getElementById('btnDestructiveTest');
         if (destBtn) {
-            destBtn.innerText = `無限制破壞測試: ${destructiveTestMode ? '開' : '關'}`;
-            destBtn.style.borderColor = destructiveTestMode ? '#ff7675' : '#e74c3c';
-            destBtn.style.color = destructiveTestMode ? '#ffd0ce' : '#ffb3b3';
+            if (HIDE_MONKEY_AND_DESTRUCTIVE_UI) {
+                destBtn.style.display = 'none';
+            } else {
+                destBtn.style.display = '';
+                destBtn.innerText = `無限制破壞測試: ${destructiveTestMode ? '開' : '關'}`;
+                destBtn.style.borderColor = destructiveTestMode ? '#ff7675' : '#e74c3c';
+                destBtn.style.color = destructiveTestMode ? '#ffd0ce' : '#ffb3b3';
+            }
         }
         const chaosBtn = document.getElementById('btnChaosMonkey');
         if (chaosBtn) {
-            chaosBtn.innerText = `🐒 混沌猴子: ${chaosMonkeyMode ? '開' : '關'}`;
-            chaosBtn.style.borderColor = chaosMonkeyMode ? '#ff7675' : '#ff9f43';
-            chaosBtn.style.color = chaosMonkeyMode ? '#ffd0ce' : '#ffd6aa';
-            chaosBtn.style.display = isLocalOfflineBypassAllowed() ? '' : 'none';
+            if (HIDE_MONKEY_AND_DESTRUCTIVE_UI) {
+                chaosBtn.style.display = 'none';
+            } else {
+                chaosBtn.innerText = `🐒 混沌猴子: ${chaosMonkeyMode ? '開' : '關'}`;
+                chaosBtn.style.borderColor = chaosMonkeyMode ? '#ff7675' : '#ff9f43';
+                chaosBtn.style.color = chaosMonkeyMode ? '#ffd0ce' : '#ffd6aa';
+                chaosBtn.style.display = isLocalOfflineBypassAllowed() ? '' : 'none';
+            }
         }
         const keepTestLogVisible = !!(chaosMonkeyMode || destructiveTestMode || qaStressMode);
         if (keepTestLogVisible) {
@@ -1722,6 +1732,7 @@
     }
 
     function toggleDestructiveTest() {
+        if (HIDE_MONKEY_AND_DESTRUCTIVE_UI) return;
         if (destructiveTestMode) return stopDestructiveTest(false);
         startDestructiveTest();
     }
@@ -1825,6 +1836,7 @@
     }
 
     async function toggleChaosMonkey() {
+        if (HIDE_MONKEY_AND_DESTRUCTIVE_UI) return;
         const unlocked = await ensureOwnerUnlocked('混沌猴子');
         if (!unlocked) return;
         if (!isLocalOfflineBypassAllowed()) {
@@ -1975,7 +1987,21 @@
         updateMonkeyControlsVisibility();
     }
 
+    function applyHiddenDevTestUi() {
+        if (!HIDE_MONKEY_AND_DESTRUCTIVE_UI) return;
+        stopChaosMonkey(true);
+        stopDestructiveTest(true);
+        ['mobileMonkeyBtn', 'mobileAutoTestBtn', 'mobileOwnerLockBtn', 'btnChaosMonkey', 'btnDestructiveTest'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+        const ownerPass = document.querySelector('[data-mobile-action="owner-pass-change"]');
+        if (ownerPass) ownerPass.style.display = 'none';
+    }
+
     function updateMonkeyControlsVisibility() {
+        applyHiddenDevTestUi();
+        if (HIDE_MONKEY_AND_DESTRUCTIVE_UI) return;
         const mobileMonkeyBtn = document.getElementById('mobileMonkeyBtn');
         const mobileAutoTestBtn = document.getElementById('mobileAutoTestBtn');
         const devLocal = isLocalOfflineBypassAllowed() && !isMemberSession();
