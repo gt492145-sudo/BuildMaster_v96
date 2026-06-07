@@ -1,5 +1,5 @@
     /* ... 保留之前的 CSS 樣式，這裡為了精簡先省略，請沿用 V8.2 的黑洞版 CSS ... */
-    :root { --bg-dark: #0b1220; --bg-elevated: rgba(9, 18, 33, 0.62); --panel-bg: rgba(10, 18, 32, 0.58); --panel-strong: rgba(12, 22, 40, 0.72); --wallpaper-visible: 1; --wallpaper-overlay: 0.20; --panel-front-alpha: 0.58; --text-main: #ecf0f1; --highlight: #ff9800; --accent: #5ecbff; --money: #2ecc71; --line-soft: rgba(255,255,255,0.16); --line-strong: rgba(158, 216, 255, 0.24); --text-subtle: #b8c7d9; --radius-sm: 10px; --radius-md: 16px; --radius-lg: 22px; --shadow-soft: 0 14px 30px rgba(0,0,0,0.22); --shadow-panel: 0 18px 40px rgba(0,0,0,0.3); --shadow-focus: 0 0 0 3px rgba(94, 203, 255, 0.18); }
+    :root { --bg-dark: #0b1220; --bg-elevated: rgba(9, 18, 33, 0.72); --panel-bg: rgba(10, 18, 32, 0.70); --panel-strong: rgba(12, 22, 40, 0.82); --wallpaper-visible: 0.92; --wallpaper-overlay: 0.34; --panel-front-alpha: 0.70; --text-main: #ecf0f1; --highlight: #ff9800; --accent: #5ecbff; --money: #2ecc71; --line-soft: rgba(255,255,255,0.16); --line-strong: rgba(158, 216, 255, 0.24); --text-subtle: #b8c7d9; --radius-sm: 10px; --radius-md: 16px; --radius-lg: 22px; --shadow-soft: 0 14px 30px rgba(0,0,0,0.22); --shadow-panel: 0 18px 40px rgba(0,0,0,0.3); --shadow-focus: 0 0 0 3px rgba(94, 203, 255, 0.18); }
     [hidden] { display: none !important; }
     html { font-size: 110%; width: 100%; overflow-x: hidden; }
     body { font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; width: 100%; max-width: 100%; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100dvh; background-color: var(--bg-dark); background-image: radial-gradient(circle at top, rgba(124, 90, 255, 0.12), transparent 32%), linear-gradient(rgba(6, 10, 18, 0.26), rgba(6, 10, 18, 0.26)); background-size: 100% 100%; background-position: center center; background-repeat: no-repeat; color: var(--text-main); }
@@ -51,7 +51,7 @@
         pointer-events: none;
     }
     body.network-lite { background-image: linear-gradient(rgba(6, 10, 18, 0.3), rgba(6, 10, 18, 0.3)); }
-    header { background: linear-gradient(180deg, rgba(10, 16, 30, 0.62), rgba(10, 16, 30, 0.54)); padding: 14px 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(120, 180, 255, 0.22); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22); backdrop-filter: blur(12px) saturate(125%); }
+    header { background: linear-gradient(180deg, rgba(10, 16, 30, 0.70), rgba(10, 16, 30, 0.62)); padding: 14px 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(120, 180, 255, 0.22); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22); backdrop-filter: blur(12px) saturate(125%); }
     .logo-img { width: 84px; height: 84px; border-radius: 50%; border: 2px solid var(--highlight); margin-right: 16px; object-fit: cover; box-shadow: 0 0 14px rgba(255, 152, 0, 0.35); flex: 0 0 auto; }
     .logo-img.logo-app-brand {
         width: 84px;
@@ -222,7 +222,7 @@
     .mode-btn { border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(16, 29, 48, 0.52); color: #e8f5ff; font-weight: 700; padding: 8px 12px; cursor: pointer; transition: 0.2s; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     .mode-btn:hover { background: rgba(36, 61, 92, 0.72); transform: translateY(-1px); }
     .mode-btn:active { transform: translateY(0); opacity: 0.92; }
-    .main-layout { width: 100%; box-sizing: border-box; display: flex; flex-direction: row; flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; gap: 0; border-radius: 14px; border: 1px solid rgba(158, 210, 255, 0.24); background: linear-gradient(180deg, rgba(16, 26, 42, var(--panel-front-alpha)), rgba(10, 18, 32, 0.52)); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.06); backdrop-filter: blur(10px) saturate(120%); }
+    .main-layout { width: 100%; box-sizing: border-box; display: flex; flex-direction: row; flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; gap: 0; border-radius: 14px; border: 1px solid rgba(158, 210, 255, 0.24); background: linear-gradient(180deg, rgba(16, 26, 42, var(--panel-front-alpha)), rgba(10, 18, 32, 0.64)); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.06); backdrop-filter: blur(11px) saturate(122%); }
     .drawing-panel { flex: 1.35; min-width: 0; min-height: 0; background: transparent; border: 0; display: flex; flex-direction: column; border-radius: 0; backdrop-filter: none; box-shadow: none; overflow: hidden; }
     .calc-panel { flex: 1; min-width: 0; min-height: 0; background: transparent; border: 0; padding: 10px 8px 8px; overflow-y: auto; border-radius: 0; backdrop-filter: none; box-shadow: none; display: flex; flex-direction: column; }
     #calcModePage { order: 30; }
@@ -312,20 +312,20 @@
     .tool-mini { display: inline-flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: 0.76em; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 5px 8px; }
     .tool-mini input[type="range"] { width: 78px; accent-color: var(--highlight); }
 
-    /* 背景圖約 40% 存在感，操作面板約 60%（前面六、後面四） */
+    /* 背景圖約 30% 存在感，操作面板約 70%（前面七、後面三） */
     body.bg-wallpaper .input-wrapper input,
     body.bg-wallpaper .input-wrapper select {
-        background: rgba(10, 20, 36, 0.72);
+        background: rgba(10, 20, 36, 0.78);
     }
     body.bg-wallpaper .tool-bar {
-        background: linear-gradient(180deg, rgba(14, 24, 40, 0.56), rgba(10, 18, 32, 0.48));
+        background: linear-gradient(180deg, rgba(14, 24, 40, 0.68), rgba(10, 18, 32, 0.60));
     }
     body.bg-wallpaper .global-weather-ticker {
-        background: rgba(8, 16, 30, 0.58);
+        background: rgba(8, 16, 30, 0.68);
     }
     body.bg-wallpaper.high-contrast {
-        --wallpaper-overlay: 0.32;
-        --panel-front-alpha: 0.72;
+        --wallpaper-overlay: 0.38;
+        --panel-front-alpha: 0.78;
     }
     body.bg-wallpaper.high-contrast #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(180deg, rgba(4, 8, 14, var(--wallpaper-overlay)), rgba(4, 8, 14, calc(var(--wallpaper-overlay) + 0.08)));
