@@ -306,6 +306,11 @@
         font-size: 0.78em;
         line-height: 1.45;
     }
+    .member-chat-quick-hint a {
+        color: #9dd9ff;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
     .free-war-room-btn,
     .member-chat-btn {
         border-color: rgba(110, 187, 255, 0.74);

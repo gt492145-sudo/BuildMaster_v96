@@ -705,15 +705,18 @@
         lastQaSummary: ''
     };
     const COACH_GUIDE_STEPS = [
-        { selector: '#coachToggle', message: '第 1 步：建議保持「解說員」為開啟。你點畫面上任何按鈕或區塊，我都會用白話說明用途與下一步；進階問題可再開「AI解說」（會員3＋後端設定）。' },
-        { selector: '#workCalcBtn', message: '第 2 步：記住新版固定規則——第 1 到 3 頁是計算模式；先從這裡留在計算頁。' },
-        { selector: '#calcMeasureCluster', message: '第 3 步：在第三頁先做智慧定比例與智慧量圖，讓圖紙尺寸和比例更穩定。' },
-        { selector: '#calcAiVisionCluster', message: '第 4 步：再做 AI 看圖辨識，包含快速判讀、精準辨識與柱樑尺寸標註。' },
-        { selector: '#calcIbmCluster', message: '第 5 步：第三頁只做 IBM 自動計算、估價預覽與匯入清單；放樣本身改在第四頁執行。' },
-        { selector: '.btn-add', message: '第 6 步：確認即時預覽後，把資料吸入計算清單並匯出報表。' },
-        { selector: '#workStakeBtn', message: '第 7 步：需要放樣時，再切到第四頁放樣模式；切換後只會顯示第四頁放樣相關內容。' },
-        { selector: '#stakeExecutionCluster', message: '第 8 步：第四頁先設定柱、牆、梁與高精度，再執行一鍵放樣流程。' },
-        { selector: '#stakeQaCluster', message: '第 9 步：最後做控制點配準、偏差熱圖、穩定度重測與放樣 QA。' }
+        { selector: '#coachToggle', message: '第 1 步：建議保持「解說員」為開啟。點任何區塊都會有白話說明；也會提示群組聊天、試算卡片與公開隱私權對照（Google Sites／privacy.html）。' },
+        { selector: '#workCalcBtn', message: '第 2 步：計算模式對應第 1 到 3 頁。先從這裡進入計算流程。' },
+        { selector: '#calcPage1Btn', message: '第 3 步：第 1 頁＝簡單試算＋本機群組聊天。聊天與試算📊卡片僅存於裝置，非雲端即時多人；與 App 公開隱私權說明一致。' },
+        { selector: '#freeWarRoomCard', message: '第 4 步：可在「群組大廳」打字聊天（泡泡對話）；按「吸入計算清單」後，試算結果會自動變成📊卡片泡泡。資料不上傳伺服器。' },
+        { selector: '#calcPage2Btn', message: '第 5 步：第 2 頁是圖面全功能（量測、進階試算、IBM 工具）。' },
+        { selector: '#calcMeasureCluster', message: '第 6 步：在第 2 頁先做智慧定比例與智慧量圖，讓圖紙尺寸和比例更穩定。' },
+        { selector: '#calcAiVisionCluster', message: '第 7 步：再做 AI 看圖辨識，包含快速判讀、精準辨識與柱樑尺寸標註。' },
+        { selector: '#calcIbmCluster', message: '第 8 步：IBM 自動計算、估價預覽與匯入清單；放樣本身改在第 4 頁（放樣模式）執行。' },
+        { selector: '.btn-add', message: '第 9 步：確認即時預覽後吸入計算清單；同時會自動推送試算📊卡片到群組大廳（本機聊天，非雲端同步）。' },
+        { selector: '#workStakeBtn', message: '第 10 步：需要放樣時，切到放樣模式（第 4 頁）；切換後只顯示放樣相關內容。' },
+        { selector: '#stakeExecutionCluster', message: '第 11 步：放樣頁先設定柱、牆、梁與高精度，再執行一鍵放樣流程。' },
+        { selector: '#stakeQaCluster', message: '第 12 步：最後做控制點配準、偏差熱圖、穩定度重測與放樣 QA。' }
     ];
     let coachTimer = null;
     let coachBound = false;

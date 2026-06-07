@@ -16,7 +16,7 @@
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="styles/app-layout.css?v=v9608-pro">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9608-calcchat">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9608-coach-privacy">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v831">
@@ -654,7 +654,7 @@
                 <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()">快速送出</button>
             </div>
             <div id="memberChatQuickPreview" class="member-chat-quick-preview" aria-live="polite" aria-label="群組聊天預覽"></div>
-            <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息會送到「群組大廳」（本機泡泡對話，不需登入；換裝置不會同步）。也可開啟下方面板管理好友對話。</div>
+            <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息與試算📊卡片存於「群組大廳」本機（不需登入；換裝置不同步）。公開隱私權以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites</a> 為準，<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內摘要</a>。解說員可點區塊查看說明。</div>
             <div class="free-war-room-actions">
                 <button type="button" class="tool-btn free-war-room-btn" onclick="toggleMemberChatPanel(true)">開啟會員聊天群組</button>
                 <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()">開啟戰情室</button>
@@ -1182,7 +1182,7 @@
     <div class="coach-bubble">
         <button class="coach-close" onclick="hideCoach(true)" aria-label="關閉解說員">x</button>
         <div class="coach-title">解說員</div>
-        <div id="coachText">哈囉，現在是新版導覽：第1頁簡單+聊天、第2頁全功能（含進階試算），第3頁放樣；你點到哪一組，我就解說哪一組。</div>
+        <div id="coachText">哈囉，我是解說員：點任何區塊都有說明。第1頁含本機群組聊天與試算📊卡片（僅存裝置）；公開隱私權見 Google Sites 或 privacy 頁。</div>
         <div class="coach-ai-row">
             <input id="coachAiInput" class="coach-ai-input" type="text" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
             <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()">問AI</button>
@@ -1203,7 +1203,7 @@
 <script src="scripts/bundles/bm-core.js?v=v9606"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
 <script src="scripts/bundles/bm-calc.js?v=v960"></script>
-<script src="scripts/features/app-shell.js?v=v9607-coach-fallback"></script>
+<script src="scripts/features/app-shell.js?v=v9608-coach-privacy"></script>
 <script src="scripts/features/materials-weather.js?v=v960"></script>
 <script src="scripts/features/measurement-logs.js?v=v960"></script>
 <script src="scripts/features/bim-qa.js?v=v9607-bim-import"></script>

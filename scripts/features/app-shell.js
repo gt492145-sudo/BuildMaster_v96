@@ -14,7 +14,7 @@
             coachBound = true;
         }
         setTimeout(() => {
-            speakCoach('點任何功能框，我都會即時告訴你用途與下一步。新版固定規則：第1到3頁做計算，第4頁做放樣。');
+            speakCoach('點任何功能框，我都會即時說明用途。第1頁含本機群組聊天與試算📊卡片（資料僅存裝置）；公開隱私權請見 Google Sites 或站內 privacy 頁。');
         }, 550);
     }
 
@@ -322,7 +322,7 @@
         if (target.closest('button[onclick="saveMemberCode()"]')) return '儲存會員密碼（本機），建立或更新會員登入資料。';
         if (target.closest('button[onclick="deleteMemberCodeFromInput()"]')) return '刪除指定會員帳號，刪除後將不能用該帳號登入。';
         if (target.closest('#memberCodeBody')) return '這裡是目前可登入的會員帳號清單（本機儲存）。';
-        if (target.closest('#coachToggle')) return '可在這裡一鍵開關解說員；開啟後點擊任何功能區都會出現說明。';
+        if (target.closest('#coachToggle')) return '可在這裡一鍵開關解說員；開啟後點擊任何功能區都會出現說明，含群組聊天、試算卡片與隱私權對照提示。';
         if (target.closest('#levelBasicBtn')) return '會員1（基礎）：保留最必要功能，適合快速上手。';
         if (target.closest('#levelStandardBtn')) return '會員2（工程）：開啟量圖輔助、QA 報告與部分進階工具。';
         if (target.closest('#levelProBtn')) return '會員3（專家）：顯示完整 BIM/規則/快照等高階模組。';
@@ -331,19 +331,22 @@
         if (target.closest('#aiCoachToggle')) return 'AI 解說員：可在規則解說外補充更彈性的操作建議（需先完成後端代理設定）。';
         if (target.closest('#coachAiInput')) return '可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按問AI。';
         if (target.closest('#coachAiAskBtn')) return '送出你輸入的問題給 AI 解說員，回覆會顯示在氣泡中。';
-        if (target.closest('#coachGuideBtn')) return '點這裡可重跑新手導覽，系統會一步一步帶你操作。';
+        if (target.closest('#coachGuideBtn')) return '點這裡可重跑新手導覽，含第1頁聊天、試算卡片泡泡與隱私權說明。';
         if (target.closest('#contrastToggle')) return '高對比模式：加強文字與按鈕對比，夜間或戶外較好辨識。';
         if (target.closest('#contrastAutoToggle')) return '自動高對比：傍晚到清晨自動切換，白天恢復一般模式。';
-        if (target.closest('#calcPage1Btn')) return '第1頁：簡單試算＋群組聊天，適合快速估價與留言。';
-        if (target.closest('#calcPage2Btn')) return '第2頁：全功能計算，含材料價目、量圖輔助與進階工具。';
+        if (target.closest('#calcPage1Btn')) return '第1頁：簡單試算＋本機群組聊天。聊天與試算📊卡片為裝置本機示範，非雲端即時多人；詳見公開隱私權（Google Sites／privacy.html）。';
+        if (target.closest('#calcPage2Btn')) return '第2頁：圖面量測與完整工程功能（含進階試算、IBM 工具）。';
         if (target.closest('#btnWarRoom') || target.closest('#btnCtrlWarRoom')) return '戰情室：連線後可同步雲端資料列；離線時仍可本機試算。';
         if (target.closest('#btnCtrlVoice')) return '語音助理總開關：開啟後可在藍圖頁用麥克風口述尺寸自動填欄。';
         if (target.closest('#btnCtrlAiVision')) return 'AI 盤點總開關：控制 AI 看圖辨識相關按鈕是否顯示。';
         if (target.closest('#btnCtrlLaser')) return '藍牙雷射尺總開關：關閉後隱藏連線雷射尺相關功能。';
         if (target.closest('#btnWarRoomRows')) return '控制是否在清單中顯示戰情室雲端資料列。';
         if (target.closest('button[onclick="startVoiceAgent()"]')) return '工地語音助理：對著手機說尺寸（如長5寬3高2），系統會自動填入欄位。';
-        if (target.closest('#memberChatQuickInput') || target.closest('.member-chat-quick-send')) return '群組大廳：輸入訊息快速送出，本機泡泡對話，不需登入。';
-        if (target.closest('#memberChatPanel') || target.closest('#memberChatMessageList')) return '會員聊天：可加入好友、切換對象並在本機保存對話紀錄。';
+        if (target.closest('a[href*="buildmaster-privacy"], a[href="privacy.html"]')) return '公開隱私權政策（Google Sites 為準、站內 privacy.html 為摘要）：本機群組聊天與試算卡片僅存於裝置，不上傳雲端；與 App Store 版 Construction Master 一致。';
+        if (target.closest('#freeWarRoomCard')) return '第1頁交流區：群組大廳為本機泡泡對話；按「吸入計算清單」後，試算結果會自動變成📊卡片泡泡。資料僅存本機，換裝置不同步。';
+        if (target.closest('#memberChatQuickPreview')) return '群組聊天預覽：最近訊息與試算卡片會即時顯示；僅本機示範，不會上傳伺服器。';
+        if (target.closest('#memberChatQuickInput') || target.closest('.member-chat-quick-send')) return '群組大廳：輸入文字快速送出（本機泡泡）；試算完成也會自動推送📊卡片到此頻道。';
+        if (target.closest('#memberChatPanel') || target.closest('#memberChatMessageList')) return '會員聊天：可加入好友、切換對象；文字與試算卡片皆存於本機。公開隱私說明見 Google Sites／privacy.html。';
         if (target.closest('#mobileFuncTab') || target.closest('#mobileFuncDrawer')) return '手機功能抽屜：集中 3D、量測、日照等戰術工具。';
         if (target.closest('#mobileLeftTab') || target.closest('#mobileLeftDrawer')) return '對位抽屜：手動量測與對位微調工具。';
         if (target.closest('#globalWeatherTicker')) return '工地氣象快報：顯示目前天氣與施工安全提示。';
@@ -362,8 +365,8 @@
         if (target.closest('#qty')) return '數量欄：同一構件的重複數量。';
         if (target.closest('#unitPrice')) return '單價欄：輸入後會即時計算每筆小計。';
         if (target.closest('.preview-bar')) return '即時預覽區：顯示目前算出的數量與金額。';
-        if (target.closest('#shareCalcChatBtn')) return '將最近一次試算結果以卡片泡泡送到群組大廳。';
-        if (target.closest('.btn-add')) return '主按鈕：把目前資料加入計算清單，並自動同步試算卡片到群組大廳。';
+        if (target.closest('#shareCalcChatBtn')) return '將最近一次試算結果以📊卡片泡泡再送到群組大廳（本機示範，非雲端廣播）。';
+        if (target.closest('.btn-add')) return '主按鈕：把目前資料加入計算清單，並自動同步試算📊卡片到群組大廳（本機聊天，不上傳雲端）。';
 
         if (target.closest('#listBody')) return '明細清單：可檢查每筆數量、單價與金額。';
         if (target.closest('.btn-export')) return '匯出按鈕：下載 Excel/CSV 報表。';
