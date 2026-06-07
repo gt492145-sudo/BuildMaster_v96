@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'buildmaster-v9606-v16';
+const CACHE_VERSION = 'buildmaster-v9606-v17';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const CORE_ASSETS = [
   './styles/app-layout.css',
   './styles/blueprint-core.css',
   './styles/app-panels.css',
+  './styles/app-glass-panels.css',
   './styles/blueprint-effects.css',
   './styles/app-overlays.css',
   './styles/weather-effects.css',

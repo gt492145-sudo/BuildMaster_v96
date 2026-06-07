@@ -1440,6 +1440,7 @@
 
         document.body.classList.toggle('network-lite', isSlowNetwork);
         document.body.classList.toggle('bg-wallpaper', !isSlowNetwork);
+        document.body.classList.toggle('ui-glass-panels', !isSlowNetwork);
     }
 
     function registerServiceWorker() {
