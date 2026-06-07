@@ -16,7 +16,7 @@
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="styles/app-layout.css?v=v9608-pro">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9608-chatpro">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9608-calcchat">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v831">
@@ -951,6 +951,7 @@
         </div>
 
         <button id="addBtn" class="btn-add calc-subpage-block calc-subpage-block-1 calc-subpage-block-2" onclick="calculateAndAdd()">🚀 吸入計算清單</button>
+        <button type="button" id="shareCalcChatBtn" class="tool-btn member-chat-calc-share-btn calc-subpage-block calc-subpage-block-1" onclick="shareLastCalcResultToMemberChat()">📊 分享試算到群組大廳</button>
         
         <table class="calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
             <thead><tr><th>樓層</th><th>項目</th><th>數量(基準/合計)</th><th>單價</th><th>公式</th><th>金額(基準/合計)</th><th>操作</th></tr></thead>

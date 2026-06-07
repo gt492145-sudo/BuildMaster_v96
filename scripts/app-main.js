@@ -18,7 +18,8 @@
             startCoachGuide,
             toggleContrastMode,
             toggleAutoContrastMode,
-            startBmAutoTestFromUi
+            startBmAutoTestFromUi,
+            shareLastCalcResultToMemberChat
         });
     }
 

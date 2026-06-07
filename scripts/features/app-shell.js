@@ -362,7 +362,8 @@
         if (target.closest('#qty')) return '數量欄：同一構件的重複數量。';
         if (target.closest('#unitPrice')) return '單價欄：輸入後會即時計算每筆小計。';
         if (target.closest('.preview-bar')) return '即時預覽區：顯示目前算出的數量與金額。';
-        if (target.closest('.btn-add')) return '主按鈕：把目前資料加入計算清單。';
+        if (target.closest('#shareCalcChatBtn')) return '將最近一次試算結果以卡片泡泡送到群組大廳。';
+        if (target.closest('.btn-add')) return '主按鈕：把目前資料加入計算清單，並自動同步試算卡片到群組大廳。';
 
         if (target.closest('#listBody')) return '明細清單：可檢查每筆數量、單價與金額。';
         if (target.closest('.btn-export')) return '匯出按鈕：下載 Excel/CSV 報表。';
@@ -671,6 +672,7 @@
     function createMemberChatMessage(sender, text) {
         const now = new Date();
         return {
+            type: 'text',
             sender,
             text: String(text || '').trim().slice(0, 280),
             time: now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
@@ -679,7 +681,111 @@
         };
     }
 
+    let lastMemberChatCalcSnapshot = null;
+
+    function ensureMemberChatLobbyChannel() {
+        const friends = loadMemberChatFriends();
+        if (!friends.includes('群組大廳')) {
+            friends.unshift('群組大廳');
+            saveMemberChatFriends(friends);
+        }
+        if (!memberChatActiveFriend || !loadMemberChatFriends().includes(memberChatActiveFriend)) {
+            memberChatActiveFriend = '群組大廳';
+        }
+        return '群組大廳';
+    }
+
+    function createMemberChatCalcCardMessage(payload) {
+        const now = new Date();
+        return {
+            type: 'calc-card',
+            sender: getCurrentMemberChatIdentity(),
+            time: now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
+            ts: now.getTime(),
+            status: 'delivered',
+            card: {
+                title: String(payload.title || '試算結果'),
+                name: String(payload.name || '未命名項目'),
+                floor: String(payload.floor || '未分層'),
+                quantity: String(payload.quantity || '-'),
+                unitPrice: String(payload.unitPrice || '-'),
+                subtotal: String(payload.subtotal || '-'),
+                formula: String(payload.formula || ''),
+                note: String(payload.note || ''),
+                source: String(payload.source || '第1頁 · 試算'),
+                isDeduct: !!payload.isDeduct
+            }
+        };
+    }
+
+    function buildMemberChatCalcCardMarkup(row, options = {}) {
+        const preview = !!options.preview;
+        const animate = !!options.animate;
+        const me = isCurrentMemberChatSender(row.sender);
+        const card = row.card || {};
+        const title = escapeHTML(card.title || '試算結果');
+        const name = escapeHTML(card.name || '未命名項目');
+        const floor = escapeHTML(card.floor || '未分層');
+        const quantity = escapeHTML(card.quantity || '-');
+        const unitPrice = escapeHTML(card.unitPrice || '-');
+        const subtotal = escapeHTML(card.subtotal || '-');
+        const formula = escapeHTML(card.formula || '');
+        const note = escapeHTML(card.note || '');
+        const source = escapeHTML(card.source || '');
+        const time = escapeHTML(String(row.time || ''));
+        const tick = escapeHTML(row.status === 'delivered' ? '已送達' : '已送出');
+        const rowCls = [
+            'member-chat-row',
+            me ? 'me' : 'other',
+            'calc-card-row',
+            card.isDeduct ? 'is-deduct' : '',
+            animate ? 'is-enter' : ''
+        ].filter(Boolean).join(' ');
+
+        if (preview) {
+            return `<div class="member-chat-preview-row${me ? ' me' : ''}"><div class="member-chat-preview-bubble member-chat-preview-calc">📊 ${name} · ${subtotal}</div></div>`;
+        }
+
+        const formulaBlock = formula
+            ? `<div class="member-chat-calc-formula">${formula}</div>`
+            : '';
+        const noteBlock = note
+            ? `<div class="member-chat-calc-note">${note}</div>`
+            : '';
+
+        return `<div class="${rowCls}"><div class="member-chat-bubble-wrap"><div class="member-chat-bubble member-chat-calc-card"><div class="member-chat-calc-kicker">📊 ${title}</div><div class="member-chat-calc-title">${name}</div><dl class="member-chat-calc-grid"><div><dt>樓層</dt><dd>${floor}</dd></div><div><dt>數量</dt><dd>${quantity}</dd></div><div><dt>單價</dt><dd>${unitPrice}</dd></div><div><dt>小計</dt><dd class="member-chat-calc-subtotal">${subtotal}</dd></div></dl>${formulaBlock}${noteBlock}<div class="member-chat-calc-source">${source}</div><div class="member-chat-meta"><span class="member-chat-time">${time}</span><span class="member-chat-tick">${tick}</span></div></div></div></div>`;
+    }
+
+    function pushMemberChatCalcResult(payload, options = {}) {
+        if (!payload || typeof payload !== 'object') return false;
+        const channel = ensureMemberChatLobbyChannel();
+        const logs = loadMemberChatLogs();
+        const rows = Array.isArray(logs[channel]) ? logs[channel] : [];
+        rows.push(createMemberChatCalcCardMessage(payload));
+        logs[channel] = rows.slice(-120);
+        saveMemberChatLogs(logs);
+        lastMemberChatCalcSnapshot = { ...payload };
+        memberChatActiveFriend = channel;
+        memberChatAnimateLast = true;
+        renderMemberChatFriends();
+        memberChatAnimateLast = false;
+        if (!options.silent) {
+            showToast('📊 試算結果已送到群組大廳');
+        }
+        return true;
+    }
+
+    function shareLastCalcResultToMemberChat() {
+        if (!lastMemberChatCalcSnapshot) {
+            return showToast('尚無試算結果，請先按「吸入計算清單」');
+        }
+        pushMemberChatCalcResult(lastMemberChatCalcSnapshot, { silent: false });
+    }
+
     function buildMemberChatBubbleMarkup(row, options = {}) {
+        if (row && row.type === 'calc-card' && row.card) {
+            return buildMemberChatCalcCardMarkup(row, options);
+        }
         const compact = !!options.compact;
         const preview = !!options.preview;
         const animate = !!options.animate;
@@ -866,6 +972,7 @@
             return;
         }
         let lastSender = '';
+        let lastRowType = '';
         let lastDay = '';
         const parts = [];
         rows.forEach((row, index) => {
@@ -874,10 +981,13 @@
                 parts.push(`<div class="member-chat-day-divider">${escapeHTML(formatMemberChatDayLabel(dayKey))}</div>`);
                 lastDay = dayKey;
                 lastSender = '';
+                lastRowType = '';
             }
             const me = isCurrentMemberChatSender(row.sender);
-            const compact = !me && row.sender === lastSender;
+            const rowType = row.type || 'text';
+            const compact = !me && row.sender === lastSender && rowType === 'text' && lastRowType === 'text';
             lastSender = row.sender;
+            lastRowType = rowType;
             const animate = memberChatAnimateLast && index === rows.length - 1;
             parts.push(buildMemberChatBubbleMarkup(row, { compact, animate }));
         });
@@ -1007,7 +1117,9 @@
         switchMemberChatFriend,
         openMemberChatPanel,
         closeMemberChatPanel,
-        toggleMemberChatPanel
+        toggleMemberChatPanel,
+        pushMemberChatCalcResult,
+        shareLastCalcResultToMemberChat
     });
 
     function startMockRemoteDataStream() {

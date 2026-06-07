@@ -594,6 +594,95 @@
         background: rgba(24, 72, 112, 0.72);
         border-color: rgba(126, 200, 232, 0.22);
     }
+    .member-chat-calc-share-btn {
+        width: 100%;
+        margin: 0 0 12px;
+        border-color: rgba(198, 168, 98, 0.42);
+        color: #ffe8c8;
+        background: linear-gradient(135deg, rgba(58, 92, 132, 0.62), rgba(28, 52, 82, 0.52));
+        font-weight: 800;
+    }
+    .member-chat-row.calc-card-row .member-chat-bubble-wrap {
+        max-width: min(92%, 480px);
+    }
+    .member-chat-calc-card {
+        padding: 12px 14px 10px;
+        border-radius: 18px;
+        background: linear-gradient(155deg, rgba(18, 34, 54, 0.92), rgba(10, 20, 36, 0.88));
+        border: 1px solid rgba(126, 200, 232, 0.24);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 24px rgba(78, 180, 230, 0.10);
+    }
+    .member-chat-row.me .member-chat-calc-card {
+        background: linear-gradient(155deg, rgba(24, 58, 92, 0.92), rgba(16, 36, 62, 0.88));
+        border-color: rgba(126, 200, 232, 0.30);
+    }
+    .member-chat-row.calc-card-row.is-deduct .member-chat-calc-card {
+        border-color: rgba(255, 140, 140, 0.32);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22), 0 0 20px rgba(255, 100, 100, 0.08);
+    }
+    .member-chat-calc-kicker {
+        font-size: 0.68em;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--accent, #6ec9eb);
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+    .member-chat-calc-title {
+        color: #f3f8fc;
+        font-size: 0.98em;
+        font-weight: 800;
+        line-height: 1.35;
+        margin-bottom: 10px;
+    }
+    .member-chat-calc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 12px;
+        margin: 0 0 10px;
+    }
+    .member-chat-calc-grid > div {
+        min-width: 0;
+    }
+    .member-chat-calc-grid dt {
+        margin: 0 0 2px;
+        font-size: 0.62em;
+        color: #8fa8c4;
+        letter-spacing: 0.3px;
+    }
+    .member-chat-calc-grid dd {
+        margin: 0;
+        font-size: 0.82em;
+        color: #eef6ff;
+        font-weight: 700;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+    .member-chat-calc-subtotal {
+        color: var(--highlight-soft, #f0c878) !important;
+        font-size: 0.9em !important;
+    }
+    .member-chat-calc-formula,
+    .member-chat-calc-note {
+        font-size: 0.72em;
+        line-height: 1.45;
+        color: #b8cde0;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(126, 200, 232, 0.10);
+        margin-bottom: 8px;
+    }
+    .member-chat-calc-source {
+        font-size: 0.64em;
+        color: #8fa8c4;
+        margin-bottom: 6px;
+    }
+    .member-chat-preview-calc {
+        border-color: rgba(198, 168, 98, 0.28) !important;
+        background: rgba(18, 36, 58, 0.78) !important;
+        font-weight: 700;
+    }
     .security-watermark { position: fixed; right: 10px; bottom: 10px; z-index: 9997; pointer-events: none; opacity: 0.36; font-size: 11px; color: #d5e7ff; background: rgba(8, 16, 28, 0.55); border: 1px dashed rgba(173, 216, 255, 0.3); border-radius: 6px; padding: 5px 8px; letter-spacing: 0.3px; }
     .price-input { border-color: var(--money) !important; color: var(--money) !important; font-weight: bold; }
     .preview-bar { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,0.015); border-radius: 0; border: 0; border-top: 1px solid rgba(94, 203, 255, 0.18); font-size: 0.9em; box-shadow: none; }

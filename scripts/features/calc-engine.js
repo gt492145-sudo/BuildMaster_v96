@@ -835,6 +835,20 @@
         showToast(isDeduct
             ? '✂️ 已執行自動扣除'
             : (usedLocalFallback ? '🚀 數據已吸入（本機計算）' : '🚀 數據已吸入黑洞！'));
+        if (typeof pushMemberChatCalcResult === 'function') {
+            pushMemberChatCalcResult({
+                title: isDeduct ? '扣除項目' : '試算結果',
+                name,
+                floor,
+                quantity: `${Math.abs(res).toFixed(3)} ${priceUnit}`,
+                unitPrice: typeof formatNtd === 'function' ? formatNtd(up) : `NT$ ${Number(up).toLocaleString('zh-TW')}`,
+                subtotal: typeof formatNtd === 'function' ? formatNtd(totalCost) : `NT$ ${Number(totalCost).toLocaleString('zh-TW')}`,
+                formula: calcFormula,
+                note: String(costBreakdown || '').split('｜').join(' · '),
+                source: usedLocalFallback ? '第1頁 · 本機計算' : '第1頁 · 試算',
+                isDeduct: !!isDeduct
+            }, { silent: true });
+        }
     }
 
     function getVisibleCostBaseTotal() {
