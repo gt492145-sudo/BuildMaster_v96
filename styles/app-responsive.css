@@ -42,6 +42,7 @@
     }
     @media (min-width: 993px) {
         header { align-items: center; }
+        .logo-img.logo-app-brand,
         .logo-img.logo-blackhole-photo { align-self: center; flex-shrink: 0; }
         .main-layout { flex-direction: column !important; overflow: auto; min-height: 0; flex: 1 1 auto; }
         .drawing-panel { min-height: 44vh; border-right: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -71,9 +72,15 @@
         .coach-avatar { width: 50px; height: 50px; font-size: 26px; }
         .coach-bubble { max-width: 220px; font-size: 0.8em; padding: 9px 10px; }
         .logo-img { width: 72px; height: 72px; margin-right: 10px; }
+        .logo-img.logo-app-brand,
         .logo-img.logo-blackhole-photo {
             width: 72px;
             height: 72px;
+        }
+        .logo-img.logo-app-brand {
+            border-radius: 18%;
+        }
+        .logo-img.logo-blackhole-photo {
             border-radius: 22%;
         }
         .logo-blackhole-photo {
