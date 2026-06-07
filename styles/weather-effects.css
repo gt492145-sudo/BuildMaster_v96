@@ -264,7 +264,7 @@
     body.weather-scene-good.bg-wallpaper {
         background-image: none;
     }
-    body.weather-scene-good.bg-wallpaper::after {
+    body.weather-scene-good.bg-wallpaper #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(rgba(6, 18, 24, 0.28), rgba(6, 18, 24, 0.32));
     }
     body.weather-scene-good .main-layout {
@@ -286,7 +286,7 @@
     body.weather-scene-caution.bg-wallpaper {
         background-image: none;
     }
-    body.weather-scene-caution.bg-wallpaper::after {
+    body.weather-scene-caution.bg-wallpaper #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(rgba(38, 28, 8, 0.34), rgba(38, 28, 8, 0.38));
     }
     body.weather-scene-caution .main-layout {
@@ -308,7 +308,7 @@
     body.weather-scene-bad.bg-wallpaper {
         background-image: none;
     }
-    body.weather-scene-bad.bg-wallpaper::after {
+    body.weather-scene-bad.bg-wallpaper #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(rgba(24, 10, 14, 0.40), rgba(24, 10, 14, 0.44));
     }
     body.weather-scene-bad .main-layout {

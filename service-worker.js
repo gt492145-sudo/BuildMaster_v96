@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'buildmaster-v9606-v13';
+const CACHE_VERSION = 'buildmaster-v9606-v14';
 const CORE_ASSETS = [
   './',
   './index.html',

@@ -4,29 +4,51 @@
     html { font-size: 110%; width: 100%; overflow-x: hidden; }
     body { font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; width: 100%; max-width: 100%; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100dvh; background-color: var(--bg-dark); background-image: radial-gradient(circle at top, rgba(124, 90, 255, 0.12), transparent 32%), linear-gradient(rgba(6, 10, 18, 0.26), rgba(6, 10, 18, 0.26)); background-size: 100% 100%; background-position: center center; background-repeat: no-repeat; color: var(--text-main); }
     body.bg-wallpaper {
-        background-color: var(--bg-dark);
+        background-color: transparent;
         background-image: none;
-        position: relative;
-        isolation: isolate;
     }
-    body.bg-wallpaper::before {
-        content: '';
+    #wallpaperLayer {
+        display: none;
         position: fixed;
-        inset: 0;
-        z-index: -2;
-        pointer-events: none;
-        background: url('../app-wallpaper.jpg') center center / cover no-repeat;
-        background-attachment: fixed;
-        opacity: var(--wallpaper-visible);
-        filter: saturate(1) brightness(0.96);
-    }
-    body.bg-wallpaper::after {
-        content: '';
-        position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
         z-index: -1;
         pointer-events: none;
+        overflow: hidden;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    body.bg-wallpaper #wallpaperLayer {
+        display: block;
+    }
+    body.network-lite #wallpaperLayer {
+        display: none !important;
+    }
+    #wallpaperLayer .app-wallpaper-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+        object-position: center center;
+        opacity: var(--wallpaper-visible);
+        filter: saturate(1) brightness(0.96);
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+    }
+    #wallpaperLayer .app-wallpaper-shade {
+        position: absolute;
+        inset: 0;
         background: linear-gradient(180deg, rgba(6, 10, 18, var(--wallpaper-overlay)), rgba(8, 14, 24, calc(var(--wallpaper-overlay) + 0.06)));
+        pointer-events: none;
     }
     body.network-lite { background-image: linear-gradient(rgba(6, 10, 18, 0.3), rgba(6, 10, 18, 0.3)); }
     header { background: linear-gradient(180deg, rgba(10, 16, 30, 0.62), rgba(10, 16, 30, 0.54)); padding: 14px 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(120, 180, 255, 0.22); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22); backdrop-filter: blur(12px) saturate(125%); }
@@ -305,6 +327,6 @@
         --wallpaper-overlay: 0.32;
         --panel-front-alpha: 0.72;
     }
-    body.bg-wallpaper.high-contrast::after {
+    body.bg-wallpaper.high-contrast #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(180deg, rgba(4, 8, 14, var(--wallpaper-overlay)), rgba(4, 8, 14, calc(var(--wallpaper-overlay) + 0.08)));
     }
