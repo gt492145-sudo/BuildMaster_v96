@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=v960logo5">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=v960logo5">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v9608-pro">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9609-ios-review">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
 <link rel="stylesheet" href="styles/app-panels.css?v=v9608-coach-privacy">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
@@ -42,21 +42,21 @@
     <div class="weather-fog"></div>
 </div>
 
-<div id="securityLock" class="security-lock">
+<div id="securityLock" class="security-lock" hidden>
     <div class="security-panel">
         <h3>Construction Master V9.6</h3>
         <p id="securityMessage">歡迎使用 Construction Master。本版免登入，可直接進入工作區。</p>
-        <input id="securityMemberInput" class="security-input" type="text" placeholder="帳號（選填）">
-        <input id="securityCodeInput" class="security-input" type="password" placeholder="密碼（選填；僅會員登入時填）">
-        <button class="tool-btn" style="width:100%;">登入並進入</button>
-        <button type="button" id="securitySelfDeleteBtn" class="tool-btn security-self-delete-btn">刪除我的會員帳號</button>
-        <p class="security-onboarding-hint security-self-delete-hint">僅適用<strong>會員帳號</strong>：請先填上方「會員帳號」與「會員密碼」，再按此鈕；將永久刪除該帳號與雲端工作區，無法復原（存取碼登入無此帳號可刪）。</p>
+        <input id="securityMemberInput" class="security-input security-login-only" type="text" placeholder="帳號（選填）">
+        <input id="securityCodeInput" class="security-input security-login-only" type="password" placeholder="密碼（選填；僅會員登入時填）">
+        <button type="button" id="securityEnterBtn" class="tool-btn security-login-only" style="width:100%;">直接進入工作區</button>
+        <button type="button" id="securitySelfDeleteBtn" class="tool-btn security-self-delete-btn security-login-only">刪除我的會員帳號</button>
+        <p class="security-onboarding-hint security-self-delete-hint security-login-only">僅適用<strong>會員帳號</strong>：請先填上方「會員帳號」與「會員密碼」，再按此鈕；將永久刪除該帳號與雲端工作區，無法復原（存取碼登入無此帳號可刪）。</p>
         <div id="securityHint" class="security-hint"></div>
-        <button type="button" id="securityApi8787Btn" class="tool-btn security-api-fix-btn">將 API 指向本機 Node（8787）並重新整理</button>
+        <button type="button" id="securityApi8787Btn" class="tool-btn security-api-fix-btn security-login-only">將 API 指向本機 Node（8787）並重新整理</button>
         <button type="button" id="securityOfflineDemoBtn" class="tool-btn security-offline-demo-btn" hidden>先略過登入，進主流程（本機／不接後端）</button>
         <button type="button" id="securityFullDemoBtn" class="tool-btn security-full-demo-btn" hidden>測試全功能（會員3／不接後端）</button>
-        <p class="security-onboarding-hint">登入後右上方可開「解說員」與「新手導覽」，邊用邊有白話說明。</p>
-        <p class="security-onboarding-hint security-api-url-hint"><strong>若顯示找不到網址／404：</strong>請確認 App 或瀏覽器開啟的是 <code>BuildMaster_v96</code> 正式網址。本版為<strong>免費計算 App</strong>，開啟後直接進入主工作區，無需登入。對外公開隱私權政策請以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites 版本</a> 為準。<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內隱私權頁</a>。</p>
+        <p class="security-onboarding-hint security-login-only">登入後右上方可開「解說員」與「新手導覽」，邊用邊有白話說明。</p>
+        <p class="security-onboarding-hint security-api-url-hint">本版為<strong>免費計算 App</strong>，開啟後直接進入主工作區，無需登入。支援與隱私：<a href="https://sites.google.com/view/buildmaster-privacy" target="_blank" rel="noopener noreferrer">Google Sites 隱私權</a> · <a href="mailto:asd0900101511@icloud.com">asd0900101511@icloud.com</a></p>
     </div>
 </div>
 <div id="securityWatermark" class="security-watermark"></div>
@@ -66,13 +66,14 @@
         <img class="logo-photo" src="logo-app.png?v=v960logo5" alt="" decoding="async">
     </div>
     <div class="header-brand">
-        <div class="header-kicker">Premium Touch Workspace</div>
+        <div class="header-kicker">工程計算工作區</div>
         <div class="header-title">Construction Master <span class="header-version">V9.6</span></div>
         <div class="header-subtitle">
             <span class="live-badge">正式版 LIVE</span>
             <span class="live-badge">V9.6 放樣整合版</span>
             <span class="header-meta-chip">本版：計算工作區</span>
             <span class="header-meta-chip" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
+            <span class="header-meta-chip support-chip" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
             <span id="billingStatusChip" class="header-meta-chip billing-status-chip" hidden></span>
         </div>
     </div>
@@ -960,7 +961,7 @@
 
         <div class="calc-subpage-block calc-subpage-block-2">
         <div class="group-title level-only-pro">進階試算與 IBM 自動計算</div>
-        <div id="calcAdvancedPage" class="group-title level-only-pro" hidden aria-hidden="true">計算第三頁｜IBM 自動計算與進階試算（會員3 專用）</div>
+        <div id="calcAdvancedPage" class="group-title level-only-pro" hidden aria-hidden="true">計算第三頁｜IBM 自動計算與進階試算</div>
         <div id="calcMeasureCluster" class="action-cluster action-cluster--accent level-only-pro" style="margin-bottom:10px;">
             <div class="action-cluster-header">
                 <div>
@@ -1003,7 +1004,7 @@
                 <input type="number" id="advAutoInterpretGate" min="90" max="99" step="1" value="90" oninput="refreshAdvancedEstimate(false); previewCalc();">
             </div>
             <div class="input-wrapper">
-                <label>專業精算模式（會員3）</label>
+                <label>專業精算模式</label>
                 <label class="tool-mini" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
                     <input type="checkbox" id="advProPrecisionMode" checked onchange="refreshAdvancedEstimate(false)">
                     啟用整數分精算（稽核級）
@@ -1031,7 +1032,7 @@
                 <label>上傳後自動計算</label>
                 <label class="tool-mini" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
                     <input type="checkbox" id="blueprintAutoCalcAfterUpload" onchange="syncBlueprintAutoCalcAfterUploadPref()">
-                    圖紙載入完成後自動跑「看圖自動判讀試算」（僅計算模式、會員3）
+                    圖紙載入完成後自動跑「看圖自動判讀試算」（僅計算模式）
                 </label>
                 <div class="bim-note" style="margin-top:6px;">若流程中出現比例或構件類型確認視窗，仍需您手動輸入；關閉此選項則維持手動按鈕。</div>
         </div>
@@ -1200,14 +1201,14 @@
     <div class="coach-avatar" aria-hidden="true">🐣</div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9606"></script>
-<script src="scripts/bundles/bm-blueprint.js?v=v960"></script>
-<script src="scripts/bundles/bm-calc.js?v=v960"></script>
-<script src="scripts/features/app-shell.js?v=v9608-coach-privacy"></script>
-<script src="scripts/features/materials-weather.js?v=v960"></script>
-<script src="scripts/features/measurement-logs.js?v=v960"></script>
-<script src="scripts/features/bim-qa.js?v=v9607-bim-import"></script>
-<script src="scripts/features/calc-engine.js?v=v9607-local-fallback"></script>
-<script src="scripts/app-main.js?v=v9606"></script>
+<script src="scripts/bundles/bm-core.js?v=v9609-ios-review"></script>
+<script src="scripts/bundles/bm-blueprint.js?v=v9609"></script>
+<script src="scripts/bundles/bm-calc.js?v=v9609"></script>
+<script src="scripts/features/app-shell.js?v=v9609-ios-review"></script>
+<script src="scripts/features/materials-weather.js?v=v9609"></script>
+<script src="scripts/features/measurement-logs.js?v=v9609"></script>
+<script src="scripts/features/bim-qa.js?v=v9609-bim-import"></script>
+<script src="scripts/features/calc-engine.js?v=v9609-local-first"></script>
+<script src="scripts/app-main.js?v=v9609"></script>
 </body>
 </html>

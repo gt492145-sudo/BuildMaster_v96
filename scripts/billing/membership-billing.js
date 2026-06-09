@@ -22,10 +22,12 @@
 
     function getDefaultApiBaseForBilling() {
         try {
-            const cap = typeof window !== 'undefined' ? window.Capacitor : null;
-            if (cap && typeof cap.getPlatform === 'function' && String(cap.getPlatform()) === 'ios') {
-                return 'https://wenwenming.com';
-            }
+            const ua = String(navigator.userAgent || '');
+            const platform = String(navigator.platform || '');
+            const hasAppleTouch = Number(navigator.maxTouchPoints || 0) > 1;
+            const iosLike = /iPad|iPhone|iPod/i.test(ua) || (/MacIntel/i.test(platform) && hasAppleTouch);
+            if (iosLike) return '';
+            if (location.hostname === 'gt492145-sudo.github.io') return '';
         } catch (_e) {}
         return '/api';
     }
@@ -40,11 +42,12 @@
             }
             const fallback = getDefaultApiBaseForBilling();
             const raw = String(explicit !== null && explicit !== '' ? explicit : fallback).trim();
-            if (!raw || raw === '/') return '/api';
+            if (!raw) return '';
+            if (raw === '/') return '/api';
             if (/^https?:\/\/[^/]+$/i.test(raw)) return `${raw.replace(/\/+$/g, '')}/api`;
             return raw.replace(/\/+$/g, '');
         } catch (_e) {
-            return '/api';
+            return '';
         }
     }
 
@@ -233,8 +236,18 @@
         }
         if (isIosReviewRuntime()) {
             document.querySelectorAll('.billing-block').forEach((el) => { el.hidden = true; });
+            const chip = document.getElementById('billingStatusChip');
+            if (chip) chip.hidden = true;
             return;
         }
+        try {
+            if (location.hostname === 'gt492145-sudo.github.io') {
+                document.querySelectorAll('.billing-block').forEach((el) => { el.hidden = true; });
+                const chip = document.getElementById('billingStatusChip');
+                if (chip) chip.hidden = true;
+                return;
+            }
+        } catch (_e) {}
         const tiersHost = document.getElementById('billingTiersHost');
         if (tiersHost) {
             const catalog = await fetchCatalog();

@@ -757,6 +757,16 @@
         const extraWasteRate = getExtraWasteRateForType(type);
         let result;
         let usedLocalFallback = false;
+        const useLocalFirst = typeof shouldSkipRemoteApi === 'function' && shouldSkipRemoteApi();
+        if (useLocalFirst) {
+            try {
+                result = calculateCoreLocally(type, v1, v2, v3, n, up, isDeduct, extraWasteRate, templateExtras);
+                usedLocalFallback = true;
+            } catch (localError) {
+                console.warn('本機核心計算失敗', localError);
+                return showToast((localError && localError.message) || '核心計算失敗');
+            }
+        } else {
         try {
             result = await requestServerCoreCalculation({
                 type,
@@ -778,6 +788,7 @@
                 console.warn('本機核心計算失敗', localError);
                 return showToast((localError && localError.message) || (error && error.message) || '核心計算失敗');
             }
+        }
         }
 
         let baseRes = Number(result.baseRes || 0);

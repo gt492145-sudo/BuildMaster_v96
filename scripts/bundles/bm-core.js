@@ -902,20 +902,23 @@
 
     function normalizeApiBaseUrl(rawBase) {
         const raw = String(rawBase || '').trim();
-        if (!raw || raw === '/') return '/api';
-        if (/^https?:\/\/[^/]+$/i.test(raw)) return `${raw}/api`;
+        if (!raw) return '';
+        if (raw === '/') return '/api';
+        if (/^https?:\/\/[^/]+$/i.test(raw)) return `${raw.replace(/\/+$/g, '')}/api`;
         return raw.replace(/\/+$/g, '');
     }
 
     function getDefaultApiBaseForRuntime() {
+        if (shouldUseOfflinePublicRuntime()) return '';
         try {
             if (isCapacitorShell()) {
                 const cap = window.Capacitor;
                 if (cap && typeof cap.getPlatform === 'function' && String(cap.getPlatform()) === 'ios') {
-                    return 'https://wenwenming.com';
+                    return 'http://127.0.0.1:8787';
                 }
             }
         } catch (_e) {}
+        if (isDevHost()) return 'http://127.0.0.1:8787';
         return '/api';
     }
 
@@ -933,6 +936,19 @@
     }
 
     async function apiRequest(pathName, options = {}) {
+        if (shouldSkipRemoteApi()) {
+            const error = new Error('本版為離線公開計算，不需連線後端。');
+            error.code = 'LOCAL_PUBLIC_APP';
+            error.status = 0;
+            throw error;
+        }
+        const apiBase = getApiBaseUrl();
+        if (!apiBase) {
+            const error = new Error('本版為離線公開計算，不需連線後端。');
+            error.code = 'LOCAL_PUBLIC_APP';
+            error.status = 0;
+            throw error;
+        }
         const method = options.method || 'GET';
         const headers = {
             'Accept': 'application/json',
@@ -1491,6 +1507,7 @@
 
     async function startApp() {
         if (appBootstrapped) return;
+        applyPublicAppStoreShell();
         initGlobalErrorGuards();
         bindLifecycleResilience();
         startMainThreadWatchdog();
@@ -2300,6 +2317,46 @@
                 || location.pathname.startsWith('/BuildMaster_v69/'));
     }
 
+    function isPublishedAppRuntime() {
+        try {
+            if (typeof isIosReviewRuntime === 'function' && isIosReviewRuntime()) return true;
+            if (isPublishedTestHost()) return true;
+        } catch (_e) {}
+        return false;
+    }
+
+    function shouldUseOfflinePublicRuntime() {
+        return !!(FREE_PUBLIC_APP_UI && isPublishedAppRuntime());
+    }
+
+    function shouldSkipRemoteApi() {
+        return shouldUseOfflinePublicRuntime();
+    }
+
+    function purgeLegacyPublishedApiConfig() {
+        if (!shouldUseOfflinePublicRuntime()) return;
+        try {
+            localStorage.removeItem(API_BASE_URL_KEY);
+        } catch (_e) {}
+        try {
+            safeStorage.remove(sessionStorage, AUTH_TOKEN_KEY);
+        } catch (_e2) {}
+        try {
+            sessionStorage.removeItem(LOCAL_OFFLINE_DEMO_KEY);
+        } catch (_e3) {}
+    }
+
+    function applyPublicAppStoreShell() {
+        if (!shouldUseOfflinePublicRuntime()) return;
+        document.body.setAttribute('data-app-store-shell', '1');
+        document.body.setAttribute('data-free-public', '1');
+        const lock = document.getElementById('securityLock');
+        if (lock) {
+            lock.classList.remove('show');
+            lock.hidden = true;
+        }
+    }
+
     function shouldSkipLoginGate() {
         if (!FREE_PUBLIC_APP_UI) return false;
         try {
@@ -2659,6 +2716,16 @@
             return false;
         }
 
+        purgeLegacyPublishedApiConfig();
+
+        if (shouldSkipLoginGate()) {
+            clearBackendSession(true);
+            applyLocalOfflineDemoSession({ full: true });
+            applyPublicAppStoreShell();
+            hideSecurityLock();
+            return true;
+        }
+
         if (sessionStorage.getItem(LOCAL_OFFLINE_DEMO_KEY) === '1' && isLocalOfflineBypassAllowed()) {
             applyLocalOfflineDemoSession();
             hideSecurityLock();
@@ -2667,12 +2734,6 @@
 
         const restored = await restoreBackendSession();
         if (restored) {
-            hideSecurityLock();
-            return true;
-        }
-
-        if (shouldSkipLoginGate()) {
-            applyLocalOfflineDemoSession({ full: true });
             hideSecurityLock();
             return true;
         }
@@ -2700,6 +2761,10 @@
         const account = normalizeMemberAccount((memberInput && memberInput.value) || '');
         const code = String((input && input.value) || '').trim();
         if (!code) {
+            if (shouldSkipLoginGate()) {
+                await enterLocalOfflineDemoFromButton();
+                return;
+            }
             if (hint) hint.innerText = '請先輸入存取碼';
             return;
         }
@@ -2725,12 +2790,20 @@
                 : '後端保護模式驗證成功');
         } catch (error) {
             console.warn('後端登入失敗', error);
+            if (shouldSkipLoginGate()) {
+                await enterLocalOfflineDemoFromButton();
+                return;
+            }
             const status = error && Number(error.status);
             let loginUrl = '';
             try {
                 loginUrl = buildApiUrl('/auth/login');
             } catch (_e) {
                 loginUrl = '';
+            }
+            if (shouldUseOfflinePublicRuntime()) {
+                if (hint) hint.innerText = '本版 App 免登入。請刪除 App 重裝後再開啟，無需輸入密碼。';
+                return;
             }
             const msgLower = String(error && error.message || '').toLowerCase();
             const netFail = msgLower.includes('failed to fetch') || msgLower.includes('networkerror')
@@ -2784,7 +2857,9 @@
     }
 
     window.BuildMasterAuthBridge = {
-        applyLoginResult: applyExternalLoginResult
+        applyLoginResult: applyExternalLoginResult,
+        shouldSkipLoginGate,
+        enterLocalOfflineDemoFromButton
     };
 
 

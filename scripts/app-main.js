@@ -1,6 +1,7 @@
     function exposeInlineActionHandlers() {
         Object.assign(window, {
             submitSecurityCode,
+            enterLocalOfflineDemoFromButton,
             setUserLevel,
             setWorkMode,
             setCalcSubPage,
@@ -54,7 +55,14 @@
         bindTapAction(document.getElementById('coachGuideBtn'), () => startCoachGuide(true));
         bindTapAction(document.getElementById('contrastToggle'), () => toggleContrastMode());
         bindTapAction(document.getElementById('contrastAutoToggle'), () => toggleAutoContrastMode());
-        bindTapAction(document.querySelector('#securityLock button.tool-btn'), () => submitSecurityCode());
+        bindTapAction(document.getElementById('securityEnterBtn'), () => {
+            const bridge = window.BuildMasterAuthBridge || {};
+            if (typeof bridge.shouldSkipLoginGate === 'function' && bridge.shouldSkipLoginGate()) {
+                bridge.enterLocalOfflineDemoFromButton().catch((e) => console.warn(e));
+                return;
+            }
+            submitSecurityCode();
+        });
     }
 
     exposeInlineActionHandlers();

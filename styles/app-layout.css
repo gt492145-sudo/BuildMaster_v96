@@ -371,3 +371,17 @@
     body.bg-wallpaper.high-contrast #wallpaperLayer .app-wallpaper-shade {
         background: linear-gradient(180deg, rgba(4, 8, 14, var(--wallpaper-overlay)), rgba(4, 8, 14, calc(var(--wallpaper-overlay) + 0.08)));
     }
+
+    body[data-app-store-shell="1"] #securityLock,
+    body[data-free-public="1"] #securityLock {
+        display: none !important;
+    }
+    body[data-app-store-shell="1"] .security-login-only,
+    body[data-app-store-shell="1"] .billing-block,
+    body[data-app-store-shell="1"] .billing-status-chip,
+    body[data-app-store-shell="1"] #memberAdminPanel {
+        display: none !important;
+    }
+    body[data-app-store-shell="1"] .header-meta-chip.support-chip {
+        display: inline-flex;
+    }
