@@ -846,6 +846,7 @@
         showToast(isDeduct
             ? '✂️ 已執行自動扣除'
             : (usedLocalFallback ? '🚀 數據已吸入（本機計算）' : '🚀 數據已吸入黑洞！'));
+        if (!isDeduct && typeof recordRatingEngagement === 'function') recordRatingEngagement('calc_added');
         if (typeof pushMemberChatCalcResult === 'function') {
             pushMemberChatCalcResult({
                 title: isDeduct ? '扣除項目' : '試算結果',
@@ -1149,11 +1150,12 @@
             tbody.appendChild(tr);
         });
         
-        document.getElementById('sumC').innerText = `混凝土: ${sums.CEMENT.toFixed(2)} M³`; 
-        document.getElementById('sumM').innerText = `模板: ${sums.MOLD.toFixed(2)} M²`;
-        document.getElementById('sumE').innerText = `土方: ${sums.EARTH.toFixed(2)} M³`; 
-        document.getElementById('sumS').innerText = `鋼筋: ${sums.STEEL.toFixed(2)} Kg`;
-        document.getElementById('totalMoney').innerText = Math.round(sums.total).toLocaleString();
+        document.getElementById('sumC').innerText = (typeof window.BM_T === 'function' ? window.BM_T('footer.concrete', { n: sums.CEMENT.toFixed(2) }) : `混凝土: ${sums.CEMENT.toFixed(2)} M³`);
+        document.getElementById('sumM').innerText = (typeof window.BM_T === 'function' ? window.BM_T('footer.formwork', { n: sums.MOLD.toFixed(2) }) : `模板: ${sums.MOLD.toFixed(2)} M²`);
+        document.getElementById('sumE').innerText = (typeof window.BM_T === 'function' ? window.BM_T('footer.earth', { n: sums.EARTH.toFixed(2) }) : `土方: ${sums.EARTH.toFixed(2)} M³`);
+        document.getElementById('sumS').innerText = (typeof window.BM_T === 'function' ? window.BM_T('footer.rebar', { n: sums.STEEL.toFixed(2) }) : `鋼筋: ${sums.STEEL.toFixed(2)} Kg`);
+        const money = Math.round(sums.total).toLocaleString(typeof window.BM_LOCALE === 'function' ? window.BM_LOCALE() : 'zh-TW');
+        document.getElementById('totalMoney').innerText = money;
         updateQaDashboard();
         refreshAdvancedEstimate(false);
     }

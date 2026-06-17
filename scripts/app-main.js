@@ -20,7 +20,24 @@
             toggleContrastMode,
             toggleAutoContrastMode,
             startBmAutoTestFromUi,
-            shareLastCalcResultToMemberChat
+            shareLastCalcResultToMemberChat,
+            downloadMechaConfigFile,
+            confirmStakeFieldSimulator,
+            confirmElectricalFieldSimulator,
+            toggleStakeSimCrosshair,
+            toggleStakeSimPoints,
+            redrawStakeFieldSimulator,
+            stakeSimSnapToTarget,
+            stakeSimMarkCurrentPoint,
+            stakeSimPrevPoint,
+            stakeSimNextPoint,
+            electricalSimMeasureVoltage,
+            stakeSimZoomIn,
+            stakeSimZoomOut,
+            stakeSimZoomReset,
+            electricalSimZoomIn,
+            electricalSimZoomOut,
+            electricalSimZoomReset
         });
     }
 
@@ -47,6 +64,7 @@
     function bindPrimaryHeaderActions() {
         bindTapAction(document.getElementById('workCalcBtn'), () => setWorkMode('calc'));
         bindTapAction(document.getElementById('workStakeBtn'), () => setWorkMode('stake'));
+        bindTapAction(document.getElementById('workElectricalBtn'), () => setWorkMode('electrical'));
         bindTapAction(document.getElementById('calcPage1Btn'), () => setCalcSubPage(1));
         bindTapAction(document.getElementById('calcPage2Btn'), () => setCalcSubPage(2));
         bindTapAction(document.getElementById('coachToggle'), () => toggleCoachMode());

@@ -42,59 +42,105 @@
 <main>
     <section class="card">
         <h1>Construction Master 隱私權政策</h1>
-        <p>最後更新：2026-06-08（V9.6 · 試算卡片泡泡＋解說員隱私對照）</p>
+        <p>最後更新：2026-06-15（V9.7 · build 9611 · 群組聊天＋五星評分提示＋三語介面）</p>
         <p>
-            公開隱私權網址：
+            公開隱私權網址（正式版）：
             <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">
                 https://sites.google.com/view/buildmaster-privacy/首頁
             </a>
         </p>
-        <p>對照說明：本頁為站內摘要版，公開版本與 Apple 送審對照請以上方 Google Sites 連結為準。</p>
-        <h2>0. 資料控管者與聯絡方式（App Store 審查）</h2>
+        <p>對照說明：本頁為<strong>站內摘要</strong>。對外正式版本、Apple App Store 與 Google Play 送審對照，請以上方 Google Sites 連結為準。若兩者內容不一致，以 Google Sites 公開版為優先。</p>
+
+        <h2>0. 資料控管者與聯絡方式</h2>
         <ul>
-            <li>聯絡姓名：陳宏明</li>
-            <li>聯絡電子郵件：asd0900101511@icloud.com</li>
-            <li>聯絡電話：0900101511</li>
+            <li>資料控管者：陳宏明</li>
+            <li>電子郵件：asd0900101511@icloud.com</li>
+            <li>電話：0900101511（如需電話協助，建議先寄信至上述 Email）</li>
         </ul>
+        <p>App 名稱：Construction Master（工程計算工作區）<br>
+        iOS Bundle ID：tw.buildmaster.constructionmaster<br>
+        Android 套件名稱：com.wenwenming.constructionmaster</p>
+
         <h2>1. 適用範圍</h2>
-        <p>本政策適用於 Construction Master 之網頁版、同源 API，以及經 App Store 分發之 iOS App。目前 App 以<strong>免費使用</strong>為主，不提供 App 內購買或訂閱入口。</p>
-        <h2>2. 本版 App 功能範圍（V9.6）</h2>
-        <p>目前經 App Store 分發之 iOS App，主要提供<strong>工程計算、試算、圖面量測與放樣相關工作區</strong>。</p>
+        <p>本政策適用於：</p>
         <ul>
-            <li><strong>本版已提供</strong>：計算模式、放樣模式、圖面上傳量測、試算與相關 QA 工具等。</li>
-            <li><strong>本版尚未開放</strong>：原生 AR／LiDAR 現場量測 App 入口（相關原生程式碼保留於專案中，供後續版本更新）。</li>
-            <li><strong>後續更新</strong>：AR／LiDAR 原生功能將陸續加入；屆時本政策與 App 內說明將同步更新。</li>
+            <li>經 Apple App Store 分發之 iOS App</li>
+            <li>經 Google Play 分發之 Android App</li>
+            <li>由 App 內 WebView 或瀏覽器開啟之 Construction Master 網頁工作區，及同源 API（若您另行使用網頁版登入功能）</li>
         </ul>
-        <p>iOS App 目前<strong>無需登入即可進入主工作區</strong>；若您使用網頁版並註冊帳號，會員資料儲存於後端資料庫，不會寫入 Git 程式碼儲存庫。</p>
-        <h2>2.1 第 1 頁群組聊天（本版 iOS App）</h2>
+        <p>現版 App（build 9611）以<strong>免費使用</strong>為主：<strong>無需登入</strong>即可進入主工作區；<strong>不含第三方廣告</strong>；<strong>不提供 App 內訂閱或付費入口</strong>。</p>
+
+        <h2>2. 本版 App 功能範圍（V9.7 · build 9611）</h2>
         <ul>
-            <li>第 1 頁「群組聊天」為<strong>裝置本機示範工作區</strong>，訊息以泡泡對話框顯示，儲存在您裝置的瀏覽器／App 本機儲存空間（localStorage）。</li>
+            <li><strong>本版已提供</strong>：工程試算、圖面量測、放樣、QA 工具、第 1 頁本機群組聊天、解說員操作說明、介面語言（繁中／英／日）等。</li>
+            <li><strong>本版尚未開放</strong>：原生 AR／LiDAR 現場量測 App 入口（相關程式保留供後續版本）。</li>
+            <li><strong>後續更新</strong>：若加入 AR／LiDAR、雲端多人聊天、廣告或訂閱等功能，將同步更新本政策、App 內說明及商店申報。</li>
+        </ul>
+
+        <h2>2.1 第 1 頁群組聊天（iOS／Android 本機示範）</h2>
+        <ul>
+            <li>第 1 頁「群組聊天／群組大廳」為<strong>裝置本機示範工作區</strong>，訊息以泡泡對話框顯示，儲存在您裝置的本機儲存空間（localStorage）。</li>
             <li><strong>不需登入</strong>即可試用；未登入時聊天顯示身份為「訪客」。</li>
-            <li>當您按「吸入計算清單」時，試算結果會以<strong>📊卡片泡泡</strong>形式一併寫入本機聊天紀錄（項目、數量、金額等）；同樣<strong>僅存於裝置本機</strong>，不會自動上傳雲端。</li>
-            <li>本機聊天<strong>不會</strong>自動同步到其他手機、平板或雲端伺服器；清除 App 資料或重新安裝後，本機聊天紀錄可能消失。</li>
-            <li>「群組大廳」為本機預設頻道名稱，供快速試用；非即時多人連線聊天室。</li>
-            <li>App 內「解說員」為操作說明提示，說明內容含本機聊天與試算卡片之用途；解說員本身不會因點擊說明而額外上傳您的聊天文字（除非您另行使用需連線之 AI 解說功能）。</li>
-            <li>若未来提供需登入的雲端團隊聊天，將另行更新本政策並於 App 內標示。</li>
+            <li>「群組大廳」為本機預設頻道名稱，供快速試用；<strong>非即時多人連線聊天室</strong>。</li>
+            <li>當您按「吸入計算清單」或分享試算時，結果可能以<strong>📊試算卡片泡泡</strong>寫入本機聊天紀錄；同樣<strong>僅存於裝置本機</strong>，不會自動上傳至開發者伺服器。</li>
+            <li>本機聊天<strong>不會</strong>自動同步到其他手機、平板或雲端；清除 App 資料或重新安裝後，本機聊天紀錄可能消失。</li>
+            <li>App 內「解說員」為操作說明提示。單純閱讀解說員說明<strong>不會因此額外上傳</strong>您的聊天或試算內容。</li>
+            <li>若您<strong>另行啟用並使用</strong>需連線之 AI 解說（「問 AI」），您輸入的問題可能傳送至後端 API 以產生回覆；該功能需後端設定且非免費版必要功能。使用前 App 內會有相關提示。</li>
+            <li>若未來提供需登入的雲端團隊聊天，將另行更新本政策並於 App 內標示。</li>
         </ul>
-        <h2>2.2 公開版本對照</h2>
-        <p>本頁為站內摘要；<strong>對外正式版本</strong>以 Google Sites 隱私權政策為準，並應與 App Store 上 Construction Master 之說明一致。若兩者內容不一致，以 Google Sites 公開版為優先，並將於下次更新同步修正。</p>
-        <h2>3. 蒐集資料類型</h2>
+
+        <h2>2.2 App 內五星評分提示（build 9611 起）</h2>
         <ul>
-            <li>工程估算與操作資料（例如計算輸入、放樣點位、QA 指標）</li>
-            <li>若使用第 1 頁本機群組聊天：聊天文字與試算📊卡片內容僅存於裝置本機（未登入時不上傳伺服器）</li>
-            <li>裝置與連線資訊（例如瀏覽器環境、必要的 API 請求資訊）</li>
+            <li>App 可能在您<strong>多次使用並完成試算、匯出或新手導覽等操作後</strong>，顯示五星評分詢問視窗。</li>
+            <li>是否再次顯示、您選擇的星等、「之後再說／不再提示」等偏好，僅記錄於<strong>裝置本機</strong>（localStorage 鍵：<code>bm_69:app_rating_v1</code>），<strong>不會因此自動傳送給開發者伺服器</strong>。</li>
+            <li>若您給予 4–5 星並同意，App 可能呼叫<strong>Apple 官方 App Store 評分 API</strong>（<code>SKStoreReviewController</code>）或開啟 <strong>Google Play 商店評分頁</strong>；實際評論內容由 Apple／Google 平台處理，受各平台隱私政策規範。</li>
+            <li>若您給予 1–3 星，App 僅顯示感謝訊息，不會強制開啟商店頁面。</li>
+            <li>您可隨時選擇「不再提示」，之後將不再顯示該詢問（除非清除 App 本機資料）。</li>
         </ul>
-        <h2>4. 使用目的</h2>
+
+        <h2>2.3 裝置本機儲存（非「向開發者收集」）</h2>
+        <p>為提供 App 功能，下列資料可能<strong>僅存於您裝置</strong>，不會因此自動傳送給我們：</p>
         <ul>
-            <li>提供估算、放樣、QA 檢核與資料同步</li>
-            <li>改善穩定性與偵錯（例如錯誤記錄與服務監測）</li>
+            <li>工程試算輸入、結果與操作偏好</li>
+            <li>圖面量測、放樣、QA 相關資料</li>
+            <li>第 1 頁本機群組聊天文字與試算📊卡片</li>
+            <li>解說員／介面偏好（例如解說員開關、語言設定、顯示模式）</li>
+            <li>五星評分提示之顯示偏好（見 2.2）</li>
         </ul>
-        <h2>5. 帳號刪除</h2>
-        <p>若您於<strong>網頁版</strong>註冊並登入帳號，可於登入畫面使用「刪除我的帳號」：輸入帳號與密碼確認後，永久刪除該帳號及雲端工作區，無法復原。目前 iOS App 以本機工作區為主，無需登入即可使用主要計算功能。</p>
-        <h2>6. 資料保存與安全</h2>
-        <p>我們採取合理安全措施保護資料，並僅在提供服務所需範圍內保存資料。</p>
-        <h2>7. 聯絡方式</h2>
-        <p>如需隱私相關協助，請透過上方電子郵件與我們聯繫。</p>
+        <p>清除 App 資料、清除瀏覽器資料或重新安裝 App 後，上述本機資料可能遺失且無法復原。</p>
+
+        <h2>2.4 靜態網頁託管（GitHub Pages）</h2>
+        <p>App 內 WebView 可能載入由 GitHub Pages 託管之靜態網頁。該託管平台可能依其自身政策記錄一般網路連線資訊（例如 IP、存取時間），此屬託管平台之標準運作，非開發者用於廣告或行銷目的之主動收集。</p>
+
+        <h2>3. 我們是否會收集您的資料？（現版 build 9611）</h2>
+        <p>現版 iOS／Android App<strong>不要求註冊或登入</strong>，<strong>不使用第三方廣告 SDK</strong>，<strong>不使用向開發者回報使用者行為之分析 SDK</strong>，也<strong>不會自動將試算內容或本機聊天文字上傳至開發者自有後端</strong>。</p>
+        <p>此與 App Store「App 隱私：未收集資料」及 Google Play 資料安全表單中，現版無廣告、無第三方資料收集之聲明一致。</p>
+
+        <h2>4. 網頁版帳號功能（若您另行使用）</h2>
+        <p>若您<strong>自行</strong>在網頁版註冊帳號並登入，帳號與雲端工作區資料可能儲存於後端資料庫。本版 iOS／Android App 不要求、也不依賴該登入流程。</p>
+        <p>若您於網頁版登入，可於登入畫面使用「刪除我的帳號」：輸入帳號與密碼確認後，永久刪除該帳號及雲端工作區，無法復原。</p>
+
+        <h2>5. 我們不會做的事（現版）</h2>
+        <ul>
+            <li>不在 App 內顯示第三方或開發者廣告</li>
+            <li>不出售您的個人資料</li>
+            <li>不使用您的資料進行跨 App 追蹤</li>
+            <li>不要求帳號密碼才能使用主要功能</li>
+            <li>不將本機聊天或試算內容自動上傳至我們的伺服器</li>
+        </ul>
+
+        <h2>6. 關於日後可能之廣告或訂閱（現版沒有）</h2>
+        <p>開發者<strong>可能</strong>於<strong>未來新版本</strong>透過廣告或訂閱等方式營利。現版 build 9611 <strong>沒有</strong>廣告、<strong>沒有</strong>訂閱。若未來實際接入，將事先或同步更新本政策、App Store／Google Play 申報及 App 內說明。</p>
+
+        <h2>7. 兒童隱私</h2>
+        <p>Construction Master 並非專為 13 歲以下兒童設計。現版 App 不主動向兒童收集個人資料。若您認為我們不慎取得兒童資料，請透過 asd0900101511@icloud.com 聯絡。</p>
+
+        <h2>8. 資料安全與政策變更</h2>
+        <p>對於您主動提供給我們的資訊（例如來信詢問），我們採取合理安全措施保護。本機儲存資料之安全亦受您裝置作業系統及個人使用習慣影響。</p>
+        <p>我們可能因功能更新、法規或商店審查要求而修訂本政策；更新後將修訂頁首「最後更新」日期。</p>
+
+        <h2>9. 聯絡我們</h2>
+        <p>任何隱私相關請求，請寄至：asd0900101511@icloud.com</p>
         <p><a href="index.html">返回 Construction Master</a></p>
     </section>
 </main>

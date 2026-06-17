@@ -159,6 +159,27 @@
     };
 }());
 
+/* === scripts/modules/electrical-page.js === */
+(function initBuildMasterElectricalPageModule() {
+    const ELECTRICAL_SECTION_ID = 'electricalModePage';
+
+    function getElectricalSection() {
+        return document.getElementById(ELECTRICAL_SECTION_ID);
+    }
+
+    function getElectricalScrollTarget() {
+        return getElectricalSection();
+    }
+
+    window.BuildMasterElectricalPageModule = {
+        ids: {
+            electricalSection: ELECTRICAL_SECTION_ID
+        },
+        getElectricalSection,
+        getElectricalScrollTarget
+    };
+}());
+
 /* === scripts/modules/navigation.js === */
 (function initBuildMasterNavigationModule() {
     function getCalcModule() {
@@ -169,8 +190,14 @@
         return window.BuildMasterStakePageModule || null;
     }
 
+    function getElectricalModule() {
+        return window.BuildMasterElectricalPageModule || null;
+    }
+
     function normalizeWorkMode(mode) {
-        return mode === 'stake' ? 'stake' : 'calc';
+        if (mode === 'stake') return 'stake';
+        if (mode === 'electrical') return 'electrical';
+        return 'calc';
     }
 
     function readStoredWorkMode(storageKey) {
@@ -192,16 +219,24 @@
     function ensureFixedPageOrder() {
         const calcModule = getCalcModule();
         const stakeModule = getStakeModule();
+        const electricalModule = getElectricalModule();
         const calcSection = calcModule && typeof calcModule.getCalcSection === 'function'
             ? calcModule.getCalcSection()
             : null;
         const stakeSection = stakeModule && typeof stakeModule.getStakeSection === 'function'
             ? stakeModule.getStakeSection()
             : null;
+        const electricalSection = electricalModule && typeof electricalModule.getElectricalSection === 'function'
+            ? electricalModule.getElectricalSection()
+            : null;
         if (calcSection && stakeSection && calcSection.nextElementSibling !== stakeSection) {
             calcSection.insertAdjacentElement('afterend', stakeSection);
         }
-        let anchor = stakeSection;
+        let anchor = stakeSection || calcSection;
+        if (anchor && electricalSection && anchor.nextElementSibling !== electricalSection) {
+            anchor.insertAdjacentElement('afterend', electricalSection);
+            anchor = electricalSection;
+        }
         const supportingNodes = stakeModule && typeof stakeModule.getStakeSupportingNodes === 'function'
             ? stakeModule.getStakeSupportingNodes()
             : [];
@@ -220,6 +255,12 @@
             const stakeModule = getStakeModule();
             return stakeModule && typeof stakeModule.getStakeScrollTarget === 'function'
                 ? stakeModule.getStakeScrollTarget()
+                : null;
+        }
+        if (normalized === 'electrical') {
+            const electricalModule = getElectricalModule();
+            return electricalModule && typeof electricalModule.getElectricalScrollTarget === 'function'
+                ? electricalModule.getElectricalScrollTarget()
                 : null;
         }
         const calcModule = getCalcModule();
@@ -263,27 +304,43 @@
         const mode = readStoredWorkMode(storageKey);
         const calcBtn = document.getElementById('workCalcBtn');
         const stakeBtn = document.getElementById('workStakeBtn');
+        const electricalBtn = document.getElementById('workElectricalBtn');
         const calcModule = getCalcModule();
         const stakeModule = getStakeModule();
-        if (calcBtn) calcBtn.classList.remove('active');
-        if (stakeBtn) stakeBtn.classList.remove('active');
+        const electricalModule = getElectricalModule();
+        [calcBtn, stakeBtn, electricalBtn].forEach((btn) => {
+            if (btn) btn.classList.remove('active');
+        });
         if (calcBtn && mode === 'calc') calcBtn.classList.add('active');
         if (stakeBtn && mode === 'stake') stakeBtn.classList.add('active');
+        if (electricalBtn && mode === 'electrical') electricalBtn.classList.add('active');
         const calcSection = calcModule && typeof calcModule.getCalcSection === 'function'
             ? calcModule.getCalcSection()
             : null;
         const stakeSection = stakeModule && typeof stakeModule.getStakeSection === 'function'
             ? stakeModule.getStakeSection()
             : null;
+        const electricalSection = electricalModule && typeof electricalModule.getElectricalSection === 'function'
+            ? electricalModule.getElectricalSection()
+            : null;
         setNodeVisibility(calcSection, mode === 'calc');
         setNodeVisibility(stakeSection, mode === 'stake');
+        setNodeVisibility(electricalSection, mode === 'electrical');
+        const drawingPanel = document.querySelector('.main-layout > .drawing-panel');
+        setNodeVisibility(drawingPanel, mode === 'calc');
         const stakeSupportingNodes = stakeModule && typeof stakeModule.getStakeSupportingNodes === 'function'
             ? stakeModule.getStakeSupportingNodes()
             : [];
         stakeSupportingNodes.forEach((node) => setNodeVisibility(node, mode === 'stake'));
         document.body.dataset.workMode = mode;
-        if (mode === 'stake') {
-            scrollToModeSection('stake');
+        if (mode === 'stake' || mode === 'electrical') {
+            scrollToModeSection(mode);
+        }
+        if (mode === 'electrical' && typeof window.initElectricalPanel === 'function') {
+            window.initElectricalPanel();
+        }
+        if (mode === 'stake' && typeof window.initStakeFieldSimulator === 'function') {
+            window.initStakeFieldSimulator();
         }
         return mode;
     }
@@ -705,18 +762,18 @@
         lastQaSummary: ''
     };
     const COACH_GUIDE_STEPS = [
-        { selector: '#coachToggle', message: '第 1 步：建議保持「解說員」為開啟。點任何區塊都會有白話說明；也會提示群組聊天、試算卡片與公開隱私權對照（Google Sites／privacy.html）。' },
-        { selector: '#workCalcBtn', message: '第 2 步：計算模式對應第 1 到 3 頁。先從這裡進入計算流程。' },
-        { selector: '#calcPage1Btn', message: '第 3 步：第 1 頁＝簡單試算＋本機群組聊天。聊天與試算📊卡片僅存於裝置，非雲端即時多人；與 App 公開隱私權說明一致。' },
-        { selector: '#freeWarRoomCard', message: '第 4 步：可在「群組大廳」打字聊天（泡泡對話）；按「吸入計算清單」後，試算結果會自動變成📊卡片泡泡。資料不上傳伺服器。' },
-        { selector: '#calcPage2Btn', message: '第 5 步：第 2 頁是圖面全功能（量測、進階試算、IBM 工具）。' },
-        { selector: '#calcMeasureCluster', message: '第 6 步：在第 2 頁先做智慧定比例與智慧量圖，讓圖紙尺寸和比例更穩定。' },
-        { selector: '#calcAiVisionCluster', message: '第 7 步：再做 AI 看圖辨識，包含快速判讀、精準辨識與柱樑尺寸標註。' },
-        { selector: '#calcIbmCluster', message: '第 8 步：IBM 自動計算、估價預覽與匯入清單；放樣本身改在第 4 頁（放樣模式）執行。' },
-        { selector: '.btn-add', message: '第 9 步：確認即時預覽後吸入計算清單；同時會自動推送試算📊卡片到群組大廳（本機聊天，非雲端同步）。' },
-        { selector: '#workStakeBtn', message: '第 10 步：需要放樣時，切到放樣模式（第 4 頁）；切換後只顯示放樣相關內容。' },
-        { selector: '#stakeExecutionCluster', message: '第 11 步：放樣頁先設定柱、牆、梁與高精度，再執行一鍵放樣流程。' },
-        { selector: '#stakeQaCluster', message: '第 12 步：最後做控制點配準、偏差熱圖、穩定度重測與放樣 QA。' }
+        { selector: '#coachToggle', messageKey: 'coach.guide.s1' },
+        { selector: '#workCalcBtn', messageKey: 'coach.guide.s2' },
+        { selector: '#calcPage1Btn', messageKey: 'coach.guide.s3' },
+        { selector: '#freeWarRoomCard', messageKey: 'coach.guide.s4' },
+        { selector: '#calcPage2Btn', messageKey: 'coach.guide.s5' },
+        { selector: '#calcMeasureCluster', messageKey: 'coach.guide.s6' },
+        { selector: '#calcAiVisionCluster', messageKey: 'coach.guide.s7' },
+        { selector: '#calcIbmCluster', messageKey: 'coach.guide.s8' },
+        { selector: '.btn-add', messageKey: 'coach.guide.s9' },
+        { selector: '#workStakeBtn', messageKey: 'coach.guide.s10' },
+        { selector: '#stakeExecutionCluster', messageKey: 'coach.guide.s11' },
+        { selector: '#stakeQaCluster', messageKey: 'coach.guide.s12' }
     ];
     let coachTimer = null;
     let coachBound = false;
@@ -1712,8 +1769,13 @@
     }
 
     function setWorkMode(mode) {
-        const normalized = mode === 'stake' ? 'stake' : 'calc';
-        const targetUrl = normalized === 'stake' ? 'stake.html' : 'index.html';
+        const nav = window.BuildMasterNavigationModule;
+        const normalized = nav && typeof nav.normalizeWorkMode === 'function'
+            ? nav.normalizeWorkMode(mode)
+            : (mode === 'stake' ? 'stake' : (mode === 'electrical' ? 'electrical' : 'calc'));
+        const targetUrl = normalized === 'stake'
+            ? 'stake.html'
+            : (normalized === 'electrical' ? 'electrical.html' : 'index.html');
         try {
             safeStorage.set(localStorage, WORK_MODE_KEY, normalized);
         } catch (_e) {}
@@ -1735,18 +1797,27 @@
     }
 
     function getCurrentWorkMode() {
+        const nav = window.BuildMasterNavigationModule;
         const stored = safeStorage.get(localStorage, WORK_MODE_KEY, 'calc');
         const mode = document.body && document.body.dataset && document.body.dataset.workMode
             ? document.body.dataset.workMode
             : stored;
-        return mode === 'stake' ? 'stake' : 'calc';
+        return nav && typeof nav.normalizeWorkMode === 'function'
+            ? nav.normalizeWorkMode(mode)
+            : (mode === 'stake' ? 'stake' : (mode === 'electrical' ? 'electrical' : 'calc'));
     }
 
     function ensureWorkModeAccess(expectedMode, deniedMessage) {
-        const expected = expectedMode === 'stake' ? 'stake' : 'calc';
+        const nav = window.BuildMasterNavigationModule;
+        const expected = nav && typeof nav.normalizeWorkMode === 'function'
+            ? nav.normalizeWorkMode(expectedMode)
+            : (expectedMode === 'stake' ? 'stake' : (expectedMode === 'electrical' ? 'electrical' : 'calc'));
         const current = getCurrentWorkMode();
         if (current === expected) return true;
-        showToast(deniedMessage || (expected === 'stake' ? '請先切到第四頁放樣模式' : '請先切到第三頁計算模式'));
+        const fallback = expected === 'stake'
+            ? '請先切到放樣模式'
+            : (expected === 'electrical' ? '請先切到電機模式' : '請先切到計算模式');
+        showToast(deniedMessage || fallback);
         return false;
     }
 
@@ -1766,15 +1837,20 @@
 
     function applyWorkMode() {
         const navigationModule = window.BuildMasterNavigationModule;
-        const mode = safeStorage.get(localStorage, WORK_MODE_KEY, 'calc') === 'stake' ? 'stake' : 'calc';
         if (navigationModule && typeof navigationModule.applyWorkMode === 'function') {
             navigationModule.applyWorkMode(WORK_MODE_KEY);
-        } else {
-            const calcBtn = document.getElementById('workCalcBtn');
-            const stakeBtn = document.getElementById('workStakeBtn');
-            if (calcBtn) calcBtn.classList.toggle('active', mode === 'calc');
-            if (stakeBtn) stakeBtn.classList.toggle('active', mode === 'stake');
+            return;
         }
+        const mode = getCurrentWorkMode();
+        const calcBtn = document.getElementById('workCalcBtn');
+        const stakeBtn = document.getElementById('workStakeBtn');
+        const electricalBtn = document.getElementById('workElectricalBtn');
+        [calcBtn, stakeBtn, electricalBtn].forEach((btn) => {
+            if (btn) btn.classList.toggle('active', false);
+        });
+        if (calcBtn) calcBtn.classList.toggle('active', mode === 'calc');
+        if (stakeBtn) stakeBtn.classList.toggle('active', mode === 'stake');
+        if (electricalBtn) electricalBtn.classList.toggle('active', mode === 'electrical');
         document.body.dataset.workMode = mode;
     }
 

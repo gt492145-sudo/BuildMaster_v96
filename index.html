@@ -14,14 +14,16 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=v960logo5">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=v960logo5">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v9609-ios-review">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9618-electrical">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9608-coach-privacy">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9621-field-real">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v831">
 <link rel="stylesheet" href="styles/weather-effects.css?v=v9608-wallfix">
-<link rel="stylesheet" href="styles/app-responsive.css?v=v9608-wallfix">
+<link rel="stylesheet" href="styles/app-responsive.css?v=v9616-chat-spotlight">
+<script src="scripts/i18n/bm-i18n.js?v=v9621-field-real"></script>
+<script src="scripts/i18n/bm-coach-hints.js?v=v9618-electrical"></script>
 </head>
 <body>
 
@@ -45,17 +47,17 @@
 <div id="securityLock" class="security-lock" hidden>
     <div class="security-panel">
         <h3>Construction Master V9.6</h3>
-        <p id="securityMessage">歡迎使用 Construction Master。本版免登入，可直接進入工作區。</p>
-        <input id="securityMemberInput" class="security-input security-login-only" type="text" placeholder="帳號（選填）">
-        <input id="securityCodeInput" class="security-input security-login-only" type="password" placeholder="密碼（選填；僅會員登入時填）">
-        <button type="button" id="securityEnterBtn" class="tool-btn security-login-only" style="width:100%;">直接進入工作區</button>
+        <p id="securityMessage" data-i18n="security.welcome">歡迎使用 Construction Master。本版免登入，可直接進入工作區。</p>
+        <input id="securityMemberInput" class="security-input security-login-only" type="text" data-i18n-placeholder="security.accountPh" placeholder="帳號（選填）">
+        <input id="securityCodeInput" class="security-input security-login-only" type="password" data-i18n-placeholder="security.passwordPh" placeholder="密碼（選填；僅會員登入時填）">
+        <button type="button" id="securityEnterBtn" class="tool-btn security-login-only" style="width:100%;" data-i18n="security.enterBtn">直接進入工作區</button>
         <button type="button" id="securitySelfDeleteBtn" class="tool-btn security-self-delete-btn security-login-only">刪除我的會員帳號</button>
         <p class="security-onboarding-hint security-self-delete-hint security-login-only">僅適用<strong>會員帳號</strong>：請先填上方「會員帳號」與「會員密碼」，再按此鈕；將永久刪除該帳號與雲端工作區，無法復原（存取碼登入無此帳號可刪）。</p>
         <div id="securityHint" class="security-hint"></div>
         <button type="button" id="securityApi8787Btn" class="tool-btn security-api-fix-btn security-login-only">將 API 指向本機 Node（8787）並重新整理</button>
         <button type="button" id="securityOfflineDemoBtn" class="tool-btn security-offline-demo-btn" hidden>先略過登入，進主流程（本機／不接後端）</button>
         <button type="button" id="securityFullDemoBtn" class="tool-btn security-full-demo-btn" hidden>測試全功能（會員3／不接後端）</button>
-        <p class="security-onboarding-hint security-login-only">登入後右上方可開「解說員」與「新手導覽」，邊用邊有白話說明。</p>
+        <p class="security-onboarding-hint security-login-only" data-i18n="coach.securityHint">登入後右上方可開「解說員」與「新手導覽」，邊用邊有白話說明。</p>
         <p class="security-onboarding-hint security-api-url-hint">本版為<strong>免費計算 App</strong>，開啟後直接進入主工作區，無需登入。支援與隱私：<a href="https://sites.google.com/view/buildmaster-privacy" target="_blank" rel="noopener noreferrer">Google Sites 隱私權</a> · <a href="mailto:asd0900101511@icloud.com">asd0900101511@icloud.com</a></p>
     </div>
 </div>
@@ -66,107 +68,112 @@
         <img class="logo-photo" src="logo-app.png?v=v960logo5" alt="" decoding="async">
     </div>
     <div class="header-brand">
-        <div class="header-kicker">工程計算工作區</div>
-        <div class="header-title">Construction Master <span class="header-version">V9.6</span></div>
+        <div class="header-kicker" data-i18n="header.kicker">工程計算工作區</div>
+        <div class="header-title">Construction Master <span class="header-version">V9.7</span></div>
         <div class="header-subtitle">
-            <span class="live-badge">正式版 LIVE</span>
-            <span class="live-badge">V9.6 放樣整合版</span>
-            <span class="header-meta-chip">本版：計算工作區</span>
-            <span class="header-meta-chip" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
-            <span class="header-meta-chip support-chip" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
+            <span class="live-badge" data-i18n="header.badgeLive">正式版 LIVE</span>
+            <span class="live-badge" data-i18n="header.badgeVersion">V9.7 放樣整合版</span>
+            <span class="header-meta-chip" data-i18n="header.chipWorkspace">本版：計算工作區</span>
+            <span class="header-meta-chip" data-i18n="header.chipArLater" data-i18n-title="header.chipArLater" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
+            <span class="header-meta-chip support-chip" data-i18n="header.support" data-i18n-title="header.support" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
             <span id="billingStatusChip" class="header-meta-chip billing-status-chip" hidden></span>
         </div>
     </div>
     <div class="work-switch">
-        <button id="workCalcBtn" class="work-btn active">🧮 計算模式</button>
-        <button id="workStakeBtn" class="work-btn">📍 放樣模式</button>
+        <button id="workCalcBtn" class="work-btn active" data-i18n="work.calc">🧮 計算模式</button>
+        <button id="workStakeBtn" class="work-btn" data-i18n="work.stake">📍 放樣模式</button>
+        <button id="workElectricalBtn" class="work-btn" data-i18n="work.electrical">⚡ 電機模式</button>
     </div>
     <div class="calc-page-switch work-mode-only-calc">
-        <button type="button" id="calcPage1Btn" class="calc-page-btn active" aria-pressed="true">第1頁 簡單+聊天</button>
-        <button type="button" id="calcPage2Btn" class="calc-page-btn" aria-pressed="false">第2頁 全功能</button>
+        <button type="button" id="calcPage1Btn" class="calc-page-btn active" aria-pressed="true" data-i18n="calc.page1">第1頁 簡單+聊天</button>
+        <button type="button" id="calcPage2Btn" class="calc-page-btn" aria-pressed="false" data-i18n="calc.page2">第2頁 全功能</button>
     </div>
     <div class="header-actions">
-        <button id="coachToggle" class="mode-btn">解說員: 開</button>
-        <button id="aiCoachToggle" class="mode-btn level-only-pro">AI解說: 關</button>
-        <button id="btnWarRoom" class="mode-btn" style="border-color: #00e676; color: #00e676; font-weight: 900;">🌐 戰情室: 離線</button>
-        <button id="coachGuideBtn" class="mode-btn">新手導覽</button>
-        <button id="contrastToggle" class="mode-btn">高對比: 關</button>
-        <button id="contrastAutoToggle" class="mode-btn">自動: 關</button>
+        <button id="coachToggle" class="mode-btn" data-i18n="coach.on">解說員: 開</button>
+        <button id="aiCoachToggle" class="mode-btn level-only-pro" data-i18n="aiCoach.off">AI解說: 關</button>
+        <button id="btnWarRoom" class="mode-btn" style="border-color: #00e676; color: #00e676; font-weight: 900;" data-i18n="warRoom.offline">🌐 戰情室: 離線</button>
+        <button id="coachGuideBtn" class="mode-btn" data-i18n="coach.guide">新手導覽</button>
+        <button id="contrastToggle" class="mode-btn" data-i18n="contrast.off">高對比: 關</button>
+        <button id="contrastAutoToggle" class="mode-btn" data-i18n="contrast.autoOff">自動: 關</button>
     </div>
 </header>
 
 <div id="globalWeatherTicker" class="global-weather-ticker">
-    <span class="ticker-label">☁️ 工地氣象</span>
+    <span class="ticker-label" data-i18n="weather.label">☁️ 工地氣象</span>
     <div class="bim-note weather-news-marquee" style="margin-top:0; color:#cfe6ff;">
-        <span id="globalWeatherTickerText" class="weather-news-text">氣象快報：資料更新中...</span>
+        <span id="globalWeatherTickerText" class="weather-news-text" data-i18n="weather.loading">氣象快報：資料更新中...</span>
     </div>
 </div>
 
 <div id="mobileFuncDrawer" class="mobile-drawer" aria-hidden="true">
-    <button id="mobileFuncTab" class="mobile-func-tab" type="button" onclick="toggleMobileFuncDrawer()">功能</button>
+    <button id="mobileFuncTab" class="mobile-func-tab" type="button" onclick="toggleMobileFuncDrawer()" data-i18n="drawer.tab">功能</button>
     <div class="drawer-shell">
-        <div class="drawer-header">🛠️ 戰術工具箱</div>
+        <div class="drawer-header" data-i18n="drawer.header">🛠️ 戰術工具箱</div>
         <div id="mobileFocusBtn" class="drawer-item" data-mobile-action="toggle-focus">
             <span>🧲 視圖模式：自動</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="mode-calc">
-            <span>🧮 切換到計算模式</span>
+            <span data-i18n="drawer.modeCalc">🧮 切換到計算模式</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="mode-stake">
-            <span>📍 切換到放樣模式</span>
+            <span data-i18n="drawer.modeStake">📍 切換到放樣模式</span>
+        </div>
+
+        <div class="drawer-item" data-mobile-action="mode-electrical">
+            <span data-i18n="drawer.modeElectrical">⚡ 切換到電機模式</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="top">
-            <span>⬆️ 回到頂部</span>
+            <span data-i18n="drawer.scrollTop">⬆️ 回到頂部</span>
         </div>
 
         <div class="drawer-item level-hide-basic" data-mobile-action="scan">
-            <span>🌌 一鍵掃描 3D</span>
+            <span data-i18n="drawer.scan3d">🌌 一鍵掃描 3D</span>
         </div>
 
         <div class="drawer-item" onclick="reset3DView(true)">
-            <span>🔄 重置全息視角</span>
+            <span data-i18n="drawer.reset3d">🔄 重置全息視角</span>
         </div>
 
         <div class="drawer-item" onclick="toggleAutoMeasure()">
-            <span>📏 啟動自動量測</span>
+            <span data-i18n="drawer.autoMeasure">📏 啟動自動量測</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="pick-blueprint">
-            <span>📷 選擇／拍攝圖紙（與上方同一流程）</span>
+            <span data-i18n="drawer.pickBlueprint">📷 選擇／拍攝圖紙（與上方同一流程）</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="fit-view">
-            <span>🖼️ 適配視圖</span>
+            <span data-i18n="drawer.fitView">🖼️ 適配視圖</span>
         </div>
 
         <div class="drawer-item level-hide-basic" data-mobile-action="enhance-image">
-            <span>✨ 自動優化圖面</span>
+            <span data-i18n="drawer.enhanceImage">✨ 自動優化圖面</span>
         </div>
 
         <div class="drawer-item level-hide-basic" data-mobile-action="reset-image-filter">
-            <span>♻️ 重設圖面畫質</span>
+            <span data-i18n="drawer.resetImageFilter">♻️ 重設圖面畫質</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="remove-image">
-            <span>🗑️ 移除圖紙</span>
+            <span data-i18n="drawer.removeBlueprint">🗑️ 移除圖紙</span>
         </div>
 
         <div class="drawer-item" id="mobileOwnerLockBtn" data-mobile-action="owner-lock" hidden>
-            <span>🐒 猴子權限：未設定</span>
+            <span data-i18n="drawer.ownerLockUnset">🐒 猴子權限：未設定</span>
         </div>
         <div class="drawer-item" data-mobile-action="owner-pass-change" hidden>
-            <span>🔁 更改猴子密碼</span>
+            <span data-i18n="drawer.ownerPassChange">🔁 更改猴子密碼</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="start-coach-guide">
-            <span>🐣 新手導覽（帶我走一輪）</span>
+            <span data-i18n="drawer.coachGuide">🐣 新手導覽（帶我走一輪）</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="usage-guide">
-            <span>📘 使用與錯誤排查</span>
+            <span data-i18n="drawer.usageGuide">📘 使用與錯誤排查</span>
         </div>
 
         <div class="drawer-item" id="sunlightToggle" onclick="toggleSunlightMode()">
@@ -174,39 +181,39 @@
         </div>
 
         <div class="drawer-item" id="mobileMonkeyBtn" data-mobile-action="toggle-chaos" hidden>
-            <span>🐒 混沌猴子</span>
+            <span data-i18n="drawer.chaosMonkey">🐒 混沌猴子</span>
         </div>
         <div class="drawer-item" id="mobileAutoTestBtn" data-mobile-action="start-bm-autotest">
-            <span>🤖 藍圖自動測試（15 張）</span>
+            <span data-i18n="drawer.autoTest">🤖 藍圖自動測試（15 張）</span>
         </div>
 
         <hr style="border: 0.5px solid var(--line-soft); margin: 10px 0;">
 
         <div class="drawer-item" onclick="toggleMobileFuncDrawer(false)">
-            <span>❌ 關閉工具箱</span>
+            <span data-i18n="drawer.close">❌ 關閉工具箱</span>
         </div>
     </div>
 </div>
 
 <div id="mobileLeftDrawer" class="mobile-left-drawer" aria-hidden="true">
-    <button id="mobileLeftTab" class="mobile-left-tab" type="button" onclick="toggleMobileLeftDrawer()">對位</button>
+    <button id="mobileLeftTab" class="mobile-left-tab" type="button" onclick="toggleMobileLeftDrawer()" data-i18n="drawer.alignTab">對位</button>
     <div class="mobile-left-shell">
-        <div class="drawer-header" style="color:#ffd287;">🎯 對位微調</div>
+        <div class="drawer-header" style="color:#ffd287;" data-i18n="drawer.alignHeader">🎯 對位微調</div>
         <div id="manualMeasurePad" class="manual-measure-pad" aria-hidden="true"></div>
     </div>
 </div>
 
 <div id="mobileTestLog" class="mobile-test-log collapsed" aria-live="polite">
     <div class="mobile-test-log-head">
-        <span>🧪 手機測試紀錄</span>
+        <span data-i18n="mobile.testLogTitle">🧪 手機測試紀錄</span>
         <div class="mobile-test-log-actions">
-            <button class="mobile-test-log-btn" type="button" onclick="toggleMobileTestLog()">紀錄</button>
-            <button class="mobile-test-log-btn" type="button" onclick="copyMobileTestLog()">複製</button>
-            <button class="mobile-test-log-btn" type="button" onclick="clearMobileTestLog()">清除</button>
+            <button class="mobile-test-log-btn" type="button" onclick="toggleMobileTestLog()" data-i18n="mobile.testLogBtn">紀錄</button>
+            <button class="mobile-test-log-btn" type="button" onclick="copyMobileTestLog()" data-i18n="mobile.testLogCopy">複製</button>
+            <button class="mobile-test-log-btn" type="button" onclick="clearMobileTestLog()" data-i18n="mobile.testLogClear">清除</button>
         </div>
     </div>
     <div class="mobile-test-log-filter-wrap">
-        <input type="search" id="mobileTestLogFilter" class="mobile-test-log-filter" placeholder="搜尋關鍵字…" autocomplete="off" inputmode="search" oninput="filterMobileTestLog(this.value)">
+        <input type="search" id="mobileTestLogFilter" class="mobile-test-log-filter" data-i18n-placeholder="mobile.testLogFilterPh" placeholder="搜尋關鍵字…" autocomplete="off" inputmode="search" oninput="filterMobileTestLog(this.value)">
     </div>
     <div id="mobileTestLogBody" class="mobile-test-log-body"></div>
 </div>
@@ -214,56 +221,56 @@
 <div class="main-layout">
     <div class="drawing-panel work-mode-only-calc calc-subpage-block calc-subpage-block-2">
         <div class="tool-bar">
-            <div class="group-title calc-subpage-block calc-subpage-block-2" style="flex:1 1 100%; margin:0 0 4px; border:0; padding:0;">第2頁｜圖面量測與全功能計算</div>
+            <div class="group-title calc-subpage-block calc-subpage-block-2" style="flex:1 1 100%; margin:0 0 4px; border:0; padding:0;" data-i18n="page2.title">第2頁｜圖面量測與全功能計算</div>
             <div class="tool-group tool-group--file">
-                <span class="tool-group-label">圖紙</span>
+                <span class="tool-group-label" data-i18n="page2.group.blueprint">圖紙</span>
                 <input type="file" id="fileInput" class="mobile-toolbar-core toolbar-file-input" accept="image/*" onchange="loadImg(event)">
                 <input type="file" id="mobileBlueprintFileInput" class="toolbar-file-input" accept="image/*" aria-hidden="true" tabindex="-1" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;" onchange="loadImg(event)">
-                <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="removeLoadedImage()">移除圖紙</button>
+                <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="removeLoadedImage()" data-i18n="page2.removeBlueprint">移除圖紙</button>
             </div>
             <div id="blueprintUploadStatusBar" class="blueprint-upload-status blueprint-upload-status--idle" role="status" aria-live="polite">
                 <div class="blueprint-upload-status-track">
                     <div id="blueprintUploadStatusFill" class="blueprint-upload-status-fill"></div>
                 </div>
-                <div id="blueprintUploadStatusText" class="blueprint-upload-status-text">圖紙：尚未載入</div>
+                <div id="blueprintUploadStatusText" class="blueprint-upload-status-text" data-i18n="page2.blueprintIdle">圖紙：尚未載入</div>
             </div>
             <div class="tool-group">
-                <span class="tool-group-label">視圖</span>
-                <button class="tool-btn mobile-toolbar-extra" onclick="changeZoom(0.2)">放大</button>
-                <button class="tool-btn mobile-toolbar-extra" onclick="changeZoom(-0.2)">縮小</button>
-                <button class="tool-btn mobile-toolbar-core tool-btn--warm" onclick="fitBlueprintToViewport()">適配視圖</button>
+                <span class="tool-group-label" data-i18n="page2.group.view">視圖</span>
+                <button class="tool-btn mobile-toolbar-extra" onclick="changeZoom(0.2)" data-i18n="page2.zoomIn">放大</button>
+                <button class="tool-btn mobile-toolbar-extra" onclick="changeZoom(-0.2)" data-i18n="page2.zoomOut">縮小</button>
+                <button class="tool-btn mobile-toolbar-core tool-btn--warm" onclick="fitBlueprintToViewport()" data-i18n="page2.fitView">適配視圖</button>
                 <span id="zoom-info" class="toolbar-status-chip mobile-toolbar-extra">縮放: 100%</span>
                 <span id="touchGestureInfo" class="toolbar-status-chip toolbar-status-chip--accent mobile-toolbar-extra">上傳圖後可縮放與滑動</span>
             </div>
             <div class="tool-group">
-                <span class="tool-group-label">量測</span>
-                <button class="tool-btn mobile-toolbar-core tool-btn--warm" onclick="startCalibration()">定比例</button>
-                <button class="tool-btn mobile-toolbar-core tool-btn--money" onclick="startMeasure()">測量</button>
-                <button class="tool-btn level-only-standard mobile-toolbar-extra tool-btn--accent" onclick="connectLaserRuler()">連線藍牙雷射尺</button>
+                <span class="tool-group-label" data-i18n="page2.group.measure">量測</span>
+                <button class="tool-btn mobile-toolbar-core tool-btn--warm" onclick="startCalibration()" data-i18n="page2.calibrate">定比例</button>
+                <button class="tool-btn mobile-toolbar-core tool-btn--money" onclick="startMeasure()" data-i18n="page2.measure">測量</button>
+                <button class="tool-btn level-only-standard mobile-toolbar-extra tool-btn--accent" onclick="connectLaserRuler()" data-i18n="page2.laserConnect">連線藍牙雷射尺</button>
                 <button id="btnMeasureAssist" class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="toggleMeasureAssist()">量圖輔助: 關</button>
                 <button class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="calibrateMeasureAssist()">校正量圖</button>
                 <button id="btnMeasureStrict" class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="toggleMeasureStrictMode()">量圖嚴格: 關</button>
-                <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="clearCanvas()">清空標註</button>
+                <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="clearCanvas()" data-i18n="page2.clearCanvas">清空標註</button>
             </div>
             <div class="tool-group mobile-toolbar-extra">
-                <span class="tool-group-label">智慧分析</span>
-                <button id="btn3D" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggle3DView()">3D檢視</button>
-                <button id="btn360" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggle360Spin()">360翻轉</button>
-                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="reset3DView()">重設視角</button>
-                <button id="btnAutoScan3D" class="tool-btn level-hide-basic mobile-toolbar-extra tool-btn--accent" onclick="autoQuantumScan()">一鍵掃描 3D</button>
+                <span class="tool-group-label" data-i18n="page2.group.smart">智慧分析</span>
+                <button id="btn3D" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggle3DView()" data-i18n="page2.view3d">3D檢視</button>
+                <button id="btn360" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggle360Spin()" data-i18n="page2.spin360">360翻轉</button>
+                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="reset3DView()" data-i18n="page2.resetView">重設視角</button>
+                <button id="btnAutoScan3D" class="tool-btn level-hide-basic mobile-toolbar-extra tool-btn--accent" onclick="autoQuantumScan()" data-i18n="page2.scan3d">一鍵掃描 3D</button>
                 <button id="btnGyro" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggleGyroMode()">陀螺儀: 關</button>
                 <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="calibrateGyroBaseline()">校正陀螺儀</button>
-                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="startEdgeAIVision()">AI視覺點料</button>
+                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="startEdgeAIVision()" data-i18n="page2.aiVision">AI視覺點料</button>
             </div>
             <div class="tool-group mobile-toolbar-extra">
-                <span class="tool-group-label">畫質</span>
-                <label class="tool-mini">對比 <input type="range" id="imgContrast" min="0.7" max="1.5" step="0.01" value="1" oninput="updateImageFilter('contrast', this.value)"></label>
-                <label class="tool-mini">亮度 <input type="range" id="imgBrightness" min="0.7" max="1.4" step="0.01" value="1" oninput="updateImageFilter('brightness', this.value)"></label>
-                <button class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="autoEnhanceImage()">自動優化</button>
-                <button class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="resetImageFilter()">重設畫質</button>
+                <span class="tool-group-label" data-i18n="page2.group.quality">畫質</span>
+                <label class="tool-mini"><span data-i18n="page2.contrast">對比</span> <input type="range" id="imgContrast" min="0.7" max="1.5" step="0.01" value="1" oninput="updateImageFilter('contrast', this.value)"></label>
+                <label class="tool-mini"><span data-i18n="page2.brightness">亮度</span> <input type="range" id="imgBrightness" min="0.7" max="1.4" step="0.01" value="1" oninput="updateImageFilter('brightness', this.value)"></label>
+                <button class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="autoEnhanceImage()" data-i18n="page2.autoEnhance">自動優化</button>
+                <button class="tool-btn level-hide-basic mobile-toolbar-extra" onclick="resetImageFilter()" data-i18n="page2.resetQuality">重設畫質</button>
             </div>
             <div class="tool-group tool-group--status mobile-toolbar-extra">
-                <span class="tool-group-label">狀態</span>
+                <span class="tool-group-label" data-i18n="page2.group.status">狀態</span>
                 <span id="measureAssistInfo" class="toolbar-status-chip level-hide-basic">量圖輔助: 未啟用</span>
                 <span id="gyroInfo" class="toolbar-status-chip level-only-pro">陀螺儀: 未啟用</span>
                 <span id="blueprint-quality-info" class="toolbar-status-chip">圖紙品質: 待檢查</span>
@@ -273,8 +280,8 @@
         </div>
         <div id="canvas-container" data-empty="true" aria-label="尚未上傳圖紙">
             <div class="canvas-empty-state">
-                <strong>上傳圖紙開始量測</strong>
-                <span>按上方「選擇檔案」載入 JPG／PNG 圖面，再定比例與測量。</span>
+                <strong data-i18n="page2.emptyTitle">上傳圖紙開始量測</strong>
+                <span data-i18n="page2.emptyHint">按上方「選擇檔案」載入 JPG／PNG 圖面，再定比例與測量。</span>
             </div>
             <div class="blueprint-workspace-meta" aria-hidden="true">
                 <span class="blueprint-workspace-chip">Premium Touch</span>
@@ -356,41 +363,41 @@
 
         <!-- 固定規則：放樣內容只放在第四頁 -->
         <section id="stakeModePage" class="work-mode-only-stake">
-        <div class="group-title">
+        <div class="group-title" data-i18n="stake.title">
             放樣模式｜BIM 模型檢核與放樣
             <span style="font-size: 0.6em; color: #98c8ff;">QA v1</span>
         </div>
         <div class="bim-actions" style="margin-top:8px; margin-bottom:8px;">
-            <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')">↩️ 回計算模式</button>
+            <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')" data-i18n="stake.backCalc">↩️ 回計算模式</button>
         </div>
         <div class="input-row">
             <div class="input-wrapper">
-                <label>上傳模型檔</label>
+                <label data-i18n="stake.uploadModel">上傳模型檔</label>
                 <input type="file" id="ifcInput" accept=".ifc,.ifczip,.txt" onchange="loadIFCModel(event)">
             </div>
             <div class="input-wrapper">
-                <label>模型查詢（ID/類型）</label>
-                <input type="text" id="ifcSearch" placeholder="例如 #123 或 牆/柱/梁" oninput="searchIFCEntity(this.value)">
+                <label data-i18n="stake.searchLabel">模型查詢（ID/類型）</label>
+                <input type="text" id="ifcSearch" data-i18n-placeholder="stake.searchPh" placeholder="例如 #123 或 牆/柱/梁" oninput="searchIFCEntity(this.value)">
             </div>
         </div>
         <div class="bim-grid">
-            <div class="bim-card">模型檔名<strong id="bimFileName">尚未載入</strong></div>
-            <div class="bim-card">總實體數<strong id="bimEntityCount">0</strong></div>
-            <div class="bim-card">構件數量<strong id="bimElementCount">0</strong></div>
-            <div class="bim-card">QA 分數<strong id="bimQaScore">0 / 100</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.fileName">模型檔名</span><strong id="bimFileName" data-i18n="stake.notLoaded">尚未載入</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.entityCount">總實體數</span><strong id="bimEntityCount">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.elementCount">構件數量</span><strong id="bimElementCount">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.qaScore">QA 分數</span><strong id="bimQaScore">0 / 100</strong></div>
         </div>
         <div class="bim-grid">
-            <div class="bim-card">長度總量<strong id="bimQtyLength">0</strong></div>
-            <div class="bim-card">面積總量<strong id="bimQtyArea">0</strong></div>
-            <div class="bim-card">體積總量<strong id="bimQtyVolume">0</strong></div>
-            <div class="bim-card">計數總量<strong id="bimQtyCount">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.length">長度總量</span><strong id="bimQtyLength">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.area">面積總量</span><strong id="bimQtyArea">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.volume">體積總量</span><strong id="bimQtyVolume">0</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.count">計數總量</span><strong id="bimQtyCount">0</strong></div>
         </div>
         <div class="bim-grid">
-            <div class="bim-card">放樣 QA 等級<strong id="qaLevelLayout">-</strong></div>
+            <div class="bim-card"><span data-i18n="stake.card.layoutQa">放樣 QA 等級</span><strong id="qaLevelLayout">-</strong></div>
         </div>
         <div class="bim-table-wrap">
             <table>
-                <thead><tr><th>構件類型</th><th>數量</th></tr></thead>
+                <thead><tr><th data-i18n="stake.table.type">構件類型</th><th data-i18n="stake.table.qty">數量</th></tr></thead>
                 <tbody id="bimTypeBody"></tbody>
             </table>
         </div>
@@ -430,122 +437,154 @@
             </div>
         </div>
         <div class="bim-rule-wrap" style="border-color: rgba(198, 170, 255, 0.38); background: rgba(173, 130, 255, 0.08);">
-            <div class="bim-note" style="margin-top:0;">BIM 放樣助手（MVP）：由模型自動抽取放樣點，並輸出 QA 驗證報告。</div>
+            <div class="bim-note" style="margin-top:0;" data-i18n="stake.bimNote">BIM 放樣助手（MVP）：由模型自動抽取放樣點，並輸出 QA 驗證報告。</div>
             <div id="stakeExecutionCluster" class="action-cluster action-cluster--accent">
                 <div class="action-cluster-header">
                     <div>
-                        <div class="action-cluster-title">放樣執行設定</div>
-                        <div class="action-cluster-note">先選擇構件類型與放樣精度。一般放樣（一鍵／產點／強化等）依會員等級；⚛️ IBM 雲端放樣另需後台為該帳號勾選「IBM 雲端」權限。</div>
+                        <div class="action-cluster-title" data-i18n="stake.execTitle">放樣執行設定</div>
+                        <div class="action-cluster-note" data-i18n="stake.execNote">先選擇構件類型與放樣精度。一般放樣（一鍵／產點／強化等）依會員等級；⚛️ IBM 雲端放樣另需後台為該帳號勾選「IBM 雲端」權限。</div>
                     </div>
-                    <div class="action-cluster-chip">Page 4 Staking</div>
+                    <div class="action-cluster-chip" data-i18n="stake.chipStaking">Page 4 Staking</div>
                 </div>
                 <div class="action-cluster-tags">
-                <label class="tool-mini"><input id="layoutTypeColumn" type="checkbox" checked> 柱</label>
-                <label class="tool-mini"><input id="layoutTypeWall" type="checkbox" checked> 牆</label>
-                <label class="tool-mini"><input id="layoutTypeBeam" type="checkbox" checked> 梁</label>
-                <label class="tool-mini"><input id="layoutHighPrecisionToggle" type="checkbox" checked> 放樣高精度</label>
+                <label class="tool-mini"><input id="layoutTypeColumn" type="checkbox" checked> <span data-i18n="stake.colColumn">柱</span></label>
+                <label class="tool-mini"><input id="layoutTypeWall" type="checkbox" checked> <span data-i18n="stake.colWall">牆</span></label>
+                <label class="tool-mini"><input id="layoutTypeBeam" type="checkbox" checked> <span data-i18n="stake.colBeam">梁</span></label>
+                <label class="tool-mini"><input id="layoutHighPrecisionToggle" type="checkbox" checked> <span data-i18n="stake.highPrecision">放樣高精度</span></label>
             </div>
                 <div class="action-cluster-grid">
-                <button class="tool-btn" style="border-color:#9fa8da; color:#e5e8ff;" onclick="runDesktopStakingPipeline()">🚀 一鍵放樣流程</button>
-                <button class="tool-btn" style="border-color:#b388ff; color:#e8d9ff;" onclick="runQuantumAutoStakeLayout()">⚛️ IBM 雲端放樣</button>
-                <button class="tool-btn" onclick="generateBimLayoutPoints()">📍 產生放樣點</button>
-                <button class="tool-btn" style="border-color:#00e5ff; color:#bff8ff;" onclick="enhanceBimStakingQuality()">🛡️ 強化放樣</button>
+                <button class="tool-btn" style="border-color:#9fa8da; color:#e5e8ff;" onclick="runDesktopStakingPipeline()" data-i18n="stake.btnPipeline">🚀 一鍵放樣流程</button>
+                <button class="tool-btn" style="border-color:#b388ff; color:#e8d9ff;" onclick="runQuantumAutoStakeLayout()" data-i18n="stake.btnIbmCloud">⚛️ IBM 雲端放樣</button>
+                <button class="tool-btn" onclick="generateBimLayoutPoints()" data-i18n="stake.btnGeneratePoints">📍 產生放樣點</button>
+                <button class="tool-btn" style="border-color:#00e5ff; color:#bff8ff;" onclick="enhanceBimStakingQuality()" data-i18n="stake.btnEnhance">🛡️ 強化放樣</button>
                 </div>
             </div>
             <div id="stakeQaCluster" class="action-cluster action-cluster--warm">
                 <div class="action-cluster-header">
                     <div>
-                        <div class="action-cluster-title">QA 檢核與修正</div>
-                        <div class="action-cluster-note">集中做控制點配準、偏差分析、穩定度與置信度檢核。</div>
+                        <div class="action-cluster-title" data-i18n="stake.qaTitle">QA 檢核與修正</div>
+                        <div class="action-cluster-note" data-i18n="stake.qaNote">集中做控制點配準、偏差分析、穩定度與置信度檢核。</div>
                     </div>
-                    <div class="action-cluster-chip">QA Control</div>
+                    <div class="action-cluster-chip" data-i18n="stake.chipQa">QA Control</div>
                 </div>
                 <div class="action-cluster-grid">
-                <button class="tool-btn" style="border-color:#ffca80; color:#ffe7c7;" onclick="applyLayoutControlPointAlignment()">🧭 控制點配準</button>
-                <button class="tool-btn" style="border-color:#ff8a65; color:#ffd7cb;" onclick="runBimLayoutDeviationHeatmap()">🌡️ 偏差熱圖</button>
-                <button class="tool-btn" style="border-color:#ef9a9a; color:#ffe5e5;" onclick="runBimLayoutStabilityRetest()">🔁 穩定度重測(3輪)</button>
-                <button class="tool-btn" style="border-color:#80cbc4; color:#d4fff9;" onclick="runBimLayoutConfidenceLayering(true)">🎯 只顯示高信心點</button>
-                <button class="tool-btn" style="border-color:#b0bec5; color:#e4ebef;" onclick="showAllBimLayoutPoints()">📋 顯示全部點</button>
-                <button class="tool-btn" onclick="optimizeBimLayoutPointsForPrecision()">🎯 高精度修正</button>
-                <button class="tool-btn" onclick="groupBimLayoutPointsForQa()">🧩 自動分群 QA</button>
-                <button class="tool-btn" onclick="runBimLayoutQa()">🧪 執行放樣 QA</button>
+                <button class="tool-btn" style="border-color:#ffca80; color:#ffe7c7;" onclick="applyLayoutControlPointAlignment()" data-i18n="stake.btnControlAlign">🧭 控制點配準</button>
+                <button class="tool-btn" style="border-color:#ff8a65; color:#ffd7cb;" onclick="runBimLayoutDeviationHeatmap()" data-i18n="stake.btnHeatmap">🌡️ 偏差熱圖</button>
+                <button class="tool-btn" style="border-color:#ef9a9a; color:#ffe5e5;" onclick="runBimLayoutStabilityRetest()" data-i18n="stake.btnStability">🔁 穩定度重測(3輪)</button>
+                <button class="tool-btn" style="border-color:#80cbc4; color:#d4fff9;" onclick="runBimLayoutConfidenceLayering(true)" data-i18n="stake.btnHighConfidence">🎯 只顯示高信心點</button>
+                <button class="tool-btn" style="border-color:#b0bec5; color:#e4ebef;" onclick="showAllBimLayoutPoints()" data-i18n="stake.btnShowAll">📋 顯示全部點</button>
+                <button class="tool-btn" onclick="optimizeBimLayoutPointsForPrecision()" data-i18n="stake.btnPrecisionFix">🎯 高精度修正</button>
+                <button class="tool-btn" onclick="groupBimLayoutPointsForQa()" data-i18n="stake.btnGroupQa">🧩 自動分群 QA</button>
+                <button class="tool-btn" onclick="runBimLayoutQa()" data-i18n="stake.btnRunQa">🧪 執行放樣 QA</button>
+                </div>
+            </div>
+            <div id="stakeFieldSimulator" class="field-simulator work-mode-only-stake">
+                <div class="action-cluster action-cluster--accent" style="margin-top:12px;">
+                    <div class="action-cluster-header">
+                        <div>
+                            <div class="action-cluster-title" data-i18n="sim.stakeTitle">📸 現場放樣模擬器</div>
+                            <div class="action-cluster-note" data-i18n="sim.stakeNote">上傳現場照片，拖曳十字線逐點對準放樣位置並標記；全部點位完成現場操作後再匯出。</div>
+                        </div>
+                        <div class="action-cluster-chip" data-i18n="sim.stakeChip">Field Sim</div>
+                    </div>
+                    <label class="field-simulator-upload-label" for="stakeSimImageInput" data-i18n="sim.uploadLabel">上傳現場圖（JPG／PNG）</label>
+                    <input type="file" id="stakeSimImageInput" class="toolbar-file-input field-simulator-file" accept="image/*">
+                    <div class="field-simulator-toolbar">
+                        <button type="button" class="tool-btn" onclick="stakeSimPrevPoint()" data-i18n="sim.stakePrev">◀ 上一點</button>
+                        <button type="button" class="tool-btn" onclick="stakeSimNextPoint()" data-i18n="sim.stakeNext">下一點 ▶</button>
+                        <button type="button" class="tool-btn" onclick="stakeSimSnapToTarget()" data-i18n="sim.stakeSnap">🎯 對準此點</button>
+                        <button type="button" class="tool-btn" id="stakeSimMarkBtn" onclick="stakeSimMarkCurrentPoint()" data-i18n="sim.stakeMark" disabled>📍 標記此點已放樣</button>
+                    </div>
+                    <div id="stakeSimOpLabel" class="field-simulator-op-label" data-i18n="sim.stakeOpIdle">現場操作：請先上傳現場圖</div>
+                    <div class="field-simulator-toolbar field-simulator-toolbar--secondary">
+                        <button type="button" class="tool-btn" onclick="stakeSimZoomOut()" data-i18n="sim.zoomOut">🔍－</button>
+                        <button type="button" class="tool-btn" onclick="stakeSimZoomReset()" data-i18n="sim.zoomReset">↺ 視圖</button>
+                        <button type="button" class="tool-btn" onclick="stakeSimZoomIn()" data-i18n="sim.zoomIn">🔍＋</button>
+                        <button type="button" class="tool-btn" onclick="toggleStakeSimCrosshair()" data-i18n="sim.toggleCrosshair">十字線</button>
+                        <button type="button" class="tool-btn" onclick="toggleStakeSimPoints()" data-i18n="sim.togglePoints">放樣點</button>
+                    </div>
+                    <div class="field-simulator-stage">
+                        <canvas id="stakeSimCanvas" aria-label="放樣現場模擬器"></canvas>
+                    </div>
+                    <div id="stakeSimStatus" class="field-simulator-status" data-ok="0" data-i18n="sim.stakeStatusIdle">尚未上傳現場圖</div>
+                    <button type="button" class="tool-btn field-simulator-confirm-btn" onclick="confirmStakeFieldSimulator()" data-i18n="sim.stakeConfirm" disabled>✅ 現場放樣操作完成，可匯出資料</button>
                 </div>
             </div>
             <div id="stakeExportCluster" class="action-cluster">
                 <div class="action-cluster-header">
                     <div>
-                        <div class="action-cluster-title">輸出、補點與現場抽驗</div>
-                        <div class="action-cluster-note">完成 QA 後再匯出放樣點、QA 報告與施工包。</div>
+                        <div class="action-cluster-title" data-i18n="stake.exportTitle">輸出、補點與現場抽驗</div>
+                        <div class="action-cluster-note" data-i18n="stake.exportNote">完成 QA 後再匯出放樣點、QA 報告與施工包。</div>
                     </div>
-                    <div class="action-cluster-chip">Export</div>
+                    <div class="action-cluster-chip" data-i18n="stake.chipExport">Export</div>
                 </div>
                 <div class="action-cluster-grid">
-                <button class="tool-btn" onclick="exportBimLayoutPoints()">⬇️ 匯出放樣點 CSV</button>
-                <button class="tool-btn" onclick="exportBimLayoutQaReport()">⬇️ 匯出 QA 報告 CSV</button>
-                <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="exportBimConstructionPackage()">📦 匯出施工包</button>
-                <button class="tool-btn" style="border-color:#ffe082; color:#fff2c4;" onclick="suggestLayoutControlPointsCoverage()">🧭 自動補點建議</button>
-                <button class="tool-btn" style="border-color:#ce93d8; color:#f3dcff;" onclick="startLayoutFieldSpotCheck()">🧪 現場抽驗模式</button>
+                <button class="tool-btn" onclick="exportBimLayoutPoints()" data-i18n="stake.btnExportPoints">⬇️ 匯出放樣點 CSV</button>
+                <button class="tool-btn" onclick="exportBimLayoutQaReport()" data-i18n="stake.btnExportQa">⬇️ 匯出 QA 報告 CSV</button>
+                <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="exportBimConstructionPackage()" data-i18n="stake.btnExportPackage">📦 匯出施工包</button>
+                <button class="tool-btn" style="border-color:#ffe082; color:#fff2c4;" onclick="suggestLayoutControlPointsCoverage()" data-i18n="stake.btnSuggestCoverage">🧭 自動補點建議</button>
+                <button class="tool-btn" style="border-color:#ce93d8; color:#f3dcff;" onclick="startLayoutFieldSpotCheck()" data-i18n="stake.btnSpotCheck">🧪 現場抽驗模式</button>
                 </div>
             </div>
             </div>
             <div class="input-row" style="margin-top: 8px; border: 1px dashed #ffca80; padding: 10px; border-radius: 6px; background: rgba(255, 202, 128, 0.08);">
                 <div class="input-wrapper">
-                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;">控制點1（設計 X/Y -> 現地 X/Y）</label>
+                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;" data-i18n="stake.cp1Label">控制點1（設計 X/Y -> 現地 X/Y）</label>
                     <div style="display:grid; grid-template-columns:repeat(4,minmax(72px,1fr)); gap:6px;">
-                        <input id="layoutCp1DesignX" type="number" placeholder="設計X">
-                        <input id="layoutCp1DesignY" type="number" placeholder="設計Y">
-                        <input id="layoutCp1FieldX" type="number" placeholder="現地X">
-                        <input id="layoutCp1FieldY" type="number" placeholder="現地Y">
+                        <input id="layoutCp1DesignX" type="number" data-i18n-placeholder="stake.phDesignX" placeholder="設計X">
+                        <input id="layoutCp1DesignY" type="number" data-i18n-placeholder="stake.phDesignY" placeholder="設計Y">
+                        <input id="layoutCp1FieldX" type="number" data-i18n-placeholder="stake.phFieldX" placeholder="現地X">
+                        <input id="layoutCp1FieldY" type="number" data-i18n-placeholder="stake.phFieldY" placeholder="現地Y">
                     </div>
                 </div>
                 <div class="input-wrapper">
-                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;">控制點2（設計 X/Y -> 現地 X/Y）</label>
+                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;" data-i18n="stake.cp2Label">控制點2（設計 X/Y -> 現地 X/Y）</label>
                     <div style="display:grid; grid-template-columns:repeat(4,minmax(72px,1fr)); gap:6px;">
-                        <input id="layoutCp2DesignX" type="number" placeholder="設計X">
-                        <input id="layoutCp2DesignY" type="number" placeholder="設計Y">
-                        <input id="layoutCp2FieldX" type="number" placeholder="現地X">
-                        <input id="layoutCp2FieldY" type="number" placeholder="現地Y">
+                        <input id="layoutCp2DesignX" type="number" data-i18n-placeholder="stake.phDesignX" placeholder="設計X">
+                        <input id="layoutCp2DesignY" type="number" data-i18n-placeholder="stake.phDesignY" placeholder="設計Y">
+                        <input id="layoutCp2FieldX" type="number" data-i18n-placeholder="stake.phFieldX" placeholder="現地X">
+                        <input id="layoutCp2FieldY" type="number" data-i18n-placeholder="stake.phFieldY" placeholder="現地Y">
                     </div>
                 </div>
                 <div class="input-wrapper">
-                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;">控制點3（選填，提升精度）</label>
+                    <label style="color:#ffd59c; font-weight:bold; font-size:0.82em;" data-i18n="stake.cp3Label">控制點3（選填，提升精度）</label>
                     <div style="display:grid; grid-template-columns:repeat(4,minmax(72px,1fr)); gap:6px;">
-                        <input id="layoutCp3DesignX" type="number" placeholder="設計X">
-                        <input id="layoutCp3DesignY" type="number" placeholder="設計Y">
-                        <input id="layoutCp3FieldX" type="number" placeholder="現地X">
-                        <input id="layoutCp3FieldY" type="number" placeholder="現地Y">
+                        <input id="layoutCp3DesignX" type="number" data-i18n-placeholder="stake.phDesignX" placeholder="設計X">
+                        <input id="layoutCp3DesignY" type="number" data-i18n-placeholder="stake.phDesignY" placeholder="設計Y">
+                        <input id="layoutCp3FieldX" type="number" data-i18n-placeholder="stake.phFieldX" placeholder="現地X">
+                        <input id="layoutCp3FieldY" type="number" data-i18n-placeholder="stake.phFieldY" placeholder="現地Y">
                     </div>
                 </div>
             </div>
             <div class="input-row" style="margin-top: 10px; border: 1px dashed #b388ff; padding: 10px; border-radius: 6px; background: rgba(179, 136, 255, 0.05);">
                 <div class="input-wrapper">
-                    <label style="color: #b388ff; font-weight: bold; font-size: 0.85em;">🔐 IBM Quantum 後端代理</label>
+                    <label style="color: #b388ff; font-weight: bold; font-size: 0.85em;" data-i18n="stake.ibmProxyLabel">🔐 IBM Quantum 後端代理</label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="password" id="ibmQuantumKey" placeholder="正式金鑰已移至後端安全代理" style="border-color: #b388ff; box-shadow: 0 0 8px rgba(179,136,255,0.2);">
-                        <button class="tool-btn" type="button" id="ibmQuantumKeyToggleBtn" onclick="toggleIBMQuantumKeyVisibility()" style="border-color:#b388ff; color:#e8d9ff; white-space:nowrap;">後端代理</button>
-                        <button class="tool-btn" type="button" onclick="clearIBMQuantumKey()" style="border-color:#ff9aa2; color:#ffd7dc; white-space:nowrap;">🧹 清除</button>
+                        <input type="password" id="ibmQuantumKey" data-i18n-placeholder="stake.ibmKeyPh" placeholder="正式金鑰已移至後端安全代理" style="border-color: #b388ff; box-shadow: 0 0 8px rgba(179,136,255,0.2);">
+                        <button class="tool-btn" type="button" id="ibmQuantumKeyToggleBtn" onclick="toggleIBMQuantumKeyVisibility()" style="border-color:#b388ff; color:#e8d9ff; white-space:nowrap;" data-i18n="stake.ibmBackendBtn">後端代理</button>
+                        <button class="tool-btn" type="button" onclick="clearIBMQuantumKey()" style="border-color:#ff9aa2; color:#ffd7dc; white-space:nowrap;" data-i18n="stake.ibmClearBtn">🧹 清除</button>
                     </div>
                 </div>
             </div>
-            <div id="layoutAlignmentSummary" class="bim-note" style="color:#ffd59c;">控制點配準：尚未套用</div>
-            <div id="layoutHeatmapSummary" class="bim-note" style="color:#ffcfbf;">偏差熱圖：尚未分析</div>
-            <div id="layoutStabilitySummary" class="bim-note" style="color:#ffcdcd;">穩定度重測：尚未執行</div>
-            <div id="layoutConfidenceSummary" class="bim-note" style="color:#b9f5ef;">置信度分層：尚未分析</div>
-            <div id="layoutCoverageSummary" class="bim-note" style="color:#ffe9a9;">補點建議：尚未分析</div>
-            <div id="layoutSpotCheckSummary" class="bim-note" style="color:#e9c7ff;">現場抽驗：尚未抽驗</div>
-            <div id="bimLayoutQaSummary" class="bim-note">放樣 QA：尚未執行</div>
+            <div id="layoutAlignmentSummary" class="bim-note" style="color:#ffd59c;" data-i18n="stake.summaryAlignment">控制點配準：尚未套用</div>
+            <div id="layoutHeatmapSummary" class="bim-note" style="color:#ffcfbf;" data-i18n="stake.summaryHeatmap">偏差熱圖：尚未分析</div>
+            <div id="layoutStabilitySummary" class="bim-note" style="color:#ffcdcd;" data-i18n="stake.summaryStability">穩定度重測：尚未執行</div>
+            <div id="layoutConfidenceSummary" class="bim-note" style="color:#b9f5ef;" data-i18n="stake.summaryConfidence">置信度分層：尚未分析</div>
+            <div id="layoutCoverageSummary" class="bim-note" style="color:#ffe9a9;" data-i18n="stake.summaryCoverage">補點建議：尚未分析</div>
+            <div id="layoutSpotCheckSummary" class="bim-note" style="color:#e9c7ff;" data-i18n="stake.summarySpotCheck">現場抽驗：尚未抽驗</div>
+            <div id="bimLayoutQaSummary" class="bim-note" data-i18n="stake.summaryQa">放樣 QA：尚未執行</div>
             <div class="bim-table-wrap">
                 <table>
-                    <thead><tr><th>ID</th><th>來源構件</th><th>類型</th><th>點位</th><th>X</th><th>Y</th><th>Z</th><th>樓層</th><th>群組</th><th>偏差</th><th>信心</th></tr></thead>
+                    <thead><tr><th data-i18n="stake.table.id">ID</th><th data-i18n="stake.table.source">來源構件</th><th data-i18n="stake.table.type">類型</th><th data-i18n="stake.table.point">點位</th><th>X</th><th>Y</th><th>Z</th><th data-i18n="stake.table.floor">樓層</th><th data-i18n="stake.table.group">群組</th><th data-i18n="stake.table.deviation">偏差</th><th data-i18n="stake.table.confidence">信心</th></tr></thead>
                     <tbody id="bimLayoutBody"></tbody>
                 </table>
             </div>
-            <div class="group-title level-only-pro" style="margin-top:14px;">放樣學習摘要</div>
-            <div class="bim-note level-only-pro" id="stakingLearningSummary" style="margin-top:6px; color:#d7e9ff;">放樣學習：尚未建立</div>
-            <div class="bim-note level-only-pro" id="stakingSuggestionHint" style="margin-top:6px; color:#d8dff0;">相似案例建議：尚未命中</div>
+            <div class="group-title level-only-pro" style="margin-top:14px;" data-i18n="stake.learningTitle">放樣學習摘要</div>
+            <div class="bim-note level-only-pro" id="stakingLearningSummary" style="margin-top:6px; color:#d7e9ff;" data-i18n="stake.learningSummary">放樣學習：尚未建立</div>
+            <div class="bim-note level-only-pro" id="stakingSuggestionHint" style="margin-top:6px; color:#d8dff0;" data-i18n="stake.suggestionHint">相似案例建議：尚未命中</div>
             <div class="bim-actions level-only-pro" style="margin-top:8px;">
-                <button class="tool-btn" style="border-color:#9bc2e5; color:#d7ebff;" onclick="renderStakingLearningPanel()">🔄 重新整理放樣學習</button>
-                <button class="tool-btn" style="border-color:#80cbc4; color:#d4fff9;" onclick="applyStakingMemorySuggestion()">🧭 套用相似案例建議</button>
+                <button class="tool-btn" style="border-color:#9bc2e5; color:#d7ebff;" onclick="renderStakingLearningPanel()" data-i18n="stake.btnRefreshLearning">🔄 重新整理放樣學習</button>
+                <button class="tool-btn" style="border-color:#80cbc4; color:#d4fff9;" onclick="applyStakingMemorySuggestion()" data-i18n="stake.btnApplySuggestion">🧭 套用相似案例建議</button>
                 <button class="tool-btn" style="border-color:#9fa8da; color:#e5e8ff;" onclick="approveStakingMemory()">✅ 通過入核心</button>
                 <button class="tool-btn" style="border-color:#b39ddb; color:#efe3ff;" onclick="approveStakingMemoryWithCurrentState()">🛠️ 以目前狀態修正後通過</button>
                 <button class="tool-btn" style="border-color:#ffcc80; color:#ffe9c7;" onclick="rejectStakingMemory()">↩️ 退回本次結果</button>
@@ -642,43 +681,103 @@
         <div class="bim-note">支援模型文字解析：自動統計構件類型、讀取部分工程量欄位，作為 QA 與算量前檢核。</div>
         </section>
 
-        <!-- 固定規則：第1~3頁只保留計算內容 -->
-        <section id="calcModePage">
-        <div id="freeWarRoomCard" class="free-war-room-card calc-subpage-block calc-subpage-block-1">
-            <div class="free-war-room-card-head">
-                <strong>💬 第一頁交流入口（免費）</strong>
-                <span id="freeWarRoomStatus" class="free-war-room-status">戰情室：離線</span>
+        <!-- 電機模式：機電參數配置與本機組態匯出 -->
+        <section id="electricalModePage" class="work-mode-only-electrical electrical-mode-page">
+            <div class="group-title" data-i18n="electrical.title">⚡ 電機模式｜機電參數配置面板</div>
+            <p class="electrical-mode-note" data-i18n="electrical.note">V1.0 雛形：設定電壓／電流／腳本模式，一鍵匯出 <code>mecha_config.txt</code> 供本機 Python 或現場測試讀取（僅存本機，不上傳雲端）。</p>
+            <div class="bim-actions" style="margin-top:8px; margin-bottom:8px;">
+                <button type="button" class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')" data-i18n="electrical.backCalc">↩️ 回計算模式</button>
             </div>
-            <p class="free-war-room-card-note">第1頁：簡單試算＋會員聊天群組。圖面量測與完整工程功能請切到第2頁。</p>
+            <div class="electrical-panel">
+                <div class="electrical-section electrical-section--green">
+                    <div class="electrical-section-title" data-i18n="electrical.sectionHardware">⚡ 系統硬體參數輸入</div>
+                    <label for="mechaVoltage" data-i18n="electrical.voltageLabel">請設定實體電壓控制值 (V)</label>
+                    <input type="number" id="mechaVoltage" class="security-input electrical-input" value="220" min="0" max="440">
+                    <label for="mechaCurrent" data-i18n="electrical.currentLabel">請設定實體電流控制值 (A)</label>
+                    <input type="number" id="mechaCurrent" class="security-input electrical-input" value="15" min="0" max="100">
+                    <div id="mechaPowerPreview" class="electrical-power-preview" data-i18n="electrical.powerPreview">自動計算總功率：3300 W</div>
+                </div>
+                <div class="electrical-section electrical-section--blue">
+                    <div class="electrical-section-title" data-i18n="electrical.sectionScript">⚙️ 控制腳本模式切換</div>
+                    <label for="mechaWorkMode" data-i18n="electrical.scriptLabel">請選擇本地要執行的 Python 腳本對應模式</label>
+                    <select id="mechaWorkMode" class="electrical-select">
+                        <option value="calc_mode" data-i18n="electrical.modeCalc">標準計算模式 (calc.py)</option>
+                        <option value="stake_mode" data-i18n="electrical.modeStake">現場放樣模式 (stake.py)</option>
+                        <option value="motor_control" data-i18n="electrical.modeMotor">馬達線路驅動 (motor.py)</option>
+                        <option value="safety_lock" data-i18n="electrical.modeLock">硬體安全鎖防禦 (lock.py)</option>
+                    </select>
+                </div>
+                <div class="electrical-section electrical-section--orange">
+                    <div class="electrical-section-title" data-i18n="electrical.sectionRelay">🚨 繼電器線路開關狀態</div>
+                    <div class="electrical-radio-group">
+                        <label><input type="radio" name="mechaRelayStatus" value="ON" checked> <span data-i18n="electrical.relayOn">強制通電開關 (ON)</span></label>
+                        <label><input type="radio" name="mechaRelayStatus" value="OFF"> <span data-i18n="electrical.relayOff">安全斷電斷路 (OFF)</span></label>
+                    </div>
+                </div>
+                <div class="electrical-section electrical-section--sim">
+                    <div class="electrical-section-title" data-i18n="sim.electricalTitle">📸 電壓現場模擬器</div>
+                    <p class="field-simulator-note" data-i18n="sim.electricalNote">上傳現場照片，拖曳探棒十字線到量測點 → 模擬量測電壓 → 模擬繼電器測試；三步都完成後才能下載組態檔。</p>
+                    <label class="field-simulator-upload-label" for="electricalSimImageInput" data-i18n="sim.uploadLabel">上傳現場圖（JPG／PNG）</label>
+                    <input type="file" id="electricalSimImageInput" class="electrical-input field-simulator-file" accept="image/*">
+                    <div class="field-simulator-toolbar">
+                        <button type="button" class="tool-btn" onclick="electricalSimZoomOut()" data-i18n="sim.zoomOut">🔍－</button>
+                        <button type="button" class="tool-btn" onclick="electricalSimZoomReset()" data-i18n="sim.zoomReset">↺ 視圖</button>
+                        <button type="button" class="tool-btn" onclick="electricalSimZoomIn()" data-i18n="sim.zoomIn">🔍＋</button>
+                        <button type="button" class="tool-btn" id="electricalSimMeasureBtn" onclick="electricalSimMeasureVoltage()" data-i18n="sim.electricalMeasure" disabled>⚡ 模擬量測電壓</button>
+                        <button type="button" class="tool-btn" id="electricalSimRelayBtn" onclick="electricalSimTestRelay()" data-i18n="sim.electricalRelayTest" disabled>🔌 模擬繼電器測試</button>
+                    </div>
+                    <div id="electricalSimOpLabel" class="field-simulator-op-label" data-i18n="sim.electricalOpIdle">現場操作：請先上傳現場圖</div>
+                    <div class="field-simulator-stage">
+                        <canvas id="electricalSimCanvas" aria-label="電機現場模擬器"></canvas>
+                    </div>
+                    <div id="electricalSimStatus" class="field-simulator-status" data-ok="0" data-i18n="sim.electricalStatusIdle">尚未上傳現場圖</div>
+                    <button type="button" class="tool-btn field-simulator-confirm-btn" onclick="confirmElectricalFieldSimulator()" data-i18n="sim.electricalConfirm" disabled>✅ 現場機電操作完成</button>
+                </div>
+                <button type="button" class="tool-btn electrical-download-btn" onclick="downloadMechaConfigFile()" data-i18n="electrical.downloadBtn">💾 確認操作完成，一鍵下載到硬碟</button>
+                <div class="electrical-footer-note" data-i18n="electrical.footer">Construction Master · 機電組態匯出 · 本機硬碟對接測試</div>
+            </div>
+        </section>
+
+        <!-- 固定規則：第1~3頁只保留計算內容 -->
+        <section id="calcModePage" class="work-mode-only-calc">
+        <div id="freeWarRoomCard" class="free-war-room-card member-chat-spotlight calc-subpage-block calc-subpage-block-1">
+            <div class="free-war-room-card-head">
+                <strong data-i18n="page1.cardTitle">💬 第一頁交流入口（免費）</strong>
+                <span id="freeWarRoomStatus" class="free-war-room-status" data-i18n="page1.warRoomStatus">戰情室：離線</span>
+            </div>
+            <p class="free-war-room-card-note" data-i18n="page1.cardNote">第1頁：簡單試算＋會員聊天群組。圖面量測與完整工程功能請切到第2頁。</p>
+            <div class="member-chat-quick-head">
+                <span class="member-chat-quick-badge" data-i18n="page1.chatBadge">群組大廳 · 免登入聊天</span>
+            </div>
             <div class="member-chat-quick-row">
-                <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" placeholder="群組大廳：輸入訊息，Enter 送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
-                <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()">快速送出</button>
+                <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" data-i18n-placeholder="page1.quickPh" placeholder="群組大廳：輸入訊息，Enter 送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
+                <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()" data-i18n="page1.quickSend">快速送出</button>
             </div>
             <div id="memberChatQuickPreview" class="member-chat-quick-preview" aria-live="polite" aria-label="群組聊天預覽"></div>
             <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息與試算📊卡片存於「群組大廳」本機（不需登入；換裝置不同步）。公開隱私權以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites</a> 為準，<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內摘要</a>。解說員可點區塊查看說明。</div>
             <div class="free-war-room-actions">
-                <button type="button" class="tool-btn free-war-room-btn" onclick="toggleMemberChatPanel(true)">開啟會員聊天群組</button>
-                <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()">開啟戰情室</button>
+                <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--primary" onclick="toggleMemberChatPanel(true)" data-i18n="page1.openChat">開啟會員聊天群組</button>
+                <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()" data-i18n="page1.openWarRoom">開啟戰情室</button>
             </div>
         </div>
         <div id="memberChatPanel" class="member-chat-panel calc-subpage-block calc-subpage-block-1" hidden>
             <div class="member-chat-panel-head">
-                <strong>👥 會員聊天群組</strong>
-                <span id="memberChatStatus" class="member-chat-status">好友 0</span>
+                <strong data-i18n="page1.chatTitle">👥 會員聊天群組</strong>
+                <span id="memberChatStatus" class="member-chat-status" data-i18n="page1.friendsZero">好友 0</span>
             </div>
-            <div id="memberChatIdentity" class="member-chat-identity">目前身份：訪客</div>
+            <div id="memberChatIdentity" class="member-chat-identity" data-i18n="page1.identityGuest">目前身份：訪客</div>
             <div class="member-chat-tools">
-                <input type="text" id="memberChatFriendInput" class="security-input member-chat-input" placeholder="輸入好友帳號（例：engineer02）">
-                <button type="button" class="tool-btn member-chat-btn" onclick="addMemberChatFriend()">加入好友</button>
+                <input type="text" id="memberChatFriendInput" class="security-input member-chat-input" data-i18n-placeholder="page1.friendPh" placeholder="輸入好友帳號（例：engineer02）">
+                <button type="button" class="tool-btn member-chat-btn" onclick="addMemberChatFriend()" data-i18n="page1.addFriend">加入好友</button>
                 <select id="memberChatFriendSelect" class="member-chat-select" onchange="switchMemberChatFriend(this.value)">
-                    <option value="">請先加入好友</option>
+                    <option value="" data-i18n="page1.selectFriend">請先加入好友</option>
                 </select>
-                <button type="button" id="memberChatToggleBtn" class="tool-btn member-chat-btn member-chat-btn--ghost" onclick="toggleMemberChatPanel()">收合</button>
+                <button type="button" id="memberChatToggleBtn" class="tool-btn member-chat-btn member-chat-btn--ghost" onclick="toggleMemberChatPanel()" data-i18n="page1.toggleClose">收合</button>
             </div>
-            <div id="memberChatMessageList" class="member-chat-message-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="群組聊天訊息">尚無對話，先加入好友或從上方快速送出到群組大廳。</div>
+            <div id="memberChatMessageList" class="member-chat-message-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="群組聊天訊息" data-i18n="page1.noMessages">尚無對話，先加入好友或從上方快速送出到群組大廳。</div>
             <div class="member-chat-compose">
-                <input type="text" id="memberChatMessageInput" class="security-input member-chat-input" placeholder="輸入聊天訊息">
-                <button type="button" class="tool-btn member-chat-btn" onclick="sendMemberChatMessage()">送出訊息</button>
+                <input type="text" id="memberChatMessageInput" class="security-input member-chat-input" data-i18n-placeholder="page1.messagePh" placeholder="輸入聊天訊息">
+                <button type="button" class="tool-btn member-chat-btn" onclick="sendMemberChatMessage()" data-i18n="page1.sendMessage">送出訊息</button>
             </div>
         </div>
         <div id="stakeMemberWrap" class="member-wrap level-hide-basic work-mode-only-calc calc-subpage-block calc-subpage-block-2">
@@ -708,101 +807,101 @@
                 </table>
             </div>
         </div>
-        <div class="group-title calc-subpage-block calc-subpage-block-1">
+        <div class="group-title calc-subpage-block calc-subpage-block-1" data-i18n="page1.sectionTitle">
             第1頁｜簡單計算＋群組聊天
             <span style="font-size: 0.6em; color: #98c8ff;">聊天、試算與清單；全功能圖面量測請切第2頁</span>
         </div>
         <button class="tool-btn level-only-standard calc-subpage-block calc-subpage-block-2" style="width: 100%; margin-bottom: 15px; border-color: #e91e63; color: #ffb1c2; font-size: 1.1em; padding: 10px;" onclick="startVoiceAgent()">
             🎙️ 呼叫工地語音助理 (點我說話)
         </button>
-        <div class="group-title calc-subpage-block calc-subpage-block-1">工種規格選擇</div>
+        <div class="group-title calc-subpage-block calc-subpage-block-1" data-i18n="page1.tradeTitle">工種規格選擇</div>
         <div class="input-row calc-subpage-block calc-subpage-block-1">
             <div class="input-wrapper">
                 <select id="calcType" onchange="updateUI()">
-                    <optgroup label="模板與混凝土">
-                        <option value="C_VOL">通用體積 (長x寬x高)</option>
-                        <option value="C_COL">柱體積 (AxBxH)</option>
-                        <option value="C_STAIR">樓梯混凝土 ((高+寬)x深/2)</option>
-                        <option value="M_WALL">版牆模板 (長x寬)</option>
-                        <option value="M_COL">獨立柱模 (長+寬)x2x高</option> 
-                        <option value="M_BEAM_SIDES">一般樑模-雙側 (長x側高x2側)</option> 
-                        <option value="M_BEAM_ALL">獨立樑模-三面 (高x2+寬)x長</option>
-                        <option value="M_STAIR">樓梯模板 (斜板+平台+封口)</option>
-                        <option value="M_FOOTING_EDGE">單柱基礎周邊模板 (版厚x(長+寬)x2)</option>
+                    <optgroup data-i18n-label="calc.group.formwork" label="模板與混凝土">
+                        <option value="C_VOL" data-i18n="calcType.C_VOL">通用體積 (長x寬x高)</option>
+                        <option value="C_COL" data-i18n="calcType.C_COL">柱體積 (AxBxH)</option>
+                        <option value="C_STAIR" data-i18n="calcType.C_STAIR">樓梯混凝土 ((高+寬)x深/2)</option>
+                        <option value="M_WALL" data-i18n="calcType.M_WALL">版牆模板 (長x寬)</option>
+                        <option value="M_COL" data-i18n="calcType.M_COL">獨立柱模 (長+寬)x2x高</option> 
+                        <option value="M_BEAM_SIDES" data-i18n="calcType.M_BEAM_SIDES">一般樑模-雙側 (長x側高x2側)</option> 
+                        <option value="M_BEAM_ALL" data-i18n="calcType.M_BEAM_ALL">獨立樑模-三面 (高x2+寬)x長</option>
+                        <option value="M_STAIR" data-i18n="calcType.M_STAIR">樓梯模板 (斜板+平台+封口)</option>
+                        <option value="M_FOOTING_EDGE" data-i18n="calcType.M_FOOTING_EDGE">單柱基礎周邊模板 (版厚x(長+寬)x2)</option>
                     </optgroup>
-                    <optgroup label="鋼筋工程 (分號轉換)">
-                        <option value="R_SLAB">鋼筋 - 樓板/牆 (雙層網)</option>
-                        <option value="R_MAIN">鋼筋 - 柱/樑 主筋</option>
-                        <option value="R_HOOP">鋼筋 - 柱/樑 箍筋</option>
+                    <optgroup data-i18n-label="calc.group.rebar" label="鋼筋工程 (分號轉換)">
+                        <option value="R_SLAB" data-i18n="calcType.R_SLAB">鋼筋 - 樓板/牆 (雙層網)</option>
+                        <option value="R_MAIN" data-i18n="calcType.R_MAIN">鋼筋 - 柱/樑 主筋</option>
+                        <option value="R_HOOP" data-i18n="calcType.R_HOOP">鋼筋 - 柱/樑 箍筋</option>
                     </optgroup>
-                    <optgroup label="土方工程">
-                        <option value="E_DIG">開挖 / 回填</option>
+                    <optgroup data-i18n-label="calc.group.earth" label="土方工程">
+                        <option value="E_DIG" data-i18n="calcType.E_DIG">開挖 / 回填</option>
                     </optgroup>
                 </select>
             </div>
-            <div class="input-wrapper"><input type="text" id="customName" placeholder="部位名稱 (如: C2柱)"></div>
+            <div class="input-wrapper"><input type="text" id="customName" data-i18n-placeholder="page1.partPh" placeholder="部位名稱 (如: C2柱)"></div>
         </div>
 
-        <div class="group-title level-hide-basic calc-subpage-block calc-subpage-block-2">材料單價查詢（試算表）</div>
+        <div class="group-title level-hide-basic calc-subpage-block calc-subpage-block-2" data-i18n="materials.title">材料單價查詢（試算表）</div>
         <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
-                <label>地區資料來源</label>
+                <label data-i18n="materials.regionSource">地區資料來源</label>
                 <select id="regionSelect" onchange="handleRegionChange(this.value)">
-                    <option value="auto">手動抓目前工地</option>
-                    <option value="全台共用">全台共用</option>
-                    <option value="台北市">台北市</option>
-                    <option value="新北市">新北市</option>
-                    <option value="桃園市">桃園市</option>
-                    <option value="台中市">台中市</option>
-                    <option value="台南市">台南市</option>
-                    <option value="高雄市">高雄市</option>
+                    <option value="auto" data-i18n="materials.regionAuto">手動抓目前工地</option>
+                    <option value="全台共用" data-i18n="materials.regionNational">全台共用</option>
+                    <option value="台北市" data-i18n="materials.regionTaipei">台北市</option>
+                    <option value="新北市" data-i18n="materials.regionNewTaipei">新北市</option>
+                    <option value="桃園市" data-i18n="materials.regionTaoyuan">桃園市</option>
+                    <option value="台中市" data-i18n="materials.regionTaichung">台中市</option>
+                    <option value="台南市" data-i18n="materials.regionTainan">台南市</option>
+                    <option value="高雄市" data-i18n="materials.regionKaohsiung">高雄市</option>
                 </select>
             </div>
             <div class="input-wrapper">
-                <label>工地套用</label>
-                <button class="tool-btn" style="width:100%;" onclick="autoDetectRegion()">📍 抓目前工地並套用</button>
+                <label data-i18n="materials.siteApply">工地套用</label>
+                <button class="tool-btn" style="width:100%;" onclick="autoDetectRegion()" data-i18n="materials.detectSiteBtn">📍 抓目前工地並套用</button>
             </div>
         </div>
         <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
-                <label>工地即時天氣</label>
-                <div id="siteWeatherInfo" class="bim-note" style="margin-top:4px;">天氣：尚未更新</div>
-                <div id="siteWeatherSafety" class="bim-note" style="margin-top:4px; color:#bdeecf;">施工建議：天氣自動更新中</div>
+                <label data-i18n="materials.weatherLabel">工地即時天氣</label>
+                <div id="siteWeatherInfo" class="bim-note" style="margin-top:4px;" data-i18n="materials.weatherNotUpdated">天氣：尚未更新</div>
+                <div id="siteWeatherSafety" class="bim-note" style="margin-top:4px; color:#bdeecf;" data-i18n="materials.weatherSafetyDefault">施工建議：天氣自動更新中</div>
                 <div class="bim-note weather-news-marquee" style="margin-top:4px; color:#cfe6ff;">
-                    <span id="siteWeatherNews" class="weather-news-text">氣象快報：待更新</span>
+                    <span id="siteWeatherNews" class="weather-news-text" data-i18n="materials.weatherNewsPending">氣象快報：待更新</span>
                 </div>
             </div>
             <div class="input-wrapper">
-                <label>天氣更新方式</label>
-                <div class="bim-note" style="margin-top:4px; color:#9ad4ff;">已啟用自動更新（不會自動跳出權限）</div>
+                <label data-i18n="materials.weatherUpdateMode">天氣更新方式</label>
+                <div class="bim-note" style="margin-top:4px; color:#9ad4ff;" data-i18n="materials.weatherAutoNote">已啟用自動更新（不會自動跳出權限）</div>
             </div>
         </div>
         <div class="input-row level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
-                <label>搜尋材料關鍵字</label>
-                <input type="text" id="materialSearch" placeholder="例如：模板、混凝土、鋼筋..." oninput="filterMaterialCatalog(this.value)">
+                <label data-i18n="materials.searchLabel">搜尋材料關鍵字</label>
+                <input type="text" id="materialSearch" data-i18n-placeholder="materials.searchPh" placeholder="例如：模板、混凝土、鋼筋..." oninput="filterMaterialCatalog(this.value)">
             </div>
             <div class="input-wrapper">
-                <label>試算表項目</label>
+                <label data-i18n="materials.selectLabel">試算表項目</label>
                 <select id="materialSelect" onchange="selectMaterialFromDropdown(this.value)">
-                    <option value="">請選擇材料項目</option>
+                    <option value="" data-i18n="materials.selectPh">請選擇材料項目</option>
                 </select>
             </div>
         </div>
         <div class="material-quick-bar level-hide-basic calc-subpage-block calc-subpage-block-2">
             <div id="materialCountChip" class="material-chip">資料筆數：<strong>0</strong></div>
-            <div id="materialPriceChip" class="material-chip">目前單價：<strong>尚未選取</strong></div>
+            <div id="materialPriceChip" class="material-chip" data-i18n="materials.priceChipNone">目前單價：尚未選取</div>
             <div id="materialRegionChip" class="material-chip">地區：<strong>全台共用</strong>（預設）</div>
             <div id="materialSourceChip" class="material-chip">資料來源：<strong>未同步</strong></div>
-            <button class="tool-btn" style="margin-left:auto;" onclick="applySelectedMaterialPrice()">📌 套用到單價欄</button>
+            <button class="tool-btn" style="margin-left:auto;" onclick="applySelectedMaterialPrice()" data-i18n="materials.applyPriceBtn">📌 套用到單價欄</button>
         </div>
-        <div class="bim-note level-only-basic calc-subpage-block calc-subpage-block-2" style="margin-top:6px; color:#ffd3a3;">
+        <div class="bim-note level-only-basic calc-subpage-block calc-subpage-block-2" style="margin-top:6px; color:#ffd3a3;" data-i18n="materials.basicHideNote">
             會員1（基礎）不顯示 3D 深層掃描與價目表模組。
         </div>
 
         <div class="group-title calc-subpage-block calc-subpage-block-1 calc-subpage-block-2">
-            尺寸與預算預覽
-            <button class="tool-btn level-only-standard calc-subpage-block calc-subpage-block-2" style="margin-left:auto; border-color:#00d2d3; color:#00d2d3; font-size: 0.8em;" onclick="connectLaserRuler()">
+            <span data-i18n="page2.previewTitle">尺寸與預算預覽</span>
+            <button class="tool-btn level-only-standard calc-subpage-block calc-subpage-block-2" style="margin-left:auto; border-color:#00d2d3; color:#00d2d3; font-size: 0.8em;" onclick="connectLaserRuler()" data-i18n="page2.laserBtn">
                 🔫 連線雷射尺
             </button>
         </div>
@@ -1161,9 +1260,9 @@
         </div>
 
         <div class="btn-group calc-subpage-block calc-subpage-block-2">
-            <button class="btn-export" onclick="exportToCSV()">📥 匯出商用報表 (Excel)</button>
-            <button class="btn-export level-hide-basic" onclick="exportMeasureQaReport()">🧪 匯出量圖QA報告</button>
-            <button class="btn-clear" onclick="clearAll()">🗑️ 重新開始</button>
+            <button class="btn-export" onclick="exportToCSV()" data-i18n="page2.exportExcel">📥 匯出商用報表 (Excel)</button>
+            <button class="btn-export level-hide-basic" onclick="exportMeasureQaReport()" data-i18n="page2.exportQa">🧪 匯出量圖QA報告</button>
+            <button class="btn-clear" onclick="clearAll()" data-i18n="page2.clearAll">🗑️ 重新開始</button>
         </div>
         </div>
         </section>
@@ -1171,44 +1270,68 @@
 </div>
 
 <div class="footer-bar">
-    <div id="sumC">混凝土: 0 M³</div>
-    <div id="sumM">模板: 0 M²</div>
-    <div id="sumE">土方: 0 M³</div>
-    <div id="sumS">鋼筋: 0 Kg</div>
-    <div class="total-budget">💰 黑洞總算力 (預估支出) : $<span id="totalMoney">0</span> 元</div>
+    <div id="sumC" data-i18n="footer.concrete">混凝土: 0 M³</div>
+    <div id="sumM" data-i18n="footer.formwork">模板: 0 M²</div>
+    <div id="sumE" data-i18n="footer.earth">土方: 0 M³</div>
+    <div id="sumS" data-i18n="footer.rebar">鋼筋: 0 Kg</div>
+    <div class="total-budget"><span data-i18n="footer.budgetPrefix">💰 黑洞總算力 (預估支出) : $</span><span id="totalMoney">0</span><span data-i18n="footer.budgetSuffix"> 元</span></div>
 </div>
 
 <div id="toast"></div>
 <div id="touchCoach" class="touch-coach hide" aria-live="polite">
     <div class="coach-bubble">
-        <button class="coach-close" onclick="hideCoach(true)" aria-label="關閉解說員">x</button>
-        <div class="coach-title">解說員</div>
-        <div id="coachText">哈囉，我是解說員：點任何區塊都有說明。第1頁含本機群組聊天與試算📊卡片（僅存裝置）；公開隱私權見 Google Sites 或 privacy 頁。</div>
+        <button class="coach-close" onclick="hideCoach(true)" data-i18n-aria="coach.closeAria" aria-label="關閉解說員">x</button>
+        <div class="coach-title" data-i18n="coach.title">解說員</div>
+        <div id="coachText" data-i18n="coach.defaultText">哈囉，我是解說員：點任何區塊都有說明。第1頁含本機群組聊天與試算📊卡片（僅存裝置）；公開隱私權見 Google Sites 或 privacy 頁。</div>
         <div class="coach-ai-row">
-            <input id="coachAiInput" class="coach-ai-input" type="text" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
-            <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()">問AI</button>
+            <input id="coachAiInput" class="coach-ai-input" type="text" data-i18n-placeholder="coach.aiPh" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
+            <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()" data-i18n="coach.aiAsk">問AI</button>
         </div>
         <div id="coachGuidePanel" class="coach-guide hide">
             <div id="coachGuideStep" class="coach-guide-step"></div>
             <div class="coach-guide-actions">
-                <button type="button" id="coachGuidePrev" class="coach-guide-btn" onclick="prevCoachGuideStep()">上一步</button>
-                <button type="button" id="coachGuideNext" class="coach-guide-btn" onclick="nextCoachGuideStep()">下一步</button>
-                <button type="button" id="coachGuidePause" class="coach-guide-btn coach-guide-btn--muted" onclick="cancelCoachGuide()">暫離</button>
-                <button type="button" id="coachGuideDone" class="coach-guide-btn" onclick="finishCoachGuide()">完成</button>
+                <button type="button" id="coachGuidePrev" class="coach-guide-btn" onclick="prevCoachGuideStep()" data-i18n="coach.guidePrev">上一步</button>
+                <button type="button" id="coachGuideNext" class="coach-guide-btn" onclick="nextCoachGuideStep()" data-i18n="coach.guideNext">下一步</button>
+                <button type="button" id="coachGuidePause" class="coach-guide-btn coach-guide-btn--muted" onclick="cancelCoachGuide()" data-i18n="coach.guidePause">暫離</button>
+                <button type="button" id="coachGuideDone" class="coach-guide-btn" onclick="finishCoachGuide()" data-i18n="coach.guideDone">完成</button>
             </div>
         </div>
     </div>
     <div class="coach-avatar" aria-hidden="true">🐣</div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9609-ios-review"></script>
-<script src="scripts/bundles/bm-blueprint.js?v=v9609"></script>
-<script src="scripts/bundles/bm-calc.js?v=v9609"></script>
-<script src="scripts/features/app-shell.js?v=v9609-ios-review"></script>
-<script src="scripts/features/materials-weather.js?v=v9609"></script>
-<script src="scripts/features/measurement-logs.js?v=v9609"></script>
-<script src="scripts/features/bim-qa.js?v=v9609-bim-import"></script>
-<script src="scripts/features/calc-engine.js?v=v9609-local-first"></script>
-<script src="scripts/app-main.js?v=v9609"></script>
+<div id="appRatingPrompt" class="app-rating-prompt" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="appRatingTitle">
+    <div class="app-rating-card">
+        <div class="app-rating-head">
+            <div id="appRatingTitle" class="app-rating-title" data-i18n="rating.title">喜歡 Construction Master 嗎？</div>
+            <p class="app-rating-message" data-i18n="rating.message">若這套工程試算對你有幫助，請給我們五星好評，也讓更多同行能發現它。</p>
+        </div>
+        <div id="appRatingStars" class="app-rating-stars" role="radiogroup" aria-label="Rating">
+            <button type="button" class="app-rating-star" data-star="1" aria-label="1">★</button>
+            <button type="button" class="app-rating-star" data-star="2" aria-label="2">★</button>
+            <button type="button" class="app-rating-star" data-star="3" aria-label="3">★</button>
+            <button type="button" class="app-rating-star" data-star="4" aria-label="4">★</button>
+            <button type="button" class="app-rating-star" data-star="5" aria-label="5">★</button>
+        </div>
+        <div class="app-rating-actions">
+            <button type="button" id="appRatingSubmitBtn" class="app-rating-btn app-rating-btn--primary" data-i18n="rating.submit" disabled>送出評分</button>
+            <button type="button" id="appRatingLaterBtn" class="app-rating-btn" data-i18n="rating.later">之後再說</button>
+            <button type="button" id="appRatingNeverBtn" class="app-rating-btn app-rating-btn--muted" data-i18n="rating.never">不再提示</button>
+        </div>
+    </div>
+</div>
+
+<script src="scripts/bundles/bm-core.js?v=v9621-field-real"></script>
+<script src="scripts/bundles/bm-blueprint.js?v=v9612"></script>
+<script src="scripts/bundles/bm-calc.js?v=v9612"></script>
+<script src="scripts/features/app-shell.js?v=v9618-electrical"></script>
+<script src="scripts/features/materials-weather.js?v=v9615-rating"></script>
+<script src="scripts/features/measurement-logs.js?v=v9612"></script>
+<script src="scripts/features/bim-qa.js?v=v9612"></script>
+<script src="scripts/features/calc-engine.js?v=v9615-rating"></script>
+<script src="scripts/features/app-rating-prompt.js?v=v9618-electrical"></script>
+<script src="scripts/features/electrical-panel.js?v=v9621-field-real"></script>
+<script src="scripts/features/field-simulator.js?v=v9621-field-real"></script>
+<script src="scripts/app-main.js?v=v9621-field-real"></script>
 </body>
 </html>

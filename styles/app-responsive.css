@@ -83,6 +83,18 @@
         .touch-coach { right: 10px; top: 74px; gap: 8px; }
         .coach-avatar { width: 50px; height: 50px; font-size: 26px; }
         .coach-bubble { max-width: 220px; font-size: 0.8em; padding: 9px 10px; }
+        .member-chat-quick-row,
+        .member-chat-compose,
+        .free-war-room-actions {
+            grid-template-columns: 1fr;
+        }
+        .member-chat-quick-send,
+        .free-war-room-btn--primary {
+            width: 100%;
+        }
+        .member-chat-spotlight {
+            padding-left: 18px;
+        }
         .logo-img { width: 72px; height: 72px; margin-right: 10px; }
         .logo-img.logo-app-brand,
         .logo-img.logo-blackhole-photo {
