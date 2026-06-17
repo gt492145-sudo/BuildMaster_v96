@@ -42,7 +42,7 @@
 <main>
     <section class="card">
         <h1>Construction Master 隱私權政策</h1>
-        <p>最後更新：2026-06-15（V9.7 · build 9611 · 群組聊天＋五星評分提示＋三語介面）</p>
+        <p>最後更新：2026-06-18（V9.7 · build 9627 · 三工作模式＋操作示範與教學動畫＋現場模擬器）</p>
         <p>
             公開隱私權網址（正式版）：
             <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">
@@ -68,13 +68,20 @@
             <li>經 Google Play 分發之 Android App</li>
             <li>由 App 內 WebView 或瀏覽器開啟之 Construction Master 網頁工作區，及同源 API（若您另行使用網頁版登入功能）</li>
         </ul>
-        <p>現版 App（build 9611）以<strong>免費使用</strong>為主：<strong>無需登入</strong>即可進入主工作區；<strong>不含第三方廣告</strong>；<strong>不提供 App 內訂閱或付費入口</strong>。</p>
+        <p>現版 App（build 9627）以<strong>免費使用</strong>為主：<strong>無需登入</strong>即可進入主工作區；<strong>不含第三方廣告</strong>；<strong>不提供 App 內訂閱或付費入口</strong>。</p>
 
-        <h2>2. 本版 App 功能範圍（V9.7 · build 9611）</h2>
+        <h2>2. 本版 App 功能範圍（V9.7 · build 9627）</h2>
         <ul>
-            <li><strong>本版已提供</strong>：工程試算、圖面量測、放樣、QA 工具、第 1 頁本機群組聊天、解說員操作說明、介面語言（繁中／英／日）等。</li>
+            <li><strong>本版已提供</strong>：三種工作模式（🧮 計算、📍 放樣、⚡ 電機）、工程試算、圖面量測、放樣與 QA 工具、現場模擬器、第 1 頁本機群組聊天、解說員與操作示範／教學動畫、介面語言（繁中／英／日）等。</li>
             <li><strong>本版尚未開放</strong>：原生 AR／LiDAR 現場量測 App 入口（相關程式保留供後續版本）。</li>
             <li><strong>後續更新</strong>：若加入 AR／LiDAR、雲端多人聊天、廣告或訂閱等功能，將同步更新本政策、App 內說明及商店申報。</li>
+        </ul>
+
+        <h2>2.0 三種工作模式（計算／放樣／電機）</h2>
+        <ul>
+            <li>App 提供三種<strong>彼此獨立</strong>的工作模式，可從頂部或選單切換：<strong>🧮 計算模式</strong>（試算、量測、聊天）、<strong>📍 放樣模式</strong>（放樣工具與現場放樣模擬器）、<strong>⚡ 電機模式</strong>（機電參數設定與電壓現場模擬器）。</li>
+            <li>各模式下的輸入、偏好與匯出檔案<strong>僅存於您裝置本機</strong>，不會因此自動上傳至開發者伺服器。</li>
+            <li>放樣模式部分匯出功能（例如 CSV、QA 報表、封包）與電機模式之 <code>mecha_config.txt</code> 下載，需先完成對應之<strong>現場模擬器</strong>操作確認後才會解鎖；此為 App 內流程設計，不涉及雲端驗證。</li>
         </ul>
 
         <h2>2.1 第 1 頁群組聊天（iOS／Android 本機示範）</h2>
@@ -89,7 +96,34 @@
             <li>若未來提供需登入的雲端團隊聊天，將另行更新本政策並於 App 內標示。</li>
         </ul>
 
-        <h2>2.2 App 內五星評分提示（build 9611 起）</h2>
+        <h2>2.2 操作示範與教學動畫（build 9627 起）</h2>
+        <p>為協助新使用者熟悉介面，App 可能顯示<strong>操作示範與教學動畫</strong>，包含但不限於：約 30 秒的功能操作示範、解說員（Coach）導覽、新手導覽步驟，以及現場模擬器介面中的教學動畫提示。此類內容<strong>僅在您的裝置上播放</strong>，用於說明按鈕位置與操作流程。</p>
+        <ul>
+            <li>是否自動顯示、您按「略過／不再自動顯示／終止」、各示範之播放次數與時間戳記等偏好，僅記錄於<strong>裝置本機</strong>（localStorage 鍵前綴：<code>bm_69:feature_demo:</code>，以及 <code>bm_69:coach_guide_done</code> 等解說員相關鍵），<strong>不會因此自動傳送給開發者伺服器</strong>。</li>
+            <li>示範動畫可能透過 App 內 WebView 向 iOS／Android 原生層回報<strong>播放進度或完成事件</strong>，僅用於 App 內協調介面行為，<strong>不向開發者後端上傳</strong>。</li>
+            <li>您可隨時關閉解說員或選擇不再自動顯示示範；清除 App 本機資料後，相關偏好可能重置。</li>
+        </ul>
+
+        <h2>2.3 現場模擬器（放樣／電機）</h2>
+        <ul>
+            <li>放樣模式與電機模式各提供<strong>現場模擬器</strong>，供您上傳或選取<strong>現場照片（JPG／PNG）</strong>，在 App 內模擬現場操作步驟。</li>
+            <li>您上傳或選取之照片<strong>僅用於 App 內顯示與本機流程確認</strong>，不會因此自動上傳至開發者伺服器或第三方雲端。</li>
+            <li>完成模擬器確認後，方可解鎖部分本機匯出（放樣 CSV／QA／封包，或電機 <code>mecha_config.txt</code>）。匯出檔案由您裝置本機產生或下載，是否分享給他人由您自行決定。</li>
+        </ul>
+
+        <h2>2.4 電機模式與 mecha_config.txt</h2>
+        <ul>
+            <li>電機模式可設定電壓、電流、腳本模式、繼電器狀態等<strong>工程參數</strong>，並匯出 <code>mecha_config.txt</code> 文字檔，供您在本機 Python 腳本或現場測試環境讀取。</li>
+            <li>上述參數與匯出檔<strong>僅存於或產生於您裝置</strong>；App 不會將 <code>mecha_config.txt</code> 內容自動上傳至開發者伺服器。</li>
+        </ul>
+
+        <h2>2.5 App 內 WebView 與原生橋接</h2>
+        <ul>
+            <li>iOS／Android App 以 WebView 載入 Construction Master 網頁工作區；部分功能（例如操作示範進度、評分提示）可能透過<strong>App 內 JavaScript 與原生程式之橋接</strong>溝通。</li>
+            <li>此橋接<strong>僅在 App 與 WebView 之間運作</strong>，用於呼叫系統評分 API、協調動畫或介面狀態，<strong>不向開發者自有後端傳送個人資料或試算內容</strong>。</li>
+        </ul>
+
+        <h2>2.6 App 內五星評分提示（build 9611 起）</h2>
         <ul>
             <li>App 可能在您<strong>多次使用並完成試算、匯出或新手導覽等操作後</strong>，顯示五星評分詢問視窗。</li>
             <li>是否再次顯示、您選擇的星等、「之後再說／不再提示」等偏好，僅記錄於<strong>裝置本機</strong>（localStorage 鍵：<code>bm_69:app_rating_v1</code>），<strong>不會因此自動傳送給開發者伺服器</strong>。</li>
@@ -98,21 +132,23 @@
             <li>您可隨時選擇「不再提示」，之後將不再顯示該詢問（除非清除 App 本機資料）。</li>
         </ul>
 
-        <h2>2.3 裝置本機儲存（非「向開發者收集」）</h2>
+        <h2>2.7 裝置本機儲存（非「向開發者收集」）</h2>
         <p>為提供 App 功能，下列資料可能<strong>僅存於您裝置</strong>，不會因此自動傳送給我們：</p>
         <ul>
             <li>工程試算輸入、結果與操作偏好</li>
-            <li>圖面量測、放樣、QA 相關資料</li>
+            <li>圖面量測、放樣、QA、電機參數相關資料</li>
+            <li>現場模擬器所使用之照片（本機處理，不上傳）</li>
             <li>第 1 頁本機群組聊天文字與試算📊卡片</li>
-            <li>解說員／介面偏好（例如解說員開關、語言設定、顯示模式）</li>
-            <li>五星評分提示之顯示偏好（見 2.2）</li>
+            <li>解說員、操作示範與教學動畫之顯示偏好（見 2.2）</li>
+            <li>介面偏好（例如語言設定、工作模式、顯示模式）</li>
+            <li>五星評分提示之顯示偏好（見 2.6）</li>
         </ul>
         <p>清除 App 資料、清除瀏覽器資料或重新安裝 App 後，上述本機資料可能遺失且無法復原。</p>
 
-        <h2>2.4 靜態網頁託管（GitHub Pages）</h2>
+        <h2>2.8 靜態網頁託管（GitHub Pages）</h2>
         <p>App 內 WebView 可能載入由 GitHub Pages 託管之靜態網頁。該託管平台可能依其自身政策記錄一般網路連線資訊（例如 IP、存取時間），此屬託管平台之標準運作，非開發者用於廣告或行銷目的之主動收集。</p>
 
-        <h2>3. 我們是否會收集您的資料？（現版 build 9611）</h2>
+        <h2>3. 我們是否會收集您的資料？（現版 build 9627）</h2>
         <p>現版 iOS／Android App<strong>不要求註冊或登入</strong>，<strong>不使用第三方廣告 SDK</strong>，<strong>不使用向開發者回報使用者行為之分析 SDK</strong>，也<strong>不會自動將試算內容或本機聊天文字上傳至開發者自有後端</strong>。</p>
         <p>此與 App Store「App 隱私：未收集資料」及 Google Play 資料安全表單中，現版無廣告、無第三方資料收集之聲明一致。</p>
 
@@ -130,7 +166,7 @@
         </ul>
 
         <h2>6. 關於日後可能之廣告或訂閱（現版沒有）</h2>
-        <p>開發者<strong>可能</strong>於<strong>未來新版本</strong>透過廣告或訂閱等方式營利。現版 build 9611 <strong>沒有</strong>廣告、<strong>沒有</strong>訂閱。若未來實際接入，將事先或同步更新本政策、App Store／Google Play 申報及 App 內說明。</p>
+        <p>開發者<strong>可能</strong>於<strong>未來新版本</strong>透過廣告或訂閱等方式營利。現版 build 9627 <strong>沒有</strong>廣告、<strong>沒有</strong>訂閱。若未來實際接入，將事先或同步更新本政策、App Store／Google Play 申報及 App 內說明。</p>
 
         <h2>7. 兒童隱私</h2>
         <p>Construction Master 並非專為 13 歲以下兒童設計。現版 App 不主動向兒童收集個人資料。若您認為我們不慎取得兒童資料，請透過 asd0900101511@icloud.com 聯絡。</p>

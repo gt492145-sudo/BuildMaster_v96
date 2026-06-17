@@ -37,7 +37,20 @@
             stakeSimZoomReset,
             electricalSimZoomIn,
             electricalSimZoomOut,
-            electricalSimZoomReset
+            electricalSimZoomReset,
+            startFeatureDemo,
+            stopFeatureDemo,
+            setFeatureDemoLoopMode,
+            getFeatureDemoLoopMode,
+            getFeatureDemoProgress,
+            setFeatureDemoProgress,
+            setFeatureDemoDynamicProperty,
+            getFeatureDemoDynamicProperties,
+            setFeatureDemoPlaybackMode,
+            setFeatureDemoColorProvider,
+            resetFeatureDemoPlayback,
+            addFeatureDemoFinishListener,
+            getFeatureDemoPlayback
         });
     }
 
@@ -87,6 +100,7 @@
     bindPrimaryHeaderActions();
     initMobileFuncDrawer();
     initMemberChatUI();
+    if (typeof initFeatureDemos === 'function') initFeatureDemos();
     applyQaProfile(currentQaProfile, true);
     applyBimSpecPreset(currentBimSpecPreset, true);
     renderAutoInterpretMemoryPanel();
