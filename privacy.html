@@ -36,20 +36,25 @@
     a {
         color: #9dd9ff;
     }
+    .policy-note {
+        border-left: 3px solid rgba(255, 210, 136, 0.7);
+        padding-left: 12px;
+        color: #cfe6ff;
+    }
 </style>
 </head>
 <body>
 <main>
     <section class="card">
         <h1>Construction Master 隱私權政策</h1>
-        <p>最後更新：2026-06-18（V9.7 · build 9627 · 三工作模式＋操作示範與教學動畫＋現場模擬器）</p>
+        <p>最後更新：2026-05-29（V9.7 · build 9640 · 免費 App＋第三方廣告）</p>
+        <p class="policy-note">本頁為<strong>站內摘要</strong>（build 9640 · 免費 App＋第三方廣告）。對外正式版本請同步至 Google Sites；若兩者不一致，以 Google Sites 公開版為優先。</p>
         <p>
             公開隱私權網址（正式版）：
             <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">
                 https://sites.google.com/view/buildmaster-privacy/首頁
             </a>
         </p>
-        <p>對照說明：本頁為<strong>站內摘要</strong>。對外正式版本、Apple App Store 與 Google Play 送審對照，請以上方 Google Sites 連結為準。若兩者內容不一致，以 Google Sites 公開版為優先。</p>
 
         <h2>0. 資料控管者與聯絡方式</h2>
         <ul>
@@ -66,15 +71,15 @@
         <ul>
             <li>經 Apple App Store 分發之 iOS App</li>
             <li>經 Google Play 分發之 Android App</li>
-            <li>由 App 內 WebView 或瀏覽器開啟之 Construction Master 網頁工作區，及同源 API（若您另行使用網頁版登入功能）</li>
+            <li>由 App 內 WebView 或瀏覽器開啟之 Construction Master 網頁工作區，及同源 API</li>
         </ul>
-        <p>現版 App（build 9627）以<strong>免費使用</strong>為主：<strong>無需登入</strong>即可進入主工作區；<strong>不含第三方廣告</strong>；<strong>不提供 App 內訂閱或付費入口</strong>。</p>
+        <p>Construction Master 為<strong>免費 App</strong>：<strong>無需付費、無需登入</strong>即可使用主要功能。自 build 9640 起，App 可能顯示<strong>第三方廣告</strong>（由 Google AdMob 等合作夥伴提供，實際以 App 設定為準），以支持免費營運。<strong>不提供 App 內訂閱或付費去廣告</strong>。</p>
 
-        <h2>2. 本版 App 功能範圍（V9.7 · build 9627）</h2>
+        <h2>2. 本版 App 功能範圍（V9.7 · build 9640）</h2>
         <ul>
             <li><strong>本版已提供</strong>：三種工作模式（🧮 計算、📍 放樣、⚡ 電機）、工程試算、圖面量測、放樣與 QA 工具、現場模擬器、第 1 頁本機群組聊天、解說員與操作示範／教學動畫、介面語言（繁中／英／日）等。</li>
             <li><strong>本版尚未開放</strong>：原生 AR／LiDAR 現場量測 App 入口（相關程式保留供後續版本）。</li>
-            <li><strong>後續更新</strong>：若加入 AR／LiDAR、雲端多人聊天、廣告或訂閱等功能，將同步更新本政策、App 內說明及商店申報。</li>
+            <li><strong>本版新增／調整</strong>：免費 App 接入第三方廣告、後端 <code>/api/ads/config</code> 與 <code>/api/privacy/meta</code> 政策對照 API。</li>
         </ul>
 
         <h2>2.0 三種工作模式（計算／放樣／電機）</h2>
@@ -93,87 +98,76 @@
             <li>本機聊天<strong>不會</strong>自動同步到其他手機、平板或雲端；清除 App 資料或重新安裝後，本機聊天紀錄可能消失。</li>
             <li>App 內「解說員」為操作說明提示。單純閱讀解說員說明<strong>不會因此額外上傳</strong>您的聊天或試算內容。</li>
             <li>若您<strong>另行啟用並使用</strong>需連線之 AI 解說（「問 AI」），您輸入的問題可能傳送至後端 API 以產生回覆；該功能需後端設定且非免費版必要功能。使用前 App 內會有相關提示。</li>
-            <li>若未來提供需登入的雲端團隊聊天，將另行更新本政策並於 App 內標示。</li>
         </ul>
 
-        <h2>2.2 操作示範與教學動畫（build 9627 起）</h2>
-        <p>為協助新使用者熟悉介面，App 可能顯示<strong>操作示範與教學動畫</strong>，包含但不限於：約 30 秒的功能操作示範、解說員（Coach）導覽、新手導覽步驟，以及現場模擬器介面中的教學動畫提示。此類內容<strong>僅在您的裝置上播放</strong>，用於說明按鈕位置與操作流程。</p>
-        <ul>
-            <li>是否自動顯示、您按「略過／不再自動顯示／終止」、各示範之播放次數與時間戳記等偏好，僅記錄於<strong>裝置本機</strong>（localStorage 鍵前綴：<code>bm_69:feature_demo:</code>，以及 <code>bm_69:coach_guide_done</code> 等解說員相關鍵），<strong>不會因此自動傳送給開發者伺服器</strong>。</li>
-            <li>示範動畫可能透過 App 內 WebView 向 iOS／Android 原生層回報<strong>播放進度或完成事件</strong>，僅用於 App 內協調介面行為，<strong>不向開發者後端上傳</strong>。</li>
-            <li>您可隨時關閉解說員或選擇不再自動顯示示範；清除 App 本機資料後，相關偏好可能重置。</li>
-        </ul>
+        <h2>2.2 操作示範與教學動畫</h2>
+        <p>為協助新使用者熟悉介面，App 可能顯示<strong>操作示範與教學動畫</strong>。此類內容<strong>僅在您的裝置上播放</strong>，用於說明按鈕位置與操作流程；相關偏好僅存於裝置本機，不會因此自動傳送給開發者伺服器。</p>
 
         <h2>2.3 現場模擬器（放樣／電機）</h2>
         <ul>
-            <li>放樣模式與電機模式各提供<strong>現場模擬器</strong>，供您上傳或選取<strong>現場照片（JPG／PNG）</strong>，在 App 內模擬現場操作步驟。</li>
-            <li>您上傳或選取之照片<strong>僅用於 App 內顯示與本機流程確認</strong>，不會因此自動上傳至開發者伺服器或第三方雲端。</li>
-            <li>完成模擬器確認後，方可解鎖部分本機匯出（放樣 CSV／QA／封包，或電機 <code>mecha_config.txt</code>）。匯出檔案由您裝置本機產生或下載，是否分享給他人由您自行決定。</li>
+            <li>您上傳或選取之現場照片<strong>僅用於 App 內顯示與本機流程確認</strong>，不會因此自動上傳至開發者伺服器或第三方雲端。</li>
+            <li>完成模擬器確認後，方可解鎖部分本機匯出；匯出檔案由您裝置本機產生或下載。</li>
         </ul>
 
         <h2>2.4 電機模式與 mecha_config.txt</h2>
-        <ul>
-            <li>電機模式可設定電壓、電流、腳本模式、繼電器狀態等<strong>工程參數</strong>，並匯出 <code>mecha_config.txt</code> 文字檔，供您在本機 Python 腳本或現場測試環境讀取。</li>
-            <li>上述參數與匯出檔<strong>僅存於或產生於您裝置</strong>；App 不會將 <code>mecha_config.txt</code> 內容自動上傳至開發者伺服器。</li>
-        </ul>
+        <p>電機參數與 <code>mecha_config.txt</code> 僅存於或產生於您裝置；App 不會將其內容自動上傳至開發者伺服器。</p>
 
         <h2>2.5 App 內 WebView 與原生橋接</h2>
         <ul>
-            <li>iOS／Android App 以 WebView 載入 Construction Master 網頁工作區；部分功能（例如操作示範進度、評分提示）可能透過<strong>App 內 JavaScript 與原生程式之橋接</strong>溝通。</li>
-            <li>此橋接<strong>僅在 App 與 WebView 之間運作</strong>，用於呼叫系統評分 API、協調動畫或介面狀態，<strong>不向開發者自有後端傳送個人資料或試算內容</strong>。</li>
+            <li>iOS／Android App 以 WebView 載入 Construction Master 網頁工作區；部分功能（例如操作示範進度、評分提示、<strong>廣告顯示控制</strong>）可能透過 App 內 JavaScript 與原生程式之橋接溝通。</li>
+            <li>此橋接<strong>不向開發者自有後端傳送試算內容或本機聊天文字</strong>；廣告 SDK 可能依其自身政策處理裝置識別碼等資料（見 2.9）。</li>
         </ul>
 
-        <h2>2.6 App 內五星評分提示（build 9611 起）</h2>
-        <ul>
-            <li>App 可能在您<strong>多次使用並完成試算、匯出或新手導覽等操作後</strong>，顯示五星評分詢問視窗。</li>
-            <li>是否再次顯示、您選擇的星等、「之後再說／不再提示」等偏好，僅記錄於<strong>裝置本機</strong>（localStorage 鍵：<code>bm_69:app_rating_v1</code>），<strong>不會因此自動傳送給開發者伺服器</strong>。</li>
-            <li>若您給予 4–5 星並同意，App 可能呼叫<strong>Apple 官方 App Store 評分 API</strong>（<code>SKStoreReviewController</code>）或開啟 <strong>Google Play 商店評分頁</strong>；實際評論內容由 Apple／Google 平台處理，受各平台隱私政策規範。</li>
-            <li>若您給予 1–3 星，App 僅顯示感謝訊息，不會強制開啟商店頁面。</li>
-            <li>您可隨時選擇「不再提示」，之後將不再顯示該詢問（除非清除 App 本機資料）。</li>
-        </ul>
+        <h2>2.6 App 內五星評分提示</h2>
+        <p>App 可能在您多次使用後顯示五星評分詢問；相關偏好僅存於裝置本機。若您同意，App 可能呼叫 Apple／Google 官方商店評分 API。</p>
 
         <h2>2.7 裝置本機儲存（非「向開發者收集」）</h2>
-        <p>為提供 App 功能，下列資料可能<strong>僅存於您裝置</strong>，不會因此自動傳送給我們：</p>
-        <ul>
-            <li>工程試算輸入、結果與操作偏好</li>
-            <li>圖面量測、放樣、QA、電機參數相關資料</li>
-            <li>現場模擬器所使用之照片（本機處理，不上傳）</li>
-            <li>第 1 頁本機群組聊天文字與試算📊卡片</li>
-            <li>解說員、操作示範與教學動畫之顯示偏好（見 2.2）</li>
-            <li>介面偏好（例如語言設定、工作模式、顯示模式）</li>
-            <li>五星評分提示之顯示偏好（見 2.6）</li>
-        </ul>
-        <p>清除 App 資料、清除瀏覽器資料或重新安裝 App 後，上述本機資料可能遺失且無法復原。</p>
+        <p>工程試算、量測、放樣、聊天、教學偏好等資料可能<strong>僅存於您裝置</strong>，不會因此自動傳送給我們。清除 App 資料或重新安裝後，上述本機資料可能遺失。</p>
 
         <h2>2.8 靜態網頁託管（GitHub Pages）</h2>
-        <p>App 內 WebView 可能載入由 GitHub Pages 託管之靜態網頁。該託管平台可能依其自身政策記錄一般網路連線資訊（例如 IP、存取時間），此屬託管平台之標準運作，非開發者用於廣告或行銷目的之主動收集。</p>
+        <p>App 內 WebView 可能載入由 GitHub Pages 託管之靜態網頁。該託管平台可能依其自身政策記錄一般網路連線資訊（例如 IP、存取時間）。</p>
 
-        <h2>3. 我們是否會收集您的資料？（現版 build 9627）</h2>
-        <p>現版 iOS／Android App<strong>不要求註冊或登入</strong>，<strong>不使用第三方廣告 SDK</strong>，<strong>不使用向開發者回報使用者行為之分析 SDK</strong>，也<strong>不會自動將試算內容或本機聊天文字上傳至開發者自有後端</strong>。</p>
-        <p>此與 App Store「App 隱私：未收集資料」及 Google Play 資料安全表單中，現版無廣告、無第三方資料收集之聲明一致。</p>
-
-        <h2>4. 網頁版帳號功能（若您另行使用）</h2>
-        <p>若您<strong>自行</strong>在網頁版註冊帳號並登入，帳號與雲端工作區資料可能儲存於後端資料庫。本版 iOS／Android App 不要求、也不依賴該登入流程。</p>
-        <p>若您於網頁版登入，可於登入畫面使用「刪除我的帳號」：輸入帳號與密碼確認後，永久刪除該帳號及雲端工作區，無法復原。</p>
-
-        <h2>5. 我們不會做的事（現版）</h2>
+        <h2>2.9 第三方廣告（build 9640 起）</h2>
         <ul>
-            <li>不在 App 內顯示第三方或開發者廣告</li>
-            <li>不出售您的個人資料</li>
-            <li>不使用您的資料進行跨 App 追蹤</li>
-            <li>不要求帳號密碼才能使用主要功能</li>
-            <li>不將本機聊天或試算內容自動上傳至我們的伺服器</li>
+            <li><strong>提供者</strong>：目前規劃使用 <strong>Google AdMob</strong>（Google LLC）作為第三方廣告平台；實際 SDK 與設定以 App 正式版為準。</li>
+            <li><strong>顯示方式</strong>：所有<strong>免費使用者</strong>均可能在 App 底部看到原生廣告橫幅；<strong>不會</strong>在放樣／量測／馬達演練等關鍵操作流程中插入全螢幕廣告（以 App 實作為準）。</li>
+            <li><strong>可能涉及的資料類型</strong>（由廣告 SDK 或其合作夥伴處理）：裝置識別碼、廣告識別碼（IDFA，若您同意 ATT）、IP 位址、粗略位置、App 使用資料、診斷資料等，用途為<strong>顯示廣告、衡量廣告成效、防止詐欺</strong>。</li>
+            <li><strong>個人化廣告</strong>：預設以<strong>非個人化</strong>方式投放；若未來啟用個人化廣告，App 將依 Apple 規範顯示「追蹤」授權詢問（App Tracking Transparency），您可拒絕。</li>
+            <li><strong>審核／示範版本</strong>：送交 App Store 審核之版本（含 <code>iosreview=1</code> 參數）<strong>不顯示廣告</strong>，與正式使用者版本不同。</li>
+            <li><strong>免費、無訂閱</strong>：App 使用<strong>不收費</strong>；<strong>不提供</strong>付費去廣告或 App 內訂閱方案。</li>
+            <li><strong>第三方政策</strong>：Google 隱私說明請參閱 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 隱私權政策</a>；您可於 iOS「設定 → 隱私權與安全性 → 追蹤」管理追蹤偏好。</li>
+            <li><strong>我們不出售</strong>您的個人資料；廣告相關資料主要由廣告平台依其政策處理。</li>
         </ul>
 
-        <h2>6. 關於日後可能之廣告或訂閱（現版沒有）</h2>
-        <p>開發者<strong>可能</strong>於<strong>未來新版本</strong>透過廣告或訂閱等方式營利。現版 build 9627 <strong>沒有</strong>廣告、<strong>沒有</strong>訂閱。若未來實際接入，將事先或同步更新本政策、App Store／Google Play 申報及 App 內說明。</p>
+        <h2>3. 我們是否會收集您的資料？（build 9640）</h2>
+        <p><strong>開發者自有後端</strong>仍<strong>不會</strong>因您使用試算、放樣、本機聊天而<strong>自動上傳</strong>試算內容或聊天文字。</p>
+        <p>自 build 9640 起，App 可能接入<strong>第三方廣告 SDK</strong>；該 SDK 可能收集裝置與廣告相關資料（見 2.9）。此與 App Store「App 隱私」及 Google Play 資料安全表單中，<strong>已申報第三方廣告資料</strong>之聲明一致。</p>
+        <p>若您<strong>另行</strong>在網頁版登入會員帳號（非 App 必要流程），我們可能處理帳號及雲端工作區資料。</p>
+
+        <h2>4. 網頁版帳號功能（若您另行使用）</h2>
+        <p>若您自行在網頁版註冊帳號並登入，帳號與雲端工作區資料可能儲存於後端資料庫。您可於登入畫面使用「刪除我的帳號」永久刪除帳號及雲端工作區。</p>
+
+        <h2>5. 我們不會做的事</h2>
+        <ul>
+            <li>不出售您的個人資料</li>
+            <li>不將本機聊天或試算內容<strong>自動上傳</strong>至我們的伺服器</li>
+            <li>不在放樣／量測等關鍵流程插入全螢幕廣告（以 App 實作為準）</li>
+            <li>不要求帳號密碼才能使用主要計算功能</li>
+        </ul>
+
+        <h2>6. 廣告（免費 App · build 9640 起）</h2>
+        <ul>
+            <li><strong>免費使用</strong>：主要功能無需付費、無需登入。</li>
+            <li><strong>廣告</strong>：App 可能顯示第三方廣告以支持免費營運（見 2.9）。</li>
+            <li><strong>無 App 內訂閱</strong>：不提供付費去廣告或 App 內訂閱入口。</li>
+            <li><strong>政策 API</strong>：App 可讀取 <code>/api/ads/config</code> 與 <code>/api/privacy/meta</code> 以對照目前政策版本。</li>
+        </ul>
 
         <h2>7. 兒童隱私</h2>
-        <p>Construction Master 並非專為 13 歲以下兒童設計。現版 App 不主動向兒童收集個人資料。若您認為我們不慎取得兒童資料，請透過 asd0900101511@icloud.com 聯絡。</p>
+        <p>Construction Master 並非專為 13 歲以下兒童設計。若您認為我們不慎取得兒童資料，請透過 asd0900101511@icloud.com 聯絡。</p>
 
         <h2>8. 資料安全與政策變更</h2>
-        <p>對於您主動提供給我們的資訊（例如來信詢問），我們採取合理安全措施保護。本機儲存資料之安全亦受您裝置作業系統及個人使用習慣影響。</p>
-        <p>我們可能因功能更新、法規或商店審查要求而修訂本政策；更新後將修訂頁首「最後更新」日期。</p>
+        <p>我們可能因功能更新、法規或商店審查要求而修訂本政策；更新後將修訂頁首「最後更新」日期，並同步更新 Google Sites 與 App Store／Google Play 申報。</p>
 
         <h2>9. 聯絡我們</h2>
         <p>任何隱私相關請求，請寄至：asd0900101511@icloud.com</p>

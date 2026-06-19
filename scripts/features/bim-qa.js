@@ -1142,6 +1142,229 @@
         reader.readAsText(file);
     }
 
+    function parseIFCStepArguments(body) {
+        const args = [];
+        let depth = 0;
+        let current = '';
+        let inString = false;
+        for (let i = 0; i < body.length; i += 1) {
+            const ch = body[i];
+            if (inString) {
+                current += ch;
+                if (ch === "'" && body[i - 1] !== '\\') inString = false;
+                continue;
+            }
+            if (ch === "'") {
+                inString = true;
+                current += ch;
+                continue;
+            }
+            if (ch === '(') {
+                depth += 1;
+                current += ch;
+                continue;
+            }
+            if (ch === ')') {
+                if (depth === 0) break;
+                depth -= 1;
+                current += ch;
+                continue;
+            }
+            if (ch === ',' && depth === 0) {
+                args.push(current.trim());
+                current = '';
+                continue;
+            }
+            current += ch;
+        }
+        if (current.trim()) args.push(current.trim());
+        return args;
+    }
+
+    function buildIfcEntityIndex(lines) {
+        const index = new Map();
+        for (const lineRaw of lines) {
+            const line = lineRaw.trim();
+            if (!line.startsWith('#')) continue;
+            const m = line.match(/^#(\d+)\s*=\s*([A-Z0-9_]+)\((.*)\);?$/is);
+            if (!m) continue;
+            const entityId = `#${m[1]}`;
+            const type = m[2].toUpperCase();
+            const body = m[3] || '';
+            index.set(entityId, {
+                id: entityId,
+                type,
+                body,
+                args: parseIFCStepArguments(body)
+            });
+        }
+        return index;
+    }
+
+    function getIfcEntity(index, ref) {
+        if (!index || !ref || ref === '$') return null;
+        const id = String(ref).trim().toUpperCase();
+        return index.get(id.startsWith('#') ? id : `#${id}`) || null;
+    }
+
+    function parseIfcCoordinateNumbers(text) {
+        const nums = String(text || '').match(/-?\d+(?:\.\d+)?(?:E[+-]?\d+)?/gi);
+        if (!nums || nums.length < 2) return null;
+        const x = Number(nums[0]);
+        const y = Number(nums[1]);
+        const z = nums.length >= 3 ? Number(nums[2]) : 0;
+        if (![x, y, z].every(Number.isFinite)) return null;
+        return { x, y, z };
+    }
+
+    function parseIfcCoordinateTriple(body) {
+        const nested = body.match(/\(\(([^)]+)\)\)/);
+        if (nested) return parseIfcCoordinateNumbers(nested[1]);
+        const flat = body.match(/\(([^()]+)\)/);
+        if (flat) return parseIfcCoordinateNumbers(flat[1]);
+        return parseIfcCoordinateNumbers(body);
+    }
+
+    function resolveIfcCartesianPoint(ref, index) {
+        const ent = getIfcEntity(index, ref);
+        if (!ent) return null;
+        if (ent.type === 'IFCCARTESIANPOINT') return parseIfcCoordinateTriple(ent.body);
+        return null;
+    }
+
+    function resolveIfcDirection(ref, index) {
+        const ent = getIfcEntity(index, ref);
+        if (!ent || ent.type !== 'IFCDIRECTION') return null;
+        const coords = parseIfcCoordinateTriple(ent.body);
+        if (!coords) return null;
+        const len = Math.hypot(coords.x, coords.y, coords.z) || 1;
+        return { x: coords.x / len, y: coords.y / len, z: coords.z / len };
+    }
+
+    function resolveIfcAxis2Placement3D(ref, index) {
+        const ent = getIfcEntity(index, ref);
+        if (!ent || ent.type !== 'IFCAXIS2PLACEMENT3D') return null;
+        const location = resolveIfcCartesianPoint(ent.args[0], index) || { x: 0, y: 0, z: 0 };
+        const refDir = ent.args[1] && ent.args[1] !== '$'
+            ? resolveIfcDirection(ent.args[1], index)
+            : { x: 1, y: 0, z: 0 };
+        const axis = ent.args[2] && ent.args[2] !== '$'
+            ? resolveIfcDirection(ent.args[2], index)
+            : { x: 0, y: 0, z: 1 };
+        return {
+            x: location.x,
+            y: location.y,
+            z: location.z,
+            refDirX: refDir.x,
+            refDirY: refDir.y,
+            refDirZ: refDir.z,
+            axisX: axis.x,
+            axisY: axis.y,
+            axisZ: axis.z
+        };
+    }
+
+    function resolveIfcLocalPlacement(ref, index, cache, depth) {
+        if (!index || !ref || ref === '$') return null;
+        const key = String(ref).trim().toUpperCase();
+        if (cache.has(key)) return cache.get(key);
+        if (depth > 32) return null;
+        const ent = getIfcEntity(index, ref);
+        if (!ent || ent.type !== 'IFCLOCALPLACEMENT') return null;
+        const parent = ent.args[0] && ent.args[0] !== '$'
+            ? resolveIfcLocalPlacement(ent.args[0], index, cache, depth + 1)
+            : { x: 0, y: 0, z: 0, refDirX: 1, refDirY: 0, refDirZ: 0 };
+        const rel = resolveIfcAxis2Placement3D(ent.args[1], index);
+        if (!rel) return null;
+        const c = rel.refDirX;
+        const s = rel.refDirY;
+        const px = rel.x;
+        const py = rel.y;
+        const pz = rel.z;
+        const world = {
+            x: parent.x + (c * px - s * py),
+            y: parent.y + (s * px + c * py),
+            z: parent.z + pz,
+            refDirX: parent.refDirX * c - parent.refDirY * s,
+            refDirY: parent.refDirX * s + parent.refDirY * c,
+            refDirZ: parent.refDirZ
+        };
+        cache.set(key, world);
+        return world;
+    }
+
+    function findExtrusionDepthFromRepresentation(representationRef, index) {
+        if (!representationRef || representationRef === '$' || !index) return null;
+        const visited = new Set();
+        const queue = [String(representationRef).trim().toUpperCase()];
+        while (queue.length && visited.size < 240) {
+            const ref = queue.shift();
+            if (!ref || ref === '$' || visited.has(ref)) continue;
+            visited.add(ref);
+            const ent = getIfcEntity(index, ref);
+            if (!ent) continue;
+            if (ent.type === 'IFCEXTRUDEDAREASOLID') {
+                for (let i = ent.args.length - 1; i >= 0; i -= 1) {
+                    const num = Number(String(ent.args[i]).replace(/[^\d.E+-]/g, ''));
+                    if (Number.isFinite(num) && num > 0) return num;
+                }
+            }
+            if (ent.type === 'IFCPOLYLINE') {
+                const pointRefs = ent.args[0] ? String(ent.args[0]).match(/#\d+/gi) : null;
+                if (pointRefs && pointRefs.length >= 2) {
+                    const first = resolveIfcCartesianPoint(pointRefs[0], index);
+                    const last = resolveIfcCartesianPoint(pointRefs[pointRefs.length - 1], index);
+                    if (first && last) return Math.hypot(last.x - first.x, last.y - first.y, last.z - first.z);
+                }
+            }
+            (ent.body.match(/#\d+/gi) || []).forEach(r => queue.push(r.toUpperCase()));
+        }
+        return null;
+    }
+
+    function resolveElementLayoutFrame(placementRef, representationRef, ifcIndex) {
+        const cache = new Map();
+        const placement = placementRef ? resolveIfcLocalPlacement(placementRef, ifcIndex, cache, 0) : null;
+        if (!placement) return { coordSource: 'estimated' };
+        const extrusionDepth = findExtrusionDepthFromRepresentation(representationRef, ifcIndex);
+        return {
+            coordSource: 'file',
+            rawX: placement.x,
+            rawY: placement.y,
+            rawZ: placement.z,
+            dirX: placement.refDirX,
+            dirY: placement.refDirY,
+            extrusionDepth
+        };
+    }
+
+    function detectIfcUnitScale(text, ifcIndex) {
+        const raw = String(text || '');
+        if (/IFCUNITASSIGNMENT/i.test(raw) && /MILLI/i.test(raw) && /METRE/i.test(raw)) return 0.001;
+        if (/IFCSIUNIT\s*\([^)]*\.METRE\s*\./i.test(raw) && !/MILLI/i.test(raw)) return 1;
+        let maxAbs = 0;
+        if (ifcIndex) {
+            ifcIndex.forEach(ent => {
+                if (ent.type !== 'IFCCARTESIANPOINT') return;
+                const coords = parseIfcCoordinateTriple(ent.body);
+                if (!coords) return;
+                maxAbs = Math.max(maxAbs, Math.abs(coords.x), Math.abs(coords.y), Math.abs(coords.z));
+            });
+        }
+        if (maxAbs > 500) return 0.001;
+        return 1;
+    }
+
+    function countElementCoordSources(elements) {
+        let file = 0;
+        let estimated = 0;
+        (elements || []).forEach(el => {
+            if (el && el.coordSource === 'file') file += 1;
+            else estimated += 1;
+        });
+        return { file, estimated };
+    }
+
     function parseIFCText(text, fileName) {
         const data = {
             fileName,
@@ -1153,6 +1376,10 @@
             qtyArea: 0,
             qtyVolume: 0,
             qtyCount: 0,
+            coordResolvedCount: 0,
+            coordFallbackCount: 0,
+            coordUnitScale: 1,
+            coordUnitLabel: 'm',
             warnings: []
         };
 
@@ -1161,18 +1388,24 @@
         }
 
         const lines = text.replace(/\r/g, '').split('\n');
+        const ifcIndex = buildIfcEntityIndex(lines);
+        data.ifcIndex = ifcIndex;
+        data.coordUnitScale = detectIfcUnitScale(text, ifcIndex);
+        data.coordUnitLabel = data.coordUnitScale === 0.001 ? 'm（由 mm 換算）' : 'm';
+
         let duplicateIds = 0;
         const idSet = new Set();
 
         for (const lineRaw of lines) {
             const line = lineRaw.trim();
             if (!line.startsWith('#')) continue;
-            const m = line.match(/^#(\d+)\s*=\s*([A-Z0-9_]+)\((.*)\);?$/i);
+            const m = line.match(/^#(\d+)\s*=\s*([A-Z0-9_]+)\((.*)\);?$/is);
             if (!m) continue;
 
             const entityId = `#${m[1]}`;
             const type = m[2].toUpperCase();
             const body = m[3] || '';
+            const args = parseIFCStepArguments(body);
 
             if (idSet.has(entityId)) duplicateIds += 1;
             idSet.add(entityId);
@@ -1184,7 +1417,17 @@
                 data.totalElements += 1;
                 if (data.elements.length < 500) {
                     const nameMatch = body.match(/'([^']+)'/);
-                    data.elements.push({ id: entityId, type, name: nameMatch ? nameMatch[1] : '' });
+                    const placementRef = args.length >= 6 ? args[5] : null;
+                    const representationRef = args.length >= 7 ? args[6] : null;
+                    const frame = resolveElementLayoutFrame(placementRef, representationRef, ifcIndex);
+                    data.elements.push({
+                        id: entityId,
+                        type,
+                        name: nameMatch ? nameMatch[1] : '',
+                        placementRef,
+                        representationRef,
+                        ...frame
+                    });
                 }
             }
 
@@ -1200,8 +1443,17 @@
             }
         }
 
+        const coordStats = countElementCoordSources(data.elements);
+        data.coordResolvedCount = coordStats.file;
+        data.coordFallbackCount = coordStats.estimated;
+
         if (data.totalEntities === 0) data.warnings.push('沒有解析到模型實體，請確認檔案內容是否完整。');
         if (data.totalElements === 0) data.warnings.push('未找到常見構件（牆/梁/柱/板），可能是非建築模型或格式版本差異。');
+        if (data.coordResolvedCount > 0) {
+            data.warnings.push(`已從上傳檔讀取 ${data.coordResolvedCount} 個構件定位（座標取決於上傳檔；真實座標或專案假座標皆可，與放樣表／現場模擬一致）`);
+        } else if (data.totalElements > 0) {
+            data.warnings.push('上傳檔未含可解析的定位；將以內建估算產點（仍與模擬器相對位置一致）');
+        }
         if (data.qtyLength + data.qtyArea + data.qtyVolume + data.qtyCount === 0) data.warnings.push('未讀到工程量實體，建議先輸出算量屬性再匯入。');
         if (duplicateIds > 0) data.warnings.push(`偵測到重複編號：${duplicateIds} 筆`);
 
@@ -1354,9 +1606,15 @@
             const found = bimModelData.elements.find(e => e.id.toUpperCase() === qid);
             typeBody.innerHTML = '';
             const tr = document.createElement('tr');
-            tr.innerHTML = found
-                ? `<td>${found.id} ${formatIfcTypeDisplay(found.type)}${found.name ? ` - ${found.name}` : ''}</td><td>1</td>`
-                : `<td>查無 ${rawQ}</td><td>0</td>`;
+            if (found) {
+                const unitScale = Number(bimModelData.coordUnitScale) || 1;
+                const coordText = found.coordSource === 'file'
+                    ? `｜上傳檔座標 X ${(found.rawX * unitScale).toFixed(3)} Y ${(found.rawY * unitScale).toFixed(3)} Z ${(found.rawZ * unitScale).toFixed(3)}`
+                    : '｜座標：內建估算';
+                tr.innerHTML = `<td>${found.id} ${formatIfcTypeDisplay(found.type)}${found.name ? ` - ${found.name}` : ''}${coordText}</td><td>1</td>`;
+            } else {
+                tr.innerHTML = `<td>查無 ${rawQ}</td><td>0</td>`;
+            }
             typeBody.appendChild(tr);
             return;
         }
@@ -1887,7 +2145,58 @@
         return min + (raw / 100000) * span;
     }
 
-    function toPointRow(element, pointType, x, y, z, idx) {
+    function getLayoutUnitScale() {
+        return Number(bimModelData && bimModelData.coordUnitScale) || 1;
+    }
+
+    function extractLayoutPointCoords(element, pointType, jitter) {
+        const jx = Number(jitter && jitter.dx) || 0;
+        const jy = Number(jitter && jitter.dy) || 0;
+        const jz = Number(jitter && jitter.dz) || 0;
+        const unitScale = getLayoutUnitScale();
+
+        if (element && element.coordSource === 'file' && Number.isFinite(element.rawX)) {
+            const x = element.rawX * unitScale;
+            const y = element.rawY * unitScale;
+            const z = element.rawZ * unitScale;
+            if (pointType === 'CENTER') {
+                return { x: x + jx, y: y + jy, z: z + jz, coordSource: 'file' };
+            }
+            const defaultHalf = element.type && element.type.includes('IFCBEAM') ? 0.9 : 1.2;
+            const halfLen = (element.extrusionDepth ? element.extrusionDepth * unitScale : defaultHalf * 2) / 2;
+            const dirX = Number.isFinite(element.dirX) ? element.dirX : 1;
+            const dirY = Number.isFinite(element.dirY) ? element.dirY : 0;
+            const ox = dirX * halfLen;
+            const oy = dirY * halfLen;
+            if (pointType === 'END_A') return { x: x - ox + jx, y: y - oy + jy, z: z + jz, coordSource: 'file' };
+            if (pointType === 'END_B') return { x: x + ox + jx, y: y + oy + jy, z: z + jz, coordSource: 'file' };
+        }
+
+        const baseX = makeSeededValue(element.id, 1, 0, 120);
+        const baseY = makeSeededValue(element.id, 2, 0, 120);
+        const baseZ = makeSeededValue(element.id, 3, 0, 30);
+        if (pointType === 'CENTER') {
+            return { x: baseX + jx, y: baseY + jy, z: baseZ + jz, coordSource: 'estimated' };
+        }
+        const offset = element.type && element.type.includes('IFCBEAM') ? 1.8 : 2.4;
+        if (pointType === 'END_A') return { x: baseX - offset + jx, y: baseY - 0.8 + jy, z: baseZ + jz, coordSource: 'estimated' };
+        return { x: baseX + offset + jx, y: baseY + 0.8 + jy, z: baseZ + jz, coordSource: 'estimated' };
+    }
+
+    function pushLayoutPointForElement(points, element, pointType, jitter) {
+        const coords = extractLayoutPointCoords(element, pointType, jitter);
+        points.push(toPointRow(
+            element,
+            pointType,
+            coords.x,
+            coords.y,
+            coords.z,
+            points.length,
+            coords.coordSource
+        ));
+    }
+
+    function toPointRow(element, pointType, x, y, z, idx, coordSource) {
         const floorTag = (document.getElementById('floor_tag') && document.getElementById('floor_tag').value.trim()) || 'BIM';
         return {
             id: `LP-${String(idx + 1).padStart(4, '0')}`,
@@ -1898,6 +2207,7 @@
             y: Math.round(y * 1000) / 1000,
             z: Math.round(z * 1000) / 1000,
             floorTag,
+            coordSource: coordSource || 'estimated',
             status: 'draft'
         };
     }
@@ -1915,20 +2225,18 @@
         if (!targets.length) return [];
         const points = [];
         targets.forEach((el) => {
-            const baseX = makeSeededValue(el.id, 1, 0, 120);
-            const baseY = makeSeededValue(el.id, 2, 0, 120);
-            const baseZ = makeSeededValue(el.id, 3, 0, 30);
-            const dx = runIndex > 0 ? makeSeededOffset(el.id, 101 + runIndex, jitterAmplitude) : 0;
-            const dy = runIndex > 0 ? makeSeededOffset(el.id, 203 + runIndex, jitterAmplitude) : 0;
-            const dz = runIndex > 0 ? makeSeededOffset(el.id, 307 + runIndex, jitterAmplitude * 0.6) : 0;
+            const jitter = {
+                dx: runIndex > 0 ? makeSeededOffset(el.id, 101 + runIndex, jitterAmplitude) : 0,
+                dy: runIndex > 0 ? makeSeededOffset(el.id, 203 + runIndex, jitterAmplitude) : 0,
+                dz: runIndex > 0 ? makeSeededOffset(el.id, 307 + runIndex, jitterAmplitude * 0.6) : 0
+            };
             if (el.type.includes('IFCCOLUMN')) {
-                points.push(toPointRow(el, 'CENTER', baseX + dx, baseY + dy, baseZ + dz, points.length));
+                pushLayoutPointForElement(points, el, 'CENTER', jitter);
                 return;
             }
             if (el.type.includes('IFCWALL') || el.type.includes('IFCBEAM')) {
-                const offset = el.type.includes('IFCBEAM') ? 1.8 : 2.4;
-                points.push(toPointRow(el, 'END_A', baseX - offset + dx, baseY - 0.8 + dy, baseZ + dz, points.length));
-                points.push(toPointRow(el, 'END_B', baseX + offset + dx, baseY + 0.8 + dy, baseZ + dz, points.length));
+                pushLayoutPointForElement(points, el, 'END_A', jitter);
+                pushLayoutPointForElement(points, el, 'END_B', jitter);
             }
         });
         const seededPoints = points.slice(0, 1200);
@@ -3047,24 +3355,22 @@
         if (!targets.length) return showToast('目前勾選類型沒有可抽取的構件');
 
         const points = [];
-        targets.forEach((el, idx) => {
-            const baseX = makeSeededValue(el.id, 1, 0, 120);
-            const baseY = makeSeededValue(el.id, 2, 0, 120);
-            const baseZ = makeSeededValue(el.id, 3, 0, 30);
+        targets.forEach((el) => {
             if (el.type.includes('IFCCOLUMN')) {
-                points.push(toPointRow(el, 'CENTER', baseX, baseY, baseZ, points.length));
+                pushLayoutPointForElement(points, el, 'CENTER', null);
                 return;
             }
             if (el.type.includes('IFCWALL') || el.type.includes('IFCBEAM')) {
-                const offset = el.type.includes('IFCBEAM') ? 1.8 : 2.4;
-                points.push(toPointRow(el, 'END_A', baseX - offset, baseY - 0.8, baseZ, points.length));
-                points.push(toPointRow(el, 'END_B', baseX + offset, baseY + 0.8, baseZ, points.length));
+                pushLayoutPointForElement(points, el, 'END_A', null);
+                pushLayoutPointForElement(points, el, 'END_B', null);
             }
         });
 
         const seededPoints = points.slice(0, 1200);
         const grouped = assignLayoutGroups(seededPoints);
         bimLayoutPoints = grouped.points;
+        const filePointCount = bimLayoutPoints.filter(p => p.coordSource === 'file').length;
+        const estimatedPointCount = bimLayoutPoints.length - filePointCount;
         layoutAlignmentState = null;
         layoutConfidenceFilterMode = 'all';
         bimLayoutQaResult = null;
@@ -3090,9 +3396,9 @@
             sourceLabel: '生成放樣點',
             pipelineType: 'manual'
         });
-        addAuditLog('生成放樣點', `${bimLayoutPoints.length} 筆`);
+        addAuditLog('生成放樣點', `${bimLayoutPoints.length} 筆 / 檔案座標 ${filePointCount} / 內建估算 ${estimatedPointCount}`);
         renderStakingLearningPanel();
-        showToast(`已生成放樣點 ${bimLayoutPoints.length} 筆（${grouped.groupCount} 組）`);
+        showToast(`已生成放樣點 ${bimLayoutPoints.length} 筆（上傳檔座標 ${filePointCount}｜內建估算 ${estimatedPointCount}；真實／假座標皆可）`);
     }
 
     async function runBimLayoutQa() {
@@ -3174,7 +3480,7 @@
 
     function exportBimLayoutPoints() {
         if (!bimLayoutPoints.length) return showToast('請先產生放樣點');
-        let csv = '\uFEFF點位ID,來源構件,構件類型,點位類型,X,Y,Z,樓層,群組,狀態\n';
+        let csv = '\uFEFF點位ID,來源構件,構件類型,點位類型,X,Y,Z,樓層,群組,座標來源,狀態\n';
         bimLayoutPoints.forEach(p => {
             csv += [
                 sanitizeCSVField(p.id),
@@ -3186,6 +3492,7 @@
                 p.z,
                 sanitizeCSVField(p.floorTag),
                 sanitizeCSVField(p.layoutGroup || ''),
+                sanitizeCSVField(p.coordSource === 'file' ? '上傳檔座標' : (p.coordSource === 'estimated' ? '內建估算' : p.coordSource || '內建估算')),
                 sanitizeCSVField(p.status)
             ].join(',') + '\n';
         });

@@ -463,6 +463,16 @@
             return false;
         }
     }
+    function isNativeAppShell() {
+        try {
+            const params = new URLSearchParams(location.search);
+            if (params.get('nativeapp') === '1') return true;
+            const ua = String(navigator.userAgent || '');
+            return /ConstructionMasterNative/i.test(ua);
+        } catch (_e) {
+            return false;
+        }
+    }
     function shouldShowLocalApiDevButton() {
         try {
             if (isCapacitorShell()) return false;
@@ -2395,6 +2405,7 @@
 
     function isPublishedAppRuntime() {
         try {
+            if (isNativeAppShell()) return true;
             if (typeof isIosReviewRuntime === 'function' && isIosReviewRuntime()) return true;
             if (isPublishedTestHost()) return true;
         } catch (_e) {}
@@ -2436,6 +2447,7 @@
     function shouldSkipLoginGate() {
         if (!FREE_PUBLIC_APP_UI) return false;
         try {
+            if (isNativeAppShell()) return true;
             if (isIosReviewRuntime()) return true;
             if (isPublishedTestHost()) return true;
         } catch (_e) {}
@@ -2837,7 +2849,7 @@
         const account = normalizeMemberAccount((memberInput && memberInput.value) || '');
         const code = String((input && input.value) || '').trim();
         if (!code) {
-            if (shouldSkipLoginGate()) {
+            if (shouldSkipLoginGate() || isNativeAppShell()) {
                 await enterLocalOfflineDemoFromButton();
                 return;
             }
@@ -2878,7 +2890,11 @@
                 loginUrl = '';
             }
             if (shouldUseOfflinePublicRuntime()) {
-                if (hint) hint.innerText = '本版 App 免登入。請刪除 App 重裝後再開啟，無需輸入密碼。';
+                if (hint) {
+                    hint.innerText = isNativeAppShell()
+                        ? '手機 App 免登入：請按「直接進入工作區」，不必輸入帳密。會員登入請用電腦瀏覽器。'
+                        : '本版 App 免登入。請刪除 App 重裝後再開啟，無需輸入密碼。';
+                }
                 return;
             }
             const msgLower = String(error && error.message || '').toLowerCase();

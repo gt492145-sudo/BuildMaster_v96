@@ -1016,3 +1016,390 @@
     .electrical-section--sim {
         border-left-color: #cba6f7;
     }
+
+    /* MEP dashboard V9.7 */
+    .live-badge--mep {
+        background: linear-gradient(135deg, rgba(203, 166, 247, 0.35), rgba(137, 180, 250, 0.28));
+        border-color: rgba(203, 166, 247, 0.55);
+        color: #f5e0ff;
+    }
+    .mep-dashboard {
+        margin: 0 0 14px;
+        padding: 14px 14px 12px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(24, 24, 37, 0.96), rgba(30, 30, 46, 0.92));
+        border: 1px solid rgba(203, 166, 247, 0.28);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+        max-width: 700px;
+    }
+    .mep-dashboard-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .mep-dashboard-badge {
+        font-size: 0.78em;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #cba6f7;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(203, 166, 247, 0.45);
+        background: rgba(203, 166, 247, 0.12);
+    }
+    .mep-align-score {
+        font-size: 0.86em;
+        font-weight: 800;
+        color: #89dceb;
+    }
+    .mep-align-bar {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(49, 50, 68, 0.95);
+        overflow: hidden;
+        margin-bottom: 12px;
+        border: 1px solid rgba(137, 220, 235, 0.18);
+    }
+    .mep-align-bar__fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #89b4fa, #a6e3a1, #f9e2af);
+        transition: width 0.35s ease;
+    }
+    .mep-pipeline {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .mep-pipeline-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: 1px solid rgba(69, 71, 90, 0.9);
+        background: rgba(30, 30, 46, 0.75);
+        opacity: 0.72;
+        transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+    }
+    .mep-pipeline-step__num {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72em;
+        font-weight: 800;
+        color: #cdd6f4;
+        background: rgba(49, 50, 68, 0.95);
+    }
+    .mep-pipeline-step__label {
+        font-size: 0.68em;
+        text-align: center;
+        line-height: 1.25;
+        color: #bac2de;
+        font-weight: 700;
+    }
+    .mep-pipeline-step--active {
+        opacity: 1;
+        border-color: rgba(137, 180, 250, 0.65);
+        background: rgba(137, 180, 250, 0.1);
+    }
+    .mep-pipeline-step--done {
+        opacity: 1;
+        border-color: rgba(166, 227, 161, 0.55);
+        background: rgba(166, 227, 161, 0.1);
+    }
+    .mep-pipeline-step--done .mep-pipeline-step__num {
+        background: rgba(166, 227, 161, 0.22);
+        color: #a6e3a1;
+    }
+    .mep-live-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .mep-live-card {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(49, 50, 68, 0.72);
+        border: 1px solid rgba(69, 71, 90, 0.85);
+    }
+    .mep-live-card--power strong { color: #f9e2af; }
+    .mep-live-card--wide {
+        grid-column: span 3;
+    }
+    .mep-live-card__k {
+        font-size: 0.68em;
+        color: #9399b2;
+        font-weight: 700;
+    }
+    .mep-live-card strong {
+        font-size: 0.95em;
+        color: #cdd6f4;
+        font-weight: 800;
+    }
+    .electrical-section--purple {
+        border-left-color: #cba6f7;
+    }
+    .electrical-section--preview {
+        border-left-color: #94e2d5;
+    }
+    .mecha-config-preview {
+        margin: 0;
+        padding: 10px 12px;
+        max-height: 220px;
+        overflow: auto;
+        border-radius: 8px;
+        background: rgba(17, 17, 27, 0.95);
+        border: 1px solid rgba(148, 226, 213, 0.22);
+        color: #a6e3a1;
+        font-size: 0.72em;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .electrical-download-btn--locked,
+    .electrical-download-btn:disabled {
+        opacity: 0.55;
+        filter: grayscale(0.25);
+    }
+    .electrical-section--teal {
+        border-left-color: #94e2d5;
+    }
+    .mep-calc-note,
+    .mep-calc-footnote {
+        margin: 0 0 10px;
+        font-size: 0.8em;
+        line-height: 1.5;
+        color: #b8cde0;
+    }
+    .mep-calc-footnote {
+        margin-top: 10px;
+        margin-bottom: 0;
+        color: #89dceb;
+    }
+    .mep-calc-results {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .mep-calc-result-card {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 10px;
+        border-radius: 8px;
+        background: rgba(49, 50, 68, 0.72);
+        border: 1px solid rgba(69, 71, 90, 0.85);
+    }
+    .mep-calc-result-card__k {
+        font-size: 0.68em;
+        color: #9399b2;
+        font-weight: 700;
+    }
+    .mep-calc-result {
+        font-size: 0.92em;
+        color: #cdd6f4;
+        font-weight: 800;
+    }
+    .mep-calc-result--ok { color: #a6e3a1; }
+    .mep-calc-result--warn { color: #fab387; }
+    .mep-calc-result--bad { color: #f38ba8; }
+    @media (max-width: 520px) {
+        .mep-pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .mep-live-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .mep-live-card--wide { grid-column: span 2; }
+        .mep-calc-results { grid-template-columns: 1fr; }
+        .motor-control-toolbar { flex-direction: column; }
+    }
+
+    /* Motor control simulator */
+    .electrical-section--motor {
+        border-left-color: #f9e2af;
+    }
+    .motor-sim-note {
+        margin: 0 0 12px;
+        font-size: 0.8em;
+        line-height: 1.5;
+        color: #b8cde0;
+    }
+    .motor-status-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: rgba(49, 50, 68, 0.72);
+        border: 1px solid rgba(69, 71, 90, 0.85);
+    }
+    .motor-status-lamp {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid rgba(205, 214, 244, 0.35);
+        background: #585b70;
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+        flex-shrink: 0;
+    }
+    .motor-status-lamp--stop { background: #585b70; }
+    .motor-status-lamp--forward {
+        background: #a6e3a1;
+        box-shadow: 0 0 14px rgba(166, 227, 161, 0.55);
+    }
+    .motor-status-lamp--reverse {
+        background: #89b4fa;
+        box-shadow: 0 0 14px rgba(137, 180, 250, 0.55);
+    }
+    .motor-status-lamp--tripped {
+        background: #f38ba8;
+        box-shadow: 0 0 14px rgba(243, 139, 168, 0.55);
+    }
+    .motor-status-readouts {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.82em;
+        color: #bac2de;
+    }
+    .motor-state-label--forward { color: #a6e3a1; }
+    .motor-state-label--reverse { color: #89b4fa; }
+    .motor-state-label--tripped { color: #f38ba8; }
+    .motor-thermal-label--tripped { color: #f38ba8; }
+    .motor-control-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .motor-control-toolbar--secondary { margin-bottom: 10px; }
+    .motor-btn--forward { border-color: rgba(166, 227, 161, 0.5) !important; color: #d8ffe0 !important; }
+    .motor-btn--stop { border-color: rgba(243, 139, 168, 0.45) !important; color: #ffd8e4 !important; }
+    .motor-btn--reverse { border-color: rgba(137, 180, 250, 0.5) !important; color: #dceeff !important; }
+    .motor-op-log {
+        margin: 0 0 12px;
+        padding: 10px 12px;
+        min-height: 88px;
+        max-height: 180px;
+        overflow: auto;
+        border-radius: 8px;
+        background: rgba(17, 17, 27, 0.95);
+        border: 1px solid rgba(249, 226, 175, 0.22);
+        color: #cdd6f4;
+        font-size: 0.72em;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .motor-report-title {
+        margin-top: 4px;
+        margin-bottom: 8px;
+        font-size: 0.9em;
+    }
+    .motor-report-preview {
+        max-height: 160px;
+        margin-bottom: 10px;
+    }
+
+    /* Stair stake guide */
+    .stair-stake-panel {
+        margin: 0 0 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: rgba(30, 30, 46, 0.88);
+        border: 1px solid rgba(249, 226, 175, 0.28);
+    }
+    .stair-stake-panel__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .stair-stake-panel__title {
+        font-size: 0.88em;
+        font-weight: 800;
+        color: #f9e2af;
+    }
+    .stair-stake-badge {
+        font-size: 0.72em;
+        font-weight: 800;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(249, 226, 175, 0.45);
+        color: #ffe8b3;
+        background: rgba(249, 226, 175, 0.12);
+    }
+    .stair-stake-note {
+        margin: 0 0 10px;
+        font-size: 0.78em;
+        line-height: 1.5;
+        color: #b8cde0;
+    }
+    .stair-stake-select {
+        margin-bottom: 10px;
+    }
+    .stair-stake-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    .stair-dir-label {
+        margin: 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 0.78em;
+        line-height: 1.45;
+        color: #cdd6f4;
+        background: rgba(49, 50, 68, 0.85);
+        border: 1px solid rgba(137, 180, 250, 0.25);
+    }
+    .stair-dir-label[data-level="ok"] {
+        color: #a6e3a1;
+        border-color: rgba(166, 227, 161, 0.45);
+        background: rgba(166, 227, 161, 0.08);
+    }
+    .stair-dir-label[data-level="warn"] {
+        color: #fab387;
+        border-color: rgba(250, 179, 135, 0.45);
+        background: rgba(250, 179, 135, 0.08);
+    }
+    .stair-dir-label[data-level="info"] {
+        color: #89dceb;
+        border-color: rgba(137, 220, 235, 0.35);
+    }
+    .stair-source-label {
+        margin: 0 0 8px;
+        font-size: 0.78em;
+        font-weight: 700;
+        color: #a6e3a1;
+    }
+    .stair-points-preview {
+        margin: 0 0 10px;
+        padding: 8px 10px;
+        max-height: 120px;
+        overflow: auto;
+        border-radius: 8px;
+        background: rgba(17, 17, 27, 0.95);
+        border: 1px solid rgba(137, 180, 250, 0.22);
+        color: #bac2de;
+        font-size: 0.68em;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .stair-stake-toolbar--secondary { margin-bottom: 8px; }

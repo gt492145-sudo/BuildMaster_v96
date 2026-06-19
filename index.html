@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Construction Master V9.6 - 工程計算工作區（免費版）</title>
+<title>Construction Master V9.7 - 工程計算工作區（免費版）</title>
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#0b1220">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,16 +14,16 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=v960logo5">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=v960logo5">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles/app-layout.css?v=v9618-electrical">
+<link rel="stylesheet" href="styles/app-layout.css?v=v9638-update-marquee">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9621-field-real">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9638-update-marquee">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v9627-demo-ios-lottie">
 <link rel="stylesheet" href="styles/weather-effects.css?v=v9608-wallfix">
 <link rel="stylesheet" href="styles/app-responsive.css?v=v9616-chat-spotlight">
-<script src="scripts/i18n/bm-i18n.js?v=v9627-demo-ios-lottie"></script>
-<script src="scripts/i18n/bm-coach-hints.js?v=v9618-electrical"></script>
+<script src="scripts/i18n/bm-i18n.js?v=v9638-update-marquee"></script>
+<script src="scripts/i18n/bm-coach-hints.js?v=v9631-coach-ops"></script>
 </head>
 <body>
 
@@ -46,7 +46,7 @@
 
 <div id="securityLock" class="security-lock" hidden>
     <div class="security-panel">
-        <h3>Construction Master V9.6</h3>
+        <h3>Construction Master V9.7</h3>
         <p id="securityMessage" data-i18n="security.welcome">歡迎使用 Construction Master。本版免登入，可直接進入工作區。</p>
         <input id="securityMemberInput" class="security-input security-login-only" type="text" data-i18n-placeholder="security.accountPh" placeholder="帳號（選填）">
         <input id="securityCodeInput" class="security-input security-login-only" type="password" data-i18n-placeholder="security.passwordPh" placeholder="密碼（選填；僅會員登入時填）">
@@ -72,7 +72,7 @@
         <div class="header-title">Construction Master <span class="header-version">V9.7</span></div>
         <div class="header-subtitle">
             <span class="live-badge" data-i18n="header.badgeLive">正式版 LIVE</span>
-            <span class="live-badge" data-i18n="header.badgeVersion">V9.7 放樣整合版</span>
+            <span class="live-badge live-badge--mep" data-i18n="header.badgeVersion">V9.7 機電 MEP 強化</span>
             <span class="header-meta-chip" data-i18n="header.chipWorkspace">本版：計算工作區</span>
             <span class="header-meta-chip" data-i18n="header.chipArLater" data-i18n-title="header.chipArLater" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
             <span class="header-meta-chip support-chip" data-i18n="header.support" data-i18n-title="header.support" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
@@ -97,6 +97,16 @@
         <button id="contrastAutoToggle" class="mode-btn" data-i18n="contrast.autoOff">自動: 關</button>
     </div>
 </header>
+
+<div id="appUpdateMarquee" class="app-update-marquee" role="region" aria-label="本版更新">
+    <span class="app-update-marquee__badge" data-i18n="update.badge">📢 本版更新</span>
+    <span id="appUpdateBuildLabel" class="app-update-marquee__build">9638</span>
+    <div class="app-update-marquee__track" aria-live="polite">
+        <div id="appUpdateMarqueeInner" class="app-update-marquee__inner"></div>
+    </div>
+    <button type="button" id="appUpdateMarqueeAction" class="app-update-marquee__action" data-i18n="update.action">看放样</button>
+    <button type="button" id="appUpdateMarqueeDismiss" class="app-update-marquee__dismiss" data-i18n-title="update.dismissTitle" title="关闭本版提示">✕</button>
+</div>
 
 <div id="globalWeatherTicker" class="global-weather-ticker">
     <span class="ticker-label" data-i18n="weather.label">☁️ 工地氣象</span>
@@ -487,6 +497,36 @@
                         </div>
                         <div class="action-cluster-chip" data-i18n="sim.stakeChip">Field Sim</div>
                     </div>
+                    <div class="stair-stake-panel">
+                        <div class="stair-stake-panel__head">
+                            <span class="stair-stake-panel__title" data-i18n="stair.panelTitle">🪜 樓梯放樣（平面／立面）</span>
+                            <span id="stairDrawingBadge" class="stair-stake-badge" data-i18n="stair.badgePlan">平面圖</span>
+                        </div>
+                        <p class="stair-stake-note" data-i18n="stair.panelNote">每個建案不同：請输入建案名称 → 汇入该案的放样点 CSV，或使用上方 BIM 产生的点。示例模板仅供练习。</p>
+                        <label for="stakeProjectName" data-i18n="stair.projectLabel">建案名称</label>
+                        <input type="text" id="stakeProjectName" class="security-input electrical-input" data-i18n-placeholder="stair.projectPh" placeholder="例如：信义区 A 栋 3F 楼梯">
+                        <label for="stairDrawingType" data-i18n="stair.drawingLabel">图面类型</label>
+                        <select id="stairDrawingType" class="electrical-select stair-stake-select">
+                            <option value="plan" data-i18n="stair.optionPlan">楼梯平面图（踏步／平台／转折）</option>
+                            <option value="elevation" data-i18n="stair.optionElevation">楼梯立面图（楼面／踏步高度／扶手）</option>
+                        </select>
+                        <label class="field-simulator-upload-label" for="stakePointsCsvInput" data-i18n="stair.csvUploadLabel">汇入本案放样点 CSV（每案一份）</label>
+                        <input type="file" id="stakePointsCsvInput" class="toolbar-file-input field-simulator-file" accept=".csv,text/csv,text/plain">
+                        <div class="stair-stake-toolbar">
+                            <button type="button" class="tool-btn" onclick="loadStakeSampleC2Plan()" data-i18n="stair.btnLoadC2Sample">📍 载入 D栋 C2 平面草案（A）</button>
+                            <button type="button" class="tool-btn" onclick="useBimLayoutPointsForStakeGuide()" data-i18n="stair.btnUseBim">📐 使用上方 BIM 放样点</button>
+                            <button type="button" class="tool-btn" onclick="downloadStakePointsCsvTemplate()" data-i18n="stair.btnCsvTemplate">⬇️ 下载 CSV 格式范本</button>
+                            <button type="button" class="tool-btn" onclick="saveStakeProjectPoints()" data-i18n="stair.btnSaveProject">💾 储存本案点位</button>
+                            <button type="button" class="tool-btn" onclick="restoreStakeProjectPoints()" data-i18n="stair.btnLoadProject">📂 读取已存本案</button>
+                        </div>
+                        <div class="stair-stake-toolbar stair-stake-toolbar--secondary">
+                            <button type="button" class="tool-btn" onclick="loadStairStakeDemoPoints()" data-i18n="stair.btnDemo">🧪 载入示例（仅练习）</button>
+                            <button type="button" class="tool-btn" onclick="exportStairStakeFieldReport()" data-i18n="stair.btnExport">📄 汇出楼梯现场证实报告</button>
+                        </div>
+                        <div id="stakePointSourceLabel" class="stair-source-label" data-i18n="stair.sourceIdle">尚未载入本案放样点</div>
+                        <pre id="stakePointsPreview" class="stair-points-preview" aria-label="stake points preview"></pre>
+                        <div id="stakeSimDirLabel" class="stair-dir-label" data-i18n="stair.dirIdle">方向导引：载入本案点位后，拖曳十字线会显示导正方向</div>
+                    </div>
                     <label class="field-simulator-upload-label" for="stakeSimImageInput" data-i18n="sim.uploadLabel">上傳現場圖（JPG／PNG）</label>
                     <input type="file" id="stakeSimImageInput" class="toolbar-file-input field-simulator-file" accept="image/*">
                     <div class="field-simulator-toolbar">
@@ -684,7 +724,41 @@
         <!-- 電機模式：機電參數配置與本機組態匯出 -->
         <section id="electricalModePage" class="work-mode-only-electrical electrical-mode-page">
             <div class="group-title" data-i18n="electrical.title">⚡ 電機模式｜機電參數配置面板</div>
-            <p class="electrical-mode-note" data-i18n="electrical.note">V1.0 雛形：設定電壓／電流／腳本模式，一鍵匯出 <code>mecha_config.txt</code> 供本機 Python 或現場測試讀取（僅存本機，不上傳雲端）。</p>
+            <p class="electrical-mode-note" data-i18n="electrical.note">V9.7 MEP 強化：參數、子系統、現場三步模擬與虛實對齊度儀表；通過後匯出 mecha_config.txt（僅存本機）。</p>
+            <div id="mepDashboard" class="mep-dashboard" aria-live="polite">
+                <div class="mep-dashboard-head">
+                    <span class="mep-dashboard-badge" data-i18n="electrical.mepBadge">MEP 工作流 V9.7</span>
+                    <span id="mepAlignScoreLabel" class="mep-align-score" data-i18n="electrical.alignScore">虛實對齊度 0%</span>
+                </div>
+                <div class="mep-align-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="mepAlignBar">
+                    <div id="mepAlignBarFill" class="mep-align-bar__fill"></div>
+                </div>
+                <div class="mep-pipeline">
+                    <div class="mep-pipeline-step" data-mep-step="params" id="mepStepParams">
+                        <span class="mep-pipeline-step__num">1</span>
+                        <span class="mep-pipeline-step__label" data-i18n="electrical.pipeParams">MEP 參數</span>
+                    </div>
+                    <div class="mep-pipeline-step" data-mep-step="photo" id="mepStepPhoto">
+                        <span class="mep-pipeline-step__num">2</span>
+                        <span class="mep-pipeline-step__label" data-i18n="electrical.pipePhoto">現場照片</span>
+                    </div>
+                    <div class="mep-pipeline-step" data-mep-step="simulate" id="mepStepSimulate">
+                        <span class="mep-pipeline-step__num">3</span>
+                        <span class="mep-pipeline-step__label" data-i18n="electrical.pipeSimulate">三步模擬</span>
+                    </div>
+                    <div class="mep-pipeline-step" data-mep-step="export" id="mepStepExport">
+                        <span class="mep-pipeline-step__num">4</span>
+                        <span class="mep-pipeline-step__label" data-i18n="electrical.pipeExport">組態匯出</span>
+                    </div>
+                </div>
+                <div class="mep-live-cards">
+                    <div class="mep-live-card"><span class="mep-live-card__k">V</span><strong id="mepLiveVoltage">220</strong></div>
+                    <div class="mep-live-card"><span class="mep-live-card__k">A</span><strong id="mepLiveCurrent">15</strong></div>
+                    <div class="mep-live-card mep-live-card--power"><span class="mep-live-card__k">W</span><strong id="mepLivePower">3300</strong></div>
+                    <div class="mep-live-card"><span class="mep-live-card__k" data-i18n="electrical.liveRelay">繼電器</span><strong id="mepLiveRelay">ON</strong></div>
+                    <div class="mep-live-card mep-live-card--wide"><span class="mep-live-card__k" data-i18n="electrical.liveSubsystem">子系統</span><strong id="mepLiveSubsystem">—</strong></div>
+                </div>
+            </div>
             <div class="bim-actions" style="margin-top:8px; margin-bottom:8px;">
                 <button type="button" class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('calc')" data-i18n="electrical.backCalc">↩️ 回計算模式</button>
             </div>
@@ -696,6 +770,55 @@
                     <label for="mechaCurrent" data-i18n="electrical.currentLabel">請設定實體電流控制值 (A)</label>
                     <input type="number" id="mechaCurrent" class="security-input electrical-input" value="15" min="0" max="100">
                     <div id="mechaPowerPreview" class="electrical-power-preview" data-i18n="electrical.powerPreview">自動計算總功率：3300 W</div>
+                </div>
+                <div class="electrical-section electrical-section--purple">
+                    <div class="electrical-section-title" data-i18n="electrical.sectionMep">🏗️ MEP 子系統與電源規格</div>
+                    <label for="mechaSubsystem" data-i18n="electrical.subsystemLabel">機電子系統類型</label>
+                    <select id="mechaSubsystem" class="electrical-select">
+                        <option value="power" data-i18n="electrical.subsystemPower">配電與動力</option>
+                        <option value="hvac" data-i18n="electrical.subsystemHvac">空調 HVAC</option>
+                        <option value="plumbing" data-i18n="electrical.subsystemPlumbing">給排水管路</option>
+                        <option value="controls" data-i18n="electrical.subsystemControls">自控 BMS</option>
+                    </select>
+                    <label for="mechaPhase" data-i18n="electrical.phaseLabel">相序</label>
+                    <select id="mechaPhase" class="electrical-select">
+                        <option value="single" data-i18n="electrical.phaseSingle">單相</option>
+                        <option value="three" data-i18n="electrical.phaseThree">三相</option>
+                    </select>
+                    <label for="mechaFrequency" data-i18n="electrical.frequencyLabel">頻率 Hz</label>
+                    <select id="mechaFrequency" class="electrical-select">
+                        <option value="60">60 Hz</option>
+                        <option value="50">50 Hz</option>
+                    </select>
+                </div>
+                <div class="electrical-section electrical-section--teal">
+                    <div class="electrical-section-title" data-i18n="mep.calcTitle">📐 MEP 工程試算（負載／線徑／壓降）</div>
+                    <p class="mep-calc-note" data-i18n="mep.calcIntro">依上方電壓與相序，試算負載電流、建議線徑、斷路器與壓降（現場粗估用）。</p>
+                    <label for="mepLoadKw" data-i18n="mep.loadKwLabel">設備負載 (kW)</label>
+                    <input type="number" id="mepLoadKw" class="security-input electrical-input" value="7.5" min="0" max="500" step="0.1">
+                    <label for="mepPowerFactor" data-i18n="mep.pfLabel">功率因數 PF</label>
+                    <input type="number" id="mepPowerFactor" class="security-input electrical-input" value="0.85" min="0.5" max="1" step="0.01">
+                    <label for="mepCableLength" data-i18n="mep.lengthLabel">單程線路長度 (m)</label>
+                    <input type="number" id="mepCableLength" class="security-input electrical-input" value="30" min="0" max="500" step="1">
+                    <div class="mep-calc-results">
+                        <div class="mep-calc-result-card">
+                            <span class="mep-calc-result-card__k" data-i18n="mep.calcCurrent">負載電流</span>
+                            <strong id="mepCalcCurrent" class="mep-calc-result">—</strong>
+                        </div>
+                        <div class="mep-calc-result-card">
+                            <span class="mep-calc-result-card__k" data-i18n="mep.calcWire">建議線徑</span>
+                            <strong id="mepCalcWire" class="mep-calc-result">—</strong>
+                        </div>
+                        <div class="mep-calc-result-card">
+                            <span class="mep-calc-result-card__k" data-i18n="mep.calcBreaker">建議斷路器</span>
+                            <strong id="mepCalcBreaker" class="mep-calc-result">—</strong>
+                        </div>
+                        <div class="mep-calc-result-card">
+                            <span class="mep-calc-result-card__k" data-i18n="mep.calcVdrop">壓降估算</span>
+                            <strong id="mepCalcVdrop" class="mep-calc-result">—</strong>
+                        </div>
+                    </div>
+                    <p id="mepCalcNote" class="mep-calc-footnote" data-i18n="mep.calcNoteIdle">輸入負載 kW 後自動試算。</p>
                 </div>
                 <div class="electrical-section electrical-section--blue">
                     <div class="electrical-section-title" data-i18n="electrical.sectionScript">⚙️ 控制腳本模式切換</div>
@@ -713,6 +836,31 @@
                         <label><input type="radio" name="mechaRelayStatus" value="ON" checked> <span data-i18n="electrical.relayOn">強制通電開關 (ON)</span></label>
                         <label><input type="radio" name="mechaRelayStatus" value="OFF"> <span data-i18n="electrical.relayOff">安全斷電斷路 (OFF)</span></label>
                     </div>
+                </div>
+                <div class="electrical-section electrical-section--motor">
+                    <div class="electrical-section-title" data-i18n="motor.sectionTitle">🔧 馬達控制實務演練（SF / ST / 積熱電驛）</div>
+                    <p class="motor-sim-note" data-i18n="motor.sectionNote">模擬正轉、逆轉、停止、互鎖防呆與 TH-RY 過載跳脫；完成後可匯出考核紀錄。</p>
+                    <div class="motor-status-row">
+                        <div id="motorStatusLamp" class="motor-status-lamp motor-status-lamp--stop" aria-label="停止"></div>
+                        <div class="motor-status-readouts">
+                            <div><span data-i18n="motor.stateLabel">馬達狀態</span>：<strong id="motorStateLabel" class="motor-state-label motor-state-label--stop">停止</strong></div>
+                            <div><span data-i18n="motor.thermalLabel">積熱電驛 TH-RY</span>：<strong id="motorThermalLabel" class="motor-thermal-label">正常</strong></div>
+                        </div>
+                    </div>
+                    <div class="motor-control-toolbar">
+                        <button type="button" class="tool-btn motor-btn motor-btn--forward" onclick="pressMotorForward()" data-i18n="motor.btnForward">▶ 正轉 SF</button>
+                        <button type="button" class="tool-btn motor-btn motor-btn--stop" onclick="pressMotorStop()" data-i18n="motor.btnStop">■ 停止 ST</button>
+                        <button type="button" class="tool-btn motor-btn motor-btn--reverse" onclick="pressMotorReverse()" data-i18n="motor.btnReverse">◀ 逆轉 SR</button>
+                    </div>
+                    <div class="motor-control-toolbar motor-control-toolbar--secondary">
+                        <button type="button" class="tool-btn" onclick="triggerMotorOverload()" data-i18n="motor.btnOverload">⚠ 模擬過載跳脫</button>
+                        <button type="button" class="tool-btn" onclick="resetMotorThermal()" data-i18n="motor.btnReset">↺ TH-RY 復歸</button>
+                        <button type="button" class="tool-btn" onclick="clearMotorLogs()" data-i18n="motor.btnClear">🗑 清除紀錄</button>
+                    </div>
+                    <pre id="motorOpLog" class="motor-op-log" aria-live="polite" data-i18n="motor.logEmpty">尚無操作紀錄</pre>
+                    <div class="electrical-section-title motor-report-title" data-i18n="motor.reportPreviewTitle">📋 考核報告預覽</div>
+                    <pre id="motorReportPreview" class="mecha-config-preview motor-report-preview" aria-label="motor report preview"></pre>
+                    <button type="button" class="tool-btn" onclick="downloadMotorReport()" data-i18n="motor.downloadReport">💾 匯出電機考核報告</button>
                 </div>
                 <div class="electrical-section electrical-section--sim">
                     <div class="electrical-section-title" data-i18n="sim.electricalTitle">📸 電壓現場模擬器</div>
@@ -733,7 +881,11 @@
                     <div id="electricalSimStatus" class="field-simulator-status" data-ok="0" data-i18n="sim.electricalStatusIdle">尚未上傳現場圖</div>
                     <button type="button" class="tool-btn field-simulator-confirm-btn" onclick="confirmElectricalFieldSimulator()" data-i18n="sim.electricalConfirm" disabled>✅ 現場機電操作完成</button>
                 </div>
-                <button type="button" class="tool-btn electrical-download-btn" onclick="downloadMechaConfigFile()" data-i18n="electrical.downloadBtn">💾 確認操作完成，一鍵下載到硬碟</button>
+                <div class="electrical-section electrical-section--preview">
+                    <div class="electrical-section-title" data-i18n="electrical.previewTitle">📄 組態即時預覽</div>
+                    <pre id="mechaConfigPreview" class="mecha-config-preview" aria-label="mecha_config preview"></pre>
+                </div>
+                <button type="button" class="tool-btn electrical-download-btn" id="mechaDownloadBtn" onclick="downloadMechaConfigFile()" data-i18n="electrical.downloadBtn">💾 確認操作完成，一鍵下載到硬碟</button>
                 <div class="electrical-footer-note" data-i18n="electrical.footer">Construction Master · 機電組態匯出 · 本機硬碟對接測試</div>
             </div>
         </section>
@@ -1282,7 +1434,7 @@
     <div class="coach-bubble">
         <button class="coach-close" onclick="hideCoach(true)" data-i18n-aria="coach.closeAria" aria-label="關閉解說員">x</button>
         <div class="coach-title" data-i18n="coach.title">解說員</div>
-        <div id="coachText" data-i18n="coach.defaultText">哈囉，我是解說員：點任何區塊都有說明。第1頁含本機群組聊天與試算📊卡片（僅存裝置）；公開隱私權見 Google Sites 或 privacy 頁。</div>
+        <div id="coachText" data-i18n="coach.defaultText">哈囉，我是解說員：我會說明主要區塊的用途與操作步驟。細節可開「新手導覽」或各區「▶ 30秒示範」。第1頁含本機群組聊天與試算📊卡片；公開隱私權見 Google Sites 或 privacy 頁。</div>
         <div class="coach-ai-row">
             <input id="coachAiInput" class="coach-ai-input" type="text" data-i18n-placeholder="coach.aiPh" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
             <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()" data-i18n="coach.aiAsk">問AI</button>
@@ -1321,17 +1473,21 @@
     </div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9621-field-real"></script>
+<script src="scripts/bundles/bm-core.js?v=v9640-nativeapp-fix"></script>
 <script src="scripts/bundles/bm-blueprint.js?v=v9612"></script>
 <script src="scripts/bundles/bm-calc.js?v=v9612"></script>
-<script src="scripts/features/app-shell.js?v=v9618-electrical"></script>
+<script src="scripts/features/app-shell.js?v=v9631-coach-ops"></script>
 <script src="scripts/features/materials-weather.js?v=v9615-rating"></script>
 <script src="scripts/features/measurement-logs.js?v=v9612"></script>
-<script src="scripts/features/bim-qa.js?v=v9612"></script>
+<script src="scripts/features/bim-qa.js?v=v9629-file-coords"></script>
 <script src="scripts/features/calc-engine.js?v=v9615-rating"></script>
 <script src="scripts/features/app-rating-prompt.js?v=v9618-electrical"></script>
-<script src="scripts/features/electrical-panel.js?v=v9621-field-real"></script>
-<script src="scripts/features/field-simulator.js?v=v9621-field-real"></script>
+<script src="scripts/features/electrical-panel.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/mep-engine.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/motor-simulator.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/field-simulator.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/stair-stake-guide.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/update-marquee.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/feature-demo.js?v=v9627-demo-ios-lottie"></script>
 <script src="scripts/app-main.js?v=v9627-demo-ios-lottie"></script>
 </body>

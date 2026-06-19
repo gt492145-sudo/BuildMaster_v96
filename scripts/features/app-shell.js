@@ -236,38 +236,54 @@
     }
 
     function getGenericCoachFallback(target) {
-        const el = target.closest('button, [role="button"], a[href], input, select, textarea, label, .tool-btn, .mode-btn, .drawer-item, .calc-page-btn, .member-chat-btn');
-        if (el) {
-            if (el.closest('#touchCoach') || el.closest('#coachGuidePanel')) return '';
-            const label = String(el.innerText || el.value || el.placeholder || el.getAttribute('aria-label') || el.id || '')
-                .trim()
-                .replace(/\s+/g, ' ')
-                .slice(0, 40);
-            if (label) {
-                return bmT('coach.hint.button', { label });
-            }
+        if (target.closest('#touchCoach, #coachGuidePanel')) return '';
+        const cluster = target.closest('.action-cluster');
+        if (cluster) {
+            const titleEl = cluster.querySelector('.action-cluster-title, .group-title');
+            const title = titleEl ? String(titleEl.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 28) : '';
+            if (title) return bmT('coach.hint.clusterHelp', { title });
         }
-        const titled = target.closest('.group-title, .drawer-header, .input-wrapper, .member-chat-panel, .mobile-drawer');
-        if (titled) {
-            const heading = titled.querySelector('.group-title, .drawer-header') || (titled.classList.contains('group-title') ? titled : null);
-            const title = String((heading && heading.innerText) || titled.getAttribute('aria-label') || '').trim().slice(0, 32);
-            if (title) return bmT('coach.hint.section', { title });
+        const essentialRoot = target.closest('.drawing-panel, .calc-panel, #freeWarRoomCard, #electricalModePage, #stakeFieldSimulator');
+        if (essentialRoot && target.closest('button, input, select, textarea, a[href], [role="button"], label')) {
+            return bmT('coach.hint.essentialBrowse');
         }
-        return bmT('coach.hint.generic');
+        return '';
+    }
+
+    function coachHintSpecificityScore(target, matched) {
+        if (!matched || !target) return -1;
+        let depth = 0;
+        let node = target;
+        while (node && node !== matched) {
+            depth += 1;
+            node = node.parentElement;
+        }
+        const subtree = matched.querySelectorAll ? matched.querySelectorAll('*').length : 0;
+        return -subtree + depth * 10;
     }
 
     function resolveCoachMessage(target) {
         const rules = (typeof BM_COACH_HINT_RULES !== 'undefined' && BM_COACH_HINT_RULES) || [];
+        const essential = (typeof BM_COACH_ESSENTIAL_HINT_KEYS !== 'undefined' && BM_COACH_ESSENTIAL_HINT_KEYS) || null;
+        let bestMessage = '';
+        let bestScore = -1;
         for (let i = 0; i < rules.length; i += 1) {
             const entry = rules[i];
             const sel = entry && entry.sel ? entry.sel : (Array.isArray(entry) ? entry[0] : '');
             const key = entry && entry.key ? entry.key : (Array.isArray(entry) ? entry[1] : '');
             if (!sel || !key) continue;
+            if (essential && !essential.has(key)) continue;
             try {
-                if (target.closest(sel)) return bmT('coach.hint.' + key);
+                const matched = target.closest(sel);
+                if (!matched) continue;
+                const score = coachHintSpecificityScore(target, matched);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMessage = bmT('coach.hint.' + key);
+                }
             } catch (_e) {}
         }
-        return '';
+        return bestMessage;
     }
 
     function speakCoach(message, keepOpen) {

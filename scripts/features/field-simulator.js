@@ -20,6 +20,9 @@
         markedIds: new Set(),
         crosshairX: null,
         crosshairY: null,
+        lastDeviationPx: null,
+        _lastCx: null,
+        _lastCy: null,
         layout: null,
         dragging: false,
         gesture: null,
@@ -80,6 +83,10 @@
     }
 
     function getStakePointsForSim() {
+        if (typeof global.getStairStakePointsOverride === 'function') {
+            const stairPoints = global.getStairStakePointsOverride();
+            if (Array.isArray(stairPoints) && stairPoints.length) return stairPoints;
+        }
         if (Array.isArray(global.bimLayoutPoints) && global.bimLayoutPoints.length) {
             return global.bimLayoutPoints
                 .map((p) => ({
@@ -330,6 +337,9 @@
         stakeState.layout = null;
         stakeState.viewport = createViewport();
         stakeState.pulse = 0;
+        stakeState.lastDeviationPx = null;
+        stakeState._lastCx = null;
+        stakeState._lastCy = null;
     }
 
     function resetElectricalOperation() {
@@ -384,6 +394,74 @@
         const active = getActiveStakeScreenPoint(layout);
         if (!active || stakeState.crosshairX == null) return STAKE_ALIGN_PX + 1;
         return dist(stakeState.crosshairX, stakeState.crosshairY, active.point.sx, active.point.sy);
+    }
+
+    function getStakeDirectionPayload(layout) {
+        const active = getActiveStakeScreenPoint(layout);
+        if (!active || stakeState.crosshairX == null) return null;
+        return {
+            activePoint: active.point,
+            deltaX: active.point.sx - stakeState.crosshairX,
+            deltaY: active.point.sy - stakeState.crosshairY,
+            deviationPx: getStakeDeviation(layout),
+            prevDeviationPx: stakeState.lastDeviationPx,
+            aligned: isStakeAligned(layout)
+        };
+    }
+
+    function publishStakeDirectionFeedback(layout) {
+        const payload = getStakeDirectionPayload(layout);
+        if (!payload) return;
+        const moved = stakeState._lastCx !== stakeState.crosshairX
+            || stakeState._lastCy !== stakeState.crosshairY;
+        if (moved && typeof global.onStakeCrosshairMoved === 'function') {
+            global.onStakeCrosshairMoved(payload);
+        }
+        if (moved || payload.aligned) {
+            stakeState._lastCx = stakeState.crosshairX;
+            stakeState._lastCy = stakeState.crosshairY;
+            stakeState.lastDeviationPx = payload.deviationPx;
+        }
+        if (typeof global.updateStairDirectionPanel === 'function') {
+            global.updateStairDirectionPanel(payload);
+        }
+    }
+
+    function drawDirectionGuide(ctx, layout) {
+        const active = getActiveStakeScreenPoint(layout);
+        if (!active || stakeState.crosshairX == null || stakeState.markedIds.has(active.point.id)) return;
+        if (isStakeAligned(layout)) return;
+        const cx = stakeState.crosshairX;
+        const cy = stakeState.crosshairY;
+        const tx = active.point.sx;
+        const ty = active.point.sy;
+        const dx = tx - cx;
+        const dy = ty - cy;
+        const len = Math.hypot(dx, dy);
+        if (len < 12) return;
+        const ux = dx / len;
+        const uy = dy / len;
+        const ax = cx + ux * Math.min(len * 0.55, 120);
+        const ay = cy + uy * Math.min(len * 0.55, 120);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(249, 226, 175, 0.88)';
+        ctx.fillStyle = 'rgba(249, 226, 175, 0.88)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const head = 10;
+        const angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(ax - head * Math.cos(angle - 0.45), ay - head * Math.sin(angle - 0.45));
+        ctx.lineTo(ax - head * Math.cos(angle + 0.45), ay - head * Math.sin(angle + 0.45));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
     }
 
     function updateStakeOpPanel(layout) {
@@ -448,6 +526,9 @@
         if (relayBtn) relayBtn.disabled = !(electricalState.image && steps.measured && !steps.relayTested);
         if (confirmBtn) {
             confirmBtn.disabled = !(electricalState.image && steps.probeSet && steps.measured && steps.relayTested && verdict.level !== 'bad');
+        }
+        if (typeof global.refreshMepDashboard === 'function') {
+            global.refreshMepDashboard();
         }
     }
 
@@ -547,6 +628,7 @@
         }
 
         if (stakeState.showCrosshair && stakeState.crosshairX != null) {
+            drawDirectionGuide(ctx, layout);
             drawSurveyReticle(ctx, stakeState.crosshairX, stakeState.crosshairY, Math.min(w, h) * 0.11, aligned, stakeState.pulse);
         }
         ctx.restore();
@@ -560,6 +642,14 @@
         ctx.font = '11px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(bmT('sim.stakeHudDrag'), 14, 40);
+        if (layout.points.length) {
+            ctx.fillStyle = 'rgba(17,17,27,0.78)';
+            ctx.fillRect(8, 50, Math.min(w - 16, 420), 20);
+            ctx.fillStyle = '#a6e3a1';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(bmT('sim.stakeCoordSpace'), 14, 64);
+        }
+
         ctx.fillStyle = 'rgba(17,17,27,0.78)';
         ctx.fillRect(8, h - 58, 120, 22);
         ctx.fillStyle = '#89b4fa';
@@ -575,6 +665,7 @@
             else statusKey = 'sim.stakeStatusReady';
         }
         setStakeSimStatus(bmT(statusKey, { count: String(total), marked: String(marked) }), stakeState.verified);
+        publishStakeDirectionFeedback(layout);
         updateStakeOpPanel(layout);
     }
 
@@ -930,6 +1021,9 @@
         electricalState.verified = true;
         redrawElectricalFieldSimulator();
         toast(bmT('sim.electricalVerifiedToast'));
+        if (typeof global.refreshMepDashboard === 'function') {
+            global.refreshMepDashboard();
+        }
     }
 
     function requireStakeSimVerified() {
@@ -1015,6 +1109,27 @@
         redrawStakeFieldSimulator();
     }
 
+    global.getStakePointsForSim = getStakePointsForSim;
+    global.getStakeFieldSimulatorState = function getStakeFieldSimulatorState() {
+        const points = getStakePointsForSim();
+        return {
+            verified: stakeState.verified,
+            markedIds: Array.from(stakeState.markedIds),
+            points,
+            activeIndex: stakeState.activeIndex
+        };
+    };
+    global.getStakeSimulatorProgress = function getStakeSimulatorProgress() {
+        const points = getStakePointsForSim();
+        return {
+            hasPhoto: !!stakeState.image,
+            hasPoints: points.length > 0,
+            marked: stakeState.markedIds.size,
+            total: points.length,
+            verified: stakeState.verified
+        };
+    };
+    global.resetStakeFieldOperation = resetStakeOperation;
     global.initStakeFieldSimulator = initStakeFieldSimulator;
     global.initElectricalFieldSimulator = initElectricalFieldSimulator;
     global.redrawStakeFieldSimulator = redrawStakeFieldSimulator;
@@ -1037,4 +1152,11 @@
     global.electricalSimZoomReset = () => simZoomReset('electrical');
     global.isStakeSimulatorVerified = () => stakeState.verified;
     global.isElectricalSimulatorVerified = () => electricalState.verified;
+    global.getElectricalSimulatorProgress = () => ({
+        hasPhoto: !!electricalState.image,
+        probeSet: !!electricalState.steps.probeSet,
+        measured: !!electricalState.steps.measured,
+        relayTested: !!electricalState.steps.relayTested,
+        verified: !!electricalState.verified
+    });
 })(typeof window !== 'undefined' ? window : globalThis);
