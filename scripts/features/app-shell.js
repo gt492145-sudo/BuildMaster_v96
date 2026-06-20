@@ -1513,6 +1513,9 @@
         case 'usage-guide':
             showCalcResetGuide();
             break;
+        case 'lidar-measure-guide':
+            window.open('lidar-measure-guide.html', '_blank', 'noopener,noreferrer');
+            break;
         case 'owner-lock':
             await handleOwnerLockAction();
             break;
@@ -1548,6 +1551,9 @@
             break;
         case 'mode-electrical':
             setWorkMode('electrical');
+            break;
+        case 'mode-convert':
+            setWorkMode('convert');
             break;
         case 'top':
             window.scrollTo({ top: 0, behavior: 'smooth' });

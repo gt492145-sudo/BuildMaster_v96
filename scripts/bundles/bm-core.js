@@ -180,6 +180,27 @@
     };
 }());
 
+/* === scripts/modules/convert-page.js === */
+(function initBuildMasterConvertPageModule() {
+    const CONVERT_SECTION_ID = 'convertModePage';
+
+    function getConvertSection() {
+        return document.getElementById(CONVERT_SECTION_ID);
+    }
+
+    function getConvertScrollTarget() {
+        return getConvertSection();
+    }
+
+    window.BuildMasterConvertPageModule = {
+        ids: {
+            convertSection: CONVERT_SECTION_ID
+        },
+        getConvertSection,
+        getConvertScrollTarget
+    };
+}());
+
 /* === scripts/modules/navigation.js === */
 (function initBuildMasterNavigationModule() {
     function getCalcModule() {
@@ -194,9 +215,14 @@
         return window.BuildMasterElectricalPageModule || null;
     }
 
+    function getConvertModule() {
+        return window.BuildMasterConvertPageModule || null;
+    }
+
     function normalizeWorkMode(mode) {
         if (mode === 'stake') return 'stake';
         if (mode === 'electrical') return 'electrical';
+        if (mode === 'convert') return 'convert';
         return 'calc';
     }
 
@@ -220,6 +246,7 @@
         const calcModule = getCalcModule();
         const stakeModule = getStakeModule();
         const electricalModule = getElectricalModule();
+        const convertModule = getConvertModule();
         const calcSection = calcModule && typeof calcModule.getCalcSection === 'function'
             ? calcModule.getCalcSection()
             : null;
@@ -229,6 +256,9 @@
         const electricalSection = electricalModule && typeof electricalModule.getElectricalSection === 'function'
             ? electricalModule.getElectricalSection()
             : null;
+        const convertSection = convertModule && typeof convertModule.getConvertSection === 'function'
+            ? convertModule.getConvertSection()
+            : null;
         if (calcSection && stakeSection && calcSection.nextElementSibling !== stakeSection) {
             calcSection.insertAdjacentElement('afterend', stakeSection);
         }
@@ -236,6 +266,10 @@
         if (anchor && electricalSection && anchor.nextElementSibling !== electricalSection) {
             anchor.insertAdjacentElement('afterend', electricalSection);
             anchor = electricalSection;
+        }
+        if (anchor && convertSection && anchor.nextElementSibling !== convertSection) {
+            anchor.insertAdjacentElement('afterend', convertSection);
+            anchor = convertSection;
         }
         const supportingNodes = stakeModule && typeof stakeModule.getStakeSupportingNodes === 'function'
             ? stakeModule.getStakeSupportingNodes()
@@ -261,6 +295,12 @@
             const electricalModule = getElectricalModule();
             return electricalModule && typeof electricalModule.getElectricalScrollTarget === 'function'
                 ? electricalModule.getElectricalScrollTarget()
+                : null;
+        }
+        if (normalized === 'convert') {
+            const convertModule = getConvertModule();
+            return convertModule && typeof convertModule.getConvertScrollTarget === 'function'
+                ? convertModule.getConvertScrollTarget()
                 : null;
         }
         const calcModule = getCalcModule();
@@ -305,15 +345,18 @@
         const calcBtn = document.getElementById('workCalcBtn');
         const stakeBtn = document.getElementById('workStakeBtn');
         const electricalBtn = document.getElementById('workElectricalBtn');
+        const convertBtn = document.getElementById('workConvertBtn');
         const calcModule = getCalcModule();
         const stakeModule = getStakeModule();
         const electricalModule = getElectricalModule();
-        [calcBtn, stakeBtn, electricalBtn].forEach((btn) => {
+        const convertModule = getConvertModule();
+        [calcBtn, stakeBtn, electricalBtn, convertBtn].forEach((btn) => {
             if (btn) btn.classList.remove('active');
         });
         if (calcBtn && mode === 'calc') calcBtn.classList.add('active');
         if (stakeBtn && mode === 'stake') stakeBtn.classList.add('active');
         if (electricalBtn && mode === 'electrical') electricalBtn.classList.add('active');
+        if (convertBtn && mode === 'convert') convertBtn.classList.add('active');
         const calcSection = calcModule && typeof calcModule.getCalcSection === 'function'
             ? calcModule.getCalcSection()
             : null;
@@ -323,9 +366,13 @@
         const electricalSection = electricalModule && typeof electricalModule.getElectricalSection === 'function'
             ? electricalModule.getElectricalSection()
             : null;
+        const convertSection = convertModule && typeof convertModule.getConvertSection === 'function'
+            ? convertModule.getConvertSection()
+            : null;
         setNodeVisibility(calcSection, mode === 'calc');
         setNodeVisibility(stakeSection, mode === 'stake');
         setNodeVisibility(electricalSection, mode === 'electrical');
+        setNodeVisibility(convertSection, mode === 'convert');
         const drawingPanel = document.querySelector('.main-layout > .drawing-panel');
         setNodeVisibility(drawingPanel, mode === 'calc');
         const stakeSupportingNodes = stakeModule && typeof stakeModule.getStakeSupportingNodes === 'function'
@@ -333,11 +380,14 @@
             : [];
         stakeSupportingNodes.forEach((node) => setNodeVisibility(node, mode === 'stake'));
         document.body.dataset.workMode = mode;
-        if (mode === 'stake' || mode === 'electrical') {
+        if (mode === 'stake' || mode === 'electrical' || mode === 'convert') {
             scrollToModeSection(mode);
         }
         if (mode === 'electrical' && typeof window.initElectricalPanel === 'function') {
             window.initElectricalPanel();
+        }
+        if (mode === 'convert' && typeof window.initConvertPanel === 'function') {
+            window.initConvertPanel();
         }
         if (mode === 'stake' && typeof window.initStakeFieldSimulator === 'function') {
             window.initStakeFieldSimulator();

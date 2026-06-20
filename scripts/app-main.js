@@ -78,6 +78,7 @@
         bindTapAction(document.getElementById('workCalcBtn'), () => setWorkMode('calc'));
         bindTapAction(document.getElementById('workStakeBtn'), () => setWorkMode('stake'));
         bindTapAction(document.getElementById('workElectricalBtn'), () => setWorkMode('electrical'));
+        bindTapAction(document.getElementById('workConvertBtn'), () => setWorkMode('convert'));
         bindTapAction(document.getElementById('calcPage1Btn'), () => setCalcSubPage(1));
         bindTapAction(document.getElementById('calcPage2Btn'), () => setCalcSubPage(2));
         bindTapAction(document.getElementById('coachToggle'), () => toggleCoachMode());

@@ -74,7 +74,8 @@
             <span class="live-badge" data-i18n="header.badgeLive">正式版 LIVE</span>
             <span class="live-badge live-badge--mep" data-i18n="header.badgeVersion">V9.7 機電 MEP 強化</span>
             <span class="header-meta-chip" data-i18n="header.chipWorkspace">本版：計算工作區</span>
-            <span class="header-meta-chip" data-i18n="header.chipArLater" data-i18n-title="header.chipArLater" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
+            <span id="nativeArChip" class="header-meta-chip native-ar-chip" data-ar-source="header-chip" data-i18n="header.chipArLater" data-i18n-title="header.chipArLater" title="原生 AR／LiDAR 功能將於後續 App 更新加入">AR 後續更新</span>
+            <a id="lidarMeasureGuideLink" class="header-meta-chip header-meta-chip--link" href="lidar-measure-guide.html" target="_blank" rel="noopener noreferrer" data-i18n="header.lidarGuide" data-i18n-title="header.lidarGuideTitle" title="LiDAR 測距圖文教學">📖 LiDAR 教學</a>
             <span class="header-meta-chip support-chip" data-i18n="header.support" data-i18n-title="header.support" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
             <span id="billingStatusChip" class="header-meta-chip billing-status-chip" hidden></span>
         </div>
@@ -83,6 +84,7 @@
         <button id="workCalcBtn" class="work-btn active" data-i18n="work.calc">🧮 計算模式</button>
         <button id="workStakeBtn" class="work-btn" data-i18n="work.stake">📍 放樣模式</button>
         <button id="workElectricalBtn" class="work-btn" data-i18n="work.electrical">⚡ 電機模式</button>
+        <button id="workConvertBtn" class="work-btn" data-i18n="work.convert">🔄 資料轉換</button>
     </div>
     <div class="calc-page-switch work-mode-only-calc">
         <button type="button" id="calcPage1Btn" class="calc-page-btn active" aria-pressed="true" data-i18n="calc.page1">第1頁 簡單+聊天</button>
@@ -133,6 +135,10 @@
 
         <div class="drawer-item" data-mobile-action="mode-electrical">
             <span data-i18n="drawer.modeElectrical">⚡ 切換到電機模式</span>
+        </div>
+
+        <div class="drawer-item" data-mobile-action="mode-convert">
+            <span data-i18n="drawer.modeConvert">🔄 切換到資料轉換</span>
         </div>
 
         <div class="drawer-item" data-mobile-action="top">
@@ -186,6 +192,10 @@
             <span data-i18n="drawer.usageGuide">📘 使用與錯誤排查</span>
         </div>
 
+        <div class="drawer-item" data-mobile-action="lidar-measure-guide">
+            <span data-i18n="drawer.lidarGuide">📡 LiDAR 測距教學</span>
+        </div>
+
         <div class="drawer-item" id="sunlightToggle" onclick="toggleSunlightMode()">
             <span>☀️ 戶外高亮：關</span>
         </div>
@@ -237,6 +247,7 @@
                 <input type="file" id="fileInput" class="mobile-toolbar-core toolbar-file-input" accept="image/*" onchange="loadImg(event)">
                 <input type="file" id="mobileBlueprintFileInput" class="toolbar-file-input" accept="image/*" aria-hidden="true" tabindex="-1" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;" onchange="loadImg(event)">
                 <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="removeLoadedImage()" data-i18n="page2.removeBlueprint">移除圖紙</button>
+                <button type="button" class="tool-btn native-ar-open-btn tool-btn--accent" onclick="sendBlueprintAndOpenNativeAR({ source: 'page2-toolbar' })" data-i18n="ar.sendBlueprintToAR">📡 圖紙送 AR 貼牆</button>
             </div>
             <div id="blueprintUploadStatusBar" class="blueprint-upload-status blueprint-upload-status--idle" role="status" aria-live="polite">
                 <div class="blueprint-upload-status-track">
@@ -464,6 +475,7 @@
             </div>
                 <div class="action-cluster-grid">
                 <button class="tool-btn" style="border-color:#9fa8da; color:#e5e8ff;" onclick="runDesktopStakingPipeline()" data-i18n="stake.btnPipeline">🚀 一鍵放樣流程</button>
+                <button type="button" class="tool-btn native-ar-open-btn work-mode-only-stake" style="border-color:#7ee7ff; color:#dff5ff;" onclick="openNativeAR({ source: 'stake-toolbar' })" data-i18n="ar.openFromStake">📡 LiDAR 現場 AR</button>
                 <button class="tool-btn" style="border-color:#b388ff; color:#e8d9ff;" onclick="runQuantumAutoStakeLayout()" data-i18n="stake.btnIbmCloud">⚛️ IBM 雲端放樣</button>
                 <button class="tool-btn" onclick="generateBimLayoutPoints()" data-i18n="stake.btnGeneratePoints">📍 產生放樣點</button>
                 <button class="tool-btn" style="border-color:#00e5ff; color:#bff8ff;" onclick="enhanceBimStakingQuality()" data-i18n="stake.btnEnhance">🛡️ 強化放樣</button>
@@ -887,6 +899,46 @@
                 </div>
                 <button type="button" class="tool-btn electrical-download-btn" id="mechaDownloadBtn" onclick="downloadMechaConfigFile()" data-i18n="electrical.downloadBtn">💾 確認操作完成，一鍵下載到硬碟</button>
                 <div class="electrical-footer-note" data-i18n="electrical.footer">Construction Master · 機電組態匯出 · 本機硬碟對接測試</div>
+            </div>
+        </section>
+
+        <!-- 資料轉換模式：USDZ 匯入說明 + 一鍵送 AR -->
+        <section id="convertModePage" class="work-mode-only-convert convert-mode-page">
+            <div class="group-title" data-i18n="convert.title">🔄 資料轉換｜USDZ 3D 模型</div>
+            <p class="convert-mode-note" data-i18n="convert.note">選擇 .usdz 真 3D 模型，設定實際寬度後一鍵送到 LiDAR AR。可用 Mac Reality Converter 從 glTF/OBJ/FBX 轉出。</p>
+            <div class="convert-panel">
+                <div class="convert-section convert-section--guide">
+                    <div class="convert-section-title" data-i18n="convert.sectionGuide">📘 如何取得 USDZ？</div>
+                    <ol class="convert-guide-list">
+                        <li data-i18n="convert.guide1">在 Mac 使用 Apple Reality Converter（免費）匯入 glTF / OBJ / FBX</li>
+                        <li data-i18n="convert.guide2">或從 Blender / SketchUp 直接匯出 .usdz</li>
+                        <li data-i18n="convert.guide3">單檔建議 ≤ 40MB，太大請先簡化模型</li>
+                        <li data-i18n="convert.guide4">Revit 請先 Export IFC，再用外部工具轉 USDZ（第二階段可接自動轉檔）</li>
+                    </ol>
+                </div>
+                <div class="convert-section convert-section--upload">
+                    <div class="convert-section-title" data-i18n="convert.sectionUpload">📦 選擇 USDZ 檔案</div>
+                    <label for="convertUsdzInput" class="convert-upload-label" data-i18n="convert.uploadLabel">上傳 .usdz（本機檔案）</label>
+                    <input type="file" id="convertUsdzInput" class="convert-file-input" accept=".usdz,model/vnd.usdz+zip">
+                    <div class="convert-field-row">
+                        <label for="convertUsdzWidthM" data-i18n="convert.widthLabel">目標寬度（公尺，可選）</label>
+                        <input type="number" id="convertUsdzWidthM" class="security-input convert-number-input" value="2.0" min="0.2" max="20" step="0.05">
+                    </div>
+                    <div class="convert-field-row">
+                        <label for="convertUsdzPlacement" data-i18n="convert.placementLabel">AR 預設放置</label>
+                        <select id="convertUsdzPlacement" class="convert-select">
+                            <option value="wall" data-i18n="convert.placementWall">LiDAR 牆面（準星）</option>
+                            <option value="floor" data-i18n="convert.placementFloor">地面水平面</option>
+                            <option value="front" data-i18n="convert.placementFront">鏡頭前方預覽</option>
+                        </select>
+                    </div>
+                    <pre id="convertUsdzPreview" class="convert-preview" data-i18n="convert.previewEmpty">尚未選擇 USDZ 檔案</pre>
+                    <div id="convertStatusBox" class="convert-status" data-ok="0" data-i18n="convert.statusIdle">請選擇 .usdz 檔案</div>
+                </div>
+                <div class="convert-section convert-section--actions">
+                    <button type="button" class="tool-btn convert-action-btn" onclick="sendUsdzAndOpenNativeAR()" data-i18n="convert.sendAr">📡 一鍵送 LiDAR AR</button>
+                    <button type="button" class="tool-btn" onclick="setWorkMode('calc')" data-i18n="convert.backCalc">↩️ 回計算模式</button>
+                </div>
             </div>
         </section>
 
@@ -1483,12 +1535,14 @@
 <script src="scripts/features/calc-engine.js?v=v9615-rating"></script>
 <script src="scripts/features/app-rating-prompt.js?v=v9618-electrical"></script>
 <script src="scripts/features/electrical-panel.js?v=v9638-update-marquee"></script>
+<script src="scripts/features/convert-panel.js?v=v9642-usdz-convert"></script>
 <script src="scripts/features/mep-engine.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/motor-simulator.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/field-simulator.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/stair-stake-guide.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/update-marquee.js?v=v9638-update-marquee"></script>
 <script src="scripts/features/feature-demo.js?v=v9627-demo-ios-lottie"></script>
+<script src="scripts/features/native-ar-bridge.js?v=v9642-native-ar"></script>
 <script src="scripts/app-main.js?v=v9627-demo-ios-lottie"></script>
 </body>
 </html>

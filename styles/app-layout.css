@@ -182,6 +182,11 @@
     .header-version { color: var(--highlight-soft); font-weight: 700; }
     .header-subtitle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
     .header-meta-chip { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-soft); background: var(--glass-inner); color: #d0e0f0; font-size: 0.7em; font-weight: 700; letter-spacing: 0.4px; }
+    .header-meta-chip--link { text-decoration: none; border-color: rgba(168, 240, 200, 0.45); color: #c8f5dd; }
+    .header-meta-chip--link:hover { background: rgba(168, 240, 200, 0.12); }
+    .native-ar-chip--ready { cursor: pointer; border-color: rgba(126, 231, 255, 0.55); color: #bfe7ff; box-shadow: 0 0 0 1px rgba(126, 231, 255, 0.12); }
+    .native-ar-chip--ready:hover { background: rgba(126, 231, 255, 0.12); }
+    body:not([data-native-ar="1"]) .native-ar-open-btn { display: none !important; }
     .live-badge { display: inline-flex; align-items: center; gap: 4px; margin-left: 0; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(126, 200, 232, 0.32); background: linear-gradient(135deg, rgba(18, 36, 58, 0.78), rgba(24, 46, 72, 0.72)); color: #e3f2ff; font-size: 0.66em; letter-spacing: 0.8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     .level-switch { display: flex; gap: 6px; margin-left: 8px; }
     .level-btn { border: 1px solid var(--line-soft); border-radius: 999px; background: rgba(14, 26, 42, 0.48); color: #c8dced; font-size: 0.76em; padding: 7px 11px; cursor: pointer; transition: 0.2s ease; }
@@ -243,6 +248,7 @@
     body[data-free-public="1"][data-work-mode="stake"] #stakeModePage .level-only-pro,
     body[data-free-public="1"][data-work-mode="stake"] .work-mode-only-stake { display: revert !important; }
     body[data-free-public="1"][data-work-mode="electrical"] .work-mode-only-electrical { display: revert !important; }
+    body[data-free-public="1"][data-work-mode="convert"] .work-mode-only-convert { display: revert !important; }
     body[data-work-mode="calc"][data-calc-page="1"] .main-layout { flex-direction: column; }
     body[data-work-mode="calc"][data-calc-page="1"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-work-mode="stake"] .main-layout { flex-direction: column; }
@@ -251,12 +257,20 @@
     body[data-work-mode="stake"] #stakeModePage .bim-actions.level-only-pro { display: flex !important; flex-wrap: wrap; }
     body[data-work-mode="electrical"] .main-layout { flex-direction: column; }
     body[data-work-mode="electrical"] .calc-panel { flex: 1 1 100%; max-width: none; }
+    body[data-work-mode="convert"] .main-layout { flex-direction: column; }
+    body[data-work-mode="convert"] .calc-panel { flex: 1 1 100%; max-width: none; }
     body[data-work-mode="calc"] .work-mode-only-stake,
-    body[data-work-mode="calc"] .work-mode-only-electrical { display: none !important; }
+    body[data-work-mode="calc"] .work-mode-only-electrical,
+    body[data-work-mode="calc"] .work-mode-only-convert { display: none !important; }
     body[data-work-mode="stake"] .work-mode-only-calc,
-    body[data-work-mode="stake"] .work-mode-only-electrical { display: none !important; }
+    body[data-work-mode="stake"] .work-mode-only-electrical,
+    body[data-work-mode="stake"] .work-mode-only-convert { display: none !important; }
     body[data-work-mode="electrical"] .work-mode-only-calc,
-    body[data-work-mode="electrical"] .work-mode-only-stake { display: none !important; }
+    body[data-work-mode="electrical"] .work-mode-only-stake,
+    body[data-work-mode="electrical"] .work-mode-only-convert { display: none !important; }
+    body[data-work-mode="convert"] .work-mode-only-calc,
+    body[data-work-mode="convert"] .work-mode-only-stake,
+    body[data-work-mode="convert"] .work-mode-only-electrical { display: none !important; }
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .mode-btn { border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(16, 29, 48, 0.52); color: #e8f5ff; font-weight: 700; padding: 8px 12px; cursor: pointer; transition: 0.2s; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     .mode-btn:hover { background: rgba(36, 61, 92, 0.72); transform: translateY(-1px); }
@@ -267,6 +281,7 @@
     #calcModePage { order: 30; }
     #stakeModePage { order: 40; }
     #electricalModePage { order: 45; }
+    #convertModePage { order: 46; }
     #stakeProjectTitle { order: 41; }
     #stakeProjectMetaRow { order: 42; }
     .member-wrap { order: 43; }
