@@ -108,7 +108,7 @@
             '實體控制電流：' + p.current + ' A',
             '自動計算總功率：' + p.powerOutput + ' W',
             '繼電器開關狀態：' + p.relay,
-            '現場模擬確認：' + (p.simVerified ? '已通過' : '未確認'),
+            '現場對位確認：' + (p.simVerified ? '已通過' : '未確認'),
             '馬達演練狀態：' + motorBlock.motorLabel,
             '積熱電驛 TH-RY：' + motorBlock.thermalLabel,
             '--------------------------------------------------',

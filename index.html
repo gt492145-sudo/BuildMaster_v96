@@ -22,7 +22,8 @@
 <link rel="stylesheet" href="styles/app-overlays.css?v=v9627-demo-ios-lottie">
 <link rel="stylesheet" href="styles/weather-effects.css?v=v9608-wallfix">
 <link rel="stylesheet" href="styles/app-responsive.css?v=v9616-chat-spotlight">
-<script src="scripts/i18n/bm-i18n.js?v=v9638-update-marquee"></script>
+<script src="scripts/i18n/bm-i18n-vi.js?v=v9642-vi"></script>
+<script src="scripts/i18n/bm-i18n.js?v=v9642-vi"></script>
 <script src="scripts/i18n/bm-coach-hints.js?v=v9631-coach-ops"></script>
 </head>
 <body>
@@ -102,7 +103,7 @@
 
 <div id="appUpdateMarquee" class="app-update-marquee" role="region" aria-label="本版更新">
     <span class="app-update-marquee__badge" data-i18n="update.badge">📢 本版更新</span>
-    <span id="appUpdateBuildLabel" class="app-update-marquee__build">9638</span>
+    <span id="appUpdateBuildLabel" class="app-update-marquee__build">9642</span>
     <div class="app-update-marquee__track" aria-live="polite">
         <div id="appUpdateMarqueeInner" class="app-update-marquee__inner"></div>
     </div>
@@ -504,7 +505,7 @@
                 <div class="action-cluster action-cluster--accent" style="margin-top:12px;">
                     <div class="action-cluster-header">
                         <div>
-                            <div class="action-cluster-title" data-i18n="sim.stakeTitle">📸 現場放樣模擬器</div>
+                            <div class="action-cluster-title" data-i18n="sim.stakeTitle">📸 現場放樣對位</div>
                             <div class="action-cluster-note" data-i18n="sim.stakeNote">上傳現場照片，拖曳十字線逐點對準放樣位置並標記；全部點位完成現場操作後再匯出。</div>
                         </div>
                         <div class="action-cluster-chip" data-i18n="sim.stakeChip">Field Sim</div>
@@ -556,7 +557,7 @@
                         <button type="button" class="tool-btn" onclick="toggleStakeSimPoints()" data-i18n="sim.togglePoints">放樣點</button>
                     </div>
                     <div class="field-simulator-stage">
-                        <canvas id="stakeSimCanvas" aria-label="放樣現場模擬器"></canvas>
+                        <canvas id="stakeSimCanvas" aria-label="現場放樣對位"></canvas>
                     </div>
                     <div id="stakeSimStatus" class="field-simulator-status" data-ok="0" data-i18n="sim.stakeStatusIdle">尚未上傳現場圖</div>
                     <button type="button" class="tool-btn field-simulator-confirm-btn" onclick="confirmStakeFieldSimulator()" data-i18n="sim.stakeConfirm" disabled>✅ 現場放樣操作完成，可匯出資料</button>
@@ -875,8 +876,8 @@
                     <button type="button" class="tool-btn" onclick="downloadMotorReport()" data-i18n="motor.downloadReport">💾 匯出電機考核報告</button>
                 </div>
                 <div class="electrical-section electrical-section--sim">
-                    <div class="electrical-section-title" data-i18n="sim.electricalTitle">📸 電壓現場模擬器</div>
-                    <p class="field-simulator-note" data-i18n="sim.electricalNote">上傳現場照片，拖曳探棒十字線到量測點 → 模擬量測電壓 → 模擬繼電器測試；三步都完成後才能下載組態檔。</p>
+                    <div class="electrical-section-title" data-i18n="sim.electricalTitle">📸 現場電壓對位</div>
+                    <p class="field-simulator-note" data-i18n="sim.electricalNote">上傳現場照片，拖曳探棒十字線到量測點 → 試測電壓 → 試測繼電器；三步都完成後才能下載組態檔。</p>
                     <label class="field-simulator-upload-label" for="electricalSimImageInput" data-i18n="sim.uploadLabel">上傳現場圖（JPG／PNG）</label>
                     <input type="file" id="electricalSimImageInput" class="electrical-input field-simulator-file" accept="image/*">
                     <div class="field-simulator-toolbar">
@@ -888,7 +889,7 @@
                     </div>
                     <div id="electricalSimOpLabel" class="field-simulator-op-label" data-i18n="sim.electricalOpIdle">現場操作：請先上傳現場圖</div>
                     <div class="field-simulator-stage">
-                        <canvas id="electricalSimCanvas" aria-label="電機現場模擬器"></canvas>
+                        <canvas id="electricalSimCanvas" aria-label="現場機電對位"></canvas>
                     </div>
                     <div id="electricalSimStatus" class="field-simulator-status" data-ok="0" data-i18n="sim.electricalStatusIdle">尚未上傳現場圖</div>
                     <button type="button" class="tool-btn field-simulator-confirm-btn" onclick="confirmElectricalFieldSimulator()" data-i18n="sim.electricalConfirm" disabled>✅ 現場機電操作完成</button>
@@ -937,6 +938,7 @@
                 </div>
                 <div class="convert-section convert-section--actions">
                     <button type="button" class="tool-btn convert-action-btn" onclick="sendUsdzAndOpenNativeAR()" data-i18n="convert.sendAr">📡 一鍵送 LiDAR AR</button>
+                    <a class="tool-btn" href="lidar-measure-guide.html#usdz-ar" target="_blank" rel="noopener noreferrer" data-i18n="convert.openGuide">📖 AR 完整教學（含 USDZ 排查）</a>
                     <button type="button" class="tool-btn" onclick="setWorkMode('calc')" data-i18n="convert.backCalc">↩️ 回計算模式</button>
                 </div>
             </div>

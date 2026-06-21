@@ -44,12 +44,12 @@
     {
         "sel": "#stakeFieldSimulator",
         "key": "stakeFieldSimulator",
-        "msg": "放樣現場模擬器：對齊工地照片與放樣點，確認現場位置是否正確（不影響座標計算）。"
+        "msg": "現場放樣對位：對齊工地照片與放樣點，確認現場位置是否正確（不影響座標計算）。"
     },
     {
         "sel": ".electrical-section--sim",
         "key": "electricalFieldSim",
-        "msg": "電壓現場模擬器：對齊現場照片與電壓量測點，確認接線位置。"
+        "msg": "現場電壓對位：對齊現場照片與電壓量測點，確認接線位置。"
     },
     {
         "sel": "#ifcInput",
@@ -657,7 +657,7 @@
             'coach.hint.calcIbmCluster': "這一組是第三頁 IBM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。",
             'coach.hint.stakeExecutionCluster': "【說明】放樣執行區：選構件類型與精度後產點放樣。【操作】①上傳 IFC ②勾選柱/牆/梁 ③按「生成放樣點」或「一鍵放樣」。",
             'coach.hint.stakeQaCluster': "【說明】放樣 QA：檢查偏差、重複點與穩定度。【操作】填控制點 design/field 座標→按「控制點配準」→再按「執行放樣 QA」看分數。",
-            'coach.hint.stakeExportCluster': "【說明】QA 通過後的輸出與現場工具。【操作】按「匯出放樣點 CSV」交儀器；或「匯出 QA 報告」存稽核；現場對照可開模擬器。",
+            'coach.hint.stakeExportCluster': "【說明】QA 通過後的輸出與現場工具。【操作】按「匯出放樣點 CSV」交儀器；或「匯出 QA 報告」存稽核；現場對照可開現場對位。",
             'coach.hint.stakeFieldSimulator': "【說明】用工地照片對照放樣點位置（視覺確認，不改座標）。【操作】上傳照片→拖曳對齊點位→按「確認對位」；可按「▶30秒示範」。",
             'coach.hint.electricalFieldSim': "【說明】用現場照片對照電壓/接線量測點。【操作】上傳照片→對齊標記→確認；參數填好後可匯出 mecha_config.txt。",
             'coach.hint.ifcInput': "【說明】上傳 IFC/模型做 BIM 解析與構件統計。【操作】按此選檔→等解析完成→到放樣區按「生成放樣點」。座標依上傳檔內容。",
@@ -846,8 +846,8 @@
             'coach.hint.deleteMemberCodeFromInput': "Delete member account.",
             'coach.hint.memberCodeBody': "Local list of member accounts.",
             'coach.hint.coachToggle': "Toggle coach. Main workflow areas only—not every button. Use Quick tour or ▶ 30s demo for details.",
-            'coach.hint.stakeFieldSimulator': "Stake field simulator: align site photo with layout points (visual check only).",
-            'coach.hint.electricalFieldSim': "Voltage field simulator: align site photo with measurement points.",
+            'coach.hint.stakeFieldSimulator': "Stake field alignment: align site photo with layout points (visual check only).",
+            'coach.hint.electricalFieldSim': "Voltage field alignment: align site photo with measurement points.",
             'coach.hint.levelBasicBtn': "Tier 1 (Basic): essentials for quick start.",
             'coach.hint.levelStandardBtn': "Tier 2 (Standard): measure assist, QA export, some advanced tools.",
             'coach.hint.levelProBtn': "Tier 3 (Pro): full BIM, rules, snapshots, and more.",
@@ -971,7 +971,7 @@
             'coach.hint.deleteMemberCodeFromInput': "刪除指定會員帳號，刪除後將不能用該帳號登入。",
             'coach.hint.memberCodeBody': "ログイン可能な会員一覧（ローカル）。",
             'coach.hint.coachToggle': "解説員のオン／オフ。主要フローのみ（全ボタンではない）。詳細は「初心者ガイド」または「▶ 30秒デモ」。",
-            'coach.hint.stakeFieldSimulator': "墨出し現場シミュレータ：現場写真と墨出し点を照合（座標計算には影響しません）。",
+            'coach.hint.stakeFieldSimulator': "現場墨出し照合：現場写真と墨出し点を照合（座標計算には影響しません）。",
             'coach.hint.electricalFieldSim': "電圧現場シミュレータ：現場写真と測定点を照合。",
             'coach.hint.levelBasicBtn': "会員1（ベーシック）：必要最小機能。",
             'coach.hint.levelStandardBtn': "会員2（標準）：計測補助・QA出力等。",

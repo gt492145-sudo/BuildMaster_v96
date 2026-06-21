@@ -1450,9 +1450,9 @@
         if (data.totalEntities === 0) data.warnings.push('沒有解析到模型實體，請確認檔案內容是否完整。');
         if (data.totalElements === 0) data.warnings.push('未找到常見構件（牆/梁/柱/板），可能是非建築模型或格式版本差異。');
         if (data.coordResolvedCount > 0) {
-            data.warnings.push(`已從上傳檔讀取 ${data.coordResolvedCount} 個構件定位（座標取決於上傳檔；真實座標或專案假座標皆可，與放樣表／現場模擬一致）`);
+            data.warnings.push(`已從上傳檔讀取 ${data.coordResolvedCount} 個構件定位（座標取決於上傳檔；真實座標或專案假座標皆可，與放樣表／現場對位一致）`);
         } else if (data.totalElements > 0) {
-            data.warnings.push('上傳檔未含可解析的定位；將以內建估算產點（仍與模擬器相對位置一致）');
+            data.warnings.push('上傳檔未含可解析的定位；將以內建估算產點（仍與現場對位相對位置一致）');
         }
         if (data.qtyLength + data.qtyArea + data.qtyVolume + data.qtyCount === 0) data.warnings.push('未讀到工程量實體，建議先輸出算量屬性再匯入。');
         if (duplicateIds > 0) data.warnings.push(`偵測到重複編號：${duplicateIds} 筆`);
