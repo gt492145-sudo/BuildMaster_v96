@@ -16,6 +16,28 @@
         }
     }
 
+    function hasAndroidHandler(name) {
+        try {
+            return !!(global.BuildMasterNative
+                && typeof global.BuildMasterNative[name] === 'function');
+        } catch (_e) {
+            return false;
+        }
+    }
+
+    function postNativeMessage(name, payload) {
+        const body = payload || {};
+        if (hasNativeHandler(name)) {
+            global.webkit.messageHandlers[name].postMessage(body);
+            return true;
+        }
+        if (hasAndroidHandler(name)) {
+            global.BuildMasterNative[name](JSON.stringify(body));
+            return true;
+        }
+        return false;
+    }
+
     function readNativeARConfig() {
         const cfg = global.__bmNativeARConfig || {};
         return {
@@ -81,8 +103,7 @@
 
     function openNativeAR(options) {
         const payload = Object.assign({ source: 'web-ui' }, options || {});
-        if (hasNativeHandler(OPEN_MESSAGE)) {
-            global.webkit.messageHandlers[OPEN_MESSAGE].postMessage(payload);
+        if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
         }
         if (typeof global.showToast === 'function') {
@@ -100,12 +121,10 @@
             return false;
         }
         const payload = Object.assign({ source: 'web-pass-blueprint' }, options || {}, blueprint);
-        if (hasNativeHandler(PASS_BLUEPRINT_MESSAGE)) {
-            global.webkit.messageHandlers[PASS_BLUEPRINT_MESSAGE].postMessage(payload);
+        if (postNativeMessage(PASS_BLUEPRINT_MESSAGE, payload)) {
             return true;
         }
-        if (hasNativeHandler(OPEN_MESSAGE)) {
-            global.webkit.messageHandlers[OPEN_MESSAGE].postMessage(payload);
+        if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
         }
         return false;
@@ -117,8 +136,7 @@
             return openNativeAR(Object.assign({ source: 'web-open-without-blueprint' }, options || {}));
         }
         const payload = Object.assign({ source: 'web-blueprint-and-open' }, options || {}, blueprint);
-        if (hasNativeHandler(OPEN_MESSAGE)) {
-            global.webkit.messageHandlers[OPEN_MESSAGE].postMessage(payload);
+        if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
         }
         return passBlueprintToNativeAR({ blueprint: blueprint });
@@ -133,12 +151,10 @@
             return false;
         }
         const payload = Object.assign({ kind: 'usdz', source: 'web-pass-usdz' }, options || {}, usdz);
-        if (hasNativeHandler(PASS_USDZ_MESSAGE)) {
-            global.webkit.messageHandlers[PASS_USDZ_MESSAGE].postMessage(payload);
+        if (postNativeMessage(PASS_USDZ_MESSAGE, payload)) {
             return true;
         }
-        if (hasNativeHandler(OPEN_MESSAGE)) {
-            global.webkit.messageHandlers[OPEN_MESSAGE].postMessage(payload);
+        if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
         }
         return false;
@@ -152,12 +168,10 @@
             }
             return false;
         }
-        if (hasNativeHandler(PASS_USDZ_MESSAGE)) {
-            global.webkit.messageHandlers[PASS_USDZ_MESSAGE].postMessage(payload);
+        if (postNativeMessage(PASS_USDZ_MESSAGE, payload)) {
             return true;
         }
-        if (hasNativeHandler(OPEN_MESSAGE)) {
-            global.webkit.messageHandlers[OPEN_MESSAGE].postMessage(payload);
+        if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
         }
         if (typeof global.showToast === 'function') {
@@ -167,11 +181,7 @@
     }
 
     function exportNativeARMeasurements() {
-        if (hasNativeHandler(EXPORT_MESSAGE)) {
-            global.webkit.messageHandlers[EXPORT_MESSAGE].postMessage({ action: 'export' });
-            return true;
-        }
-        return false;
+        return postNativeMessage(EXPORT_MESSAGE, { action: 'export' });
     }
 
     function applyNativeARUI() {

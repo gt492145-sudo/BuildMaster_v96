@@ -21,10 +21,32 @@
 | 欄位 | 建議值 |
 |------|--------|
 | 名稱 | Construction Master |
-| 副標題 | 工程計算與試算工作區 |
+| 副標題 | **工程試算・放樣・機電** |
 | 主要語言 | 繁體中文 |
 | 類別 | 工具程式 |
 | 隱私權政策 URL | https://sites.google.com/view/buildmaster-privacy/首頁 |
+
+### 搜尋優化（App Store Connect · 可直接貼）
+
+**桌面顯示名**維持 `Construction Master`（與商店名稱一致，方便本地 Spotlight 搜尋）。
+
+| 欄位 | 字數限制 | 建議值 |
+|------|----------|--------|
+| 名稱 | 30 字 | Construction Master |
+| 副標題 | 30 字 | 工程試算・放樣・機電 |
+| 關鍵字 | 100 字元 | 見下方 |
+
+**關鍵字**（逗號分隔、勿重複 App 名稱已有字；繁中商店可貼）：
+
+```text
+工程,試算,放樣,工地,機電,BIM,建築,計算,量測,施工,現場,工程師
+```
+
+**英文關鍵字**（若另開英文本地化）：
+
+```text
+construction,calc,stake,electrical,site,BIM,engineer,measurement,field,workspace
+```
 
 ---
 

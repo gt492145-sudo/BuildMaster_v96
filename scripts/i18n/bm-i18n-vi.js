@@ -345,6 +345,7 @@
         'update.toastStake': 'Switched to stake mode · load C2 plan draft',
         'update.itemStair': 'Stake: CSV + field layout alignment + direction guide',
         'update.itemMep': 'Electrical: MEP + voltage field alignment + mecha_config',
+        'update.itemBuild9644': '9644: iOS/Android/Mac đồng bộ · AdMob Banner (miễn phí)',
         'update.itemModes': 'Năm chế độ: tính toán / định vị / điện / chuyển đổi',
         'update.itemC2Sample': 'Block D C2 stair plan draft — one-click field alignment',
         'update.itemFieldAlign': 'Field alignment: photo check for stake & MEP, unlocks export',
