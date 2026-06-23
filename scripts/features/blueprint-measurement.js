@@ -51,7 +51,7 @@
         if (blueprintAutoCalcAfterUploadTimer) clearTimeout(blueprintAutoCalcAfterUploadTimer);
         blueprintAutoCalcAfterUploadTimer = setTimeout(function() {
             blueprintAutoCalcAfterUploadTimer = null;
-            // Prefer full one-click pipeline (Blueprint + IBM),
+            // Prefer full one-click pipeline (Blueprint + BIM),
             // fallback to blueprint-only auto calc when BIM model is missing.
             if (typeof runAutoBlueprintPlusBIM === 'function') {
                 Promise.resolve(runAutoBlueprintPlusBIM()).catch(function(error) {
@@ -1367,6 +1367,8 @@
             decisionNote: '欄位已確認，審核通過後納入核心記憶'
         });
         if (record) {
+            autoInterpretNeedsReview = false;
+            autoInterpretGateReason = '';
             autoInterpretLastReport = attachGuidedPrecisionReviewMeta(autoInterpretLastReport, {
                 memoryStoreSize: learnResult.count,
                 needsReview: false,
@@ -1394,6 +1396,8 @@
             decisionNote: '以目前欄位值修正後通過，並納入核心記憶'
         });
         if (record) {
+            autoInterpretNeedsReview = false;
+            autoInterpretGateReason = '';
             autoInterpretLastReport = attachGuidedPrecisionReviewMeta(autoInterpretLastReport, {
                 type: String(valueSet.type || autoInterpretLastReport.type || ''),
                 quantity: Math.max(1, Number(valueSet.qty || autoInterpretLastReport.quantity) || 1),
@@ -1459,20 +1463,82 @@
         return `記憶參考 ${match.best.type} / ${match.best.quantity} 件 / 相似度 ${Math.round(match.similarity * 100)}%`;
     }
 
+    function isProPrecisionNativeShell() {
+        const g = typeof globalThis !== 'undefined' ? globalThis : window;
+        if (g.BuildMasterProAccess && typeof g.BuildMasterProAccess.isNativeAppShell === 'function') {
+            return g.BuildMasterProAccess.isNativeAppShell();
+        }
+        try {
+            const params = new URLSearchParams(g.location.search);
+            if (params.get('nativeapp') === '1') return true;
+            return /ConstructionMasterNative/i.test(String(g.navigator && g.navigator.userAgent || ''));
+        } catch (_e) {
+            return false;
+        }
+    }
+
+    function bmProPrecisionT(key, fallback) {
+        const g = typeof globalThis !== 'undefined' ? globalThis : window;
+        return (typeof g.BM_T === 'function') ? g.BM_T(key) : fallback;
+    }
+
+    function getCurrentAutoInterpretInputSignature() {
+        const type = String(document.getElementById('calcType') && document.getElementById('calcType').value || '');
+        const v1 = String(document.getElementById('v1') && document.getElementById('v1').value || '');
+        const v2 = String(document.getElementById('v2') && document.getElementById('v2').value || '');
+        const v3 = String(document.getElementById('v3') && document.getElementById('v3').value || '');
+        const qty = String(document.getElementById('qty') && document.getElementById('qty').value || '');
+        return `${type}|${v1}|${v2}|${v3}|${qty}`;
+    }
+
     function getAutoInterpretGateThreshold() {
         const gateInput = document.getElementById('advAutoInterpretGate');
         const gatePercent = Number(gateInput && gateInput.value);
-        const minGatePercent = Math.round(AUTO_INTERPRET_GATE_DEFAULT_CONFIDENCE * 100);
+        const minGatePercent = isProPrecisionNativeShell()
+            ? 95
+            : Math.round(AUTO_INTERPRET_GATE_DEFAULT_CONFIDENCE * 100);
         const normalizedPercent = Number.isFinite(gatePercent) ? Math.max(minGatePercent, Math.min(99, gatePercent)) : minGatePercent;
         return normalizedPercent / 100;
     }
 
     function evaluateAutoInterpretGate() {
-        if (!autoInterpretNeedsReview) return { ok: true, msg: '' };
-        return {
-            ok: false,
-            msg: autoInterpretGateReason || '自動判讀信心不足，請先複核或重跑判讀'
-        };
+        if (autoInterpretNeedsReview) {
+            return {
+                ok: false,
+                msg: autoInterpretGateReason || '自動判讀信心不足，請先複核或重跑判讀'
+            };
+        }
+        if (!isProPrecisionNativeShell() || !autoInterpretLastReport) {
+            return { ok: true, msg: '' };
+        }
+        const report = autoInterpretLastReport;
+        const sameSession = getCurrentAutoInterpretInputSignature() === String(report.inputSignature || '');
+        if (!sameSession) {
+            return { ok: true, msg: '' };
+        }
+        const mode = String(report.precisionMode || '');
+        const status = String(report.decisionStatus || '');
+        if (mode === 'quick') {
+            return {
+                ok: false,
+                msg: bmProPrecisionT('proAccess.gateQuickBlocked', 'Pro 模式需使用極強精準辨識並完成審核後，才能吸入清單或匯出')
+            };
+        }
+        if (mode === 'guided') {
+            if (status === 'rejected') {
+                return {
+                    ok: false,
+                    msg: bmProPrecisionT('proAccess.gateRejected', '本次極強精準已退回，請重跑辨識或手動修正後再匯出')
+                };
+            }
+            if (status !== 'approved' && status !== 'corrected') {
+                return {
+                    ok: false,
+                    msg: bmProPrecisionT('proAccess.gateReviewPending', '極強精準結果待審核：請先按「審核通過」或「修正後通過」再吸入清單或匯出')
+                };
+            }
+        }
+        return { ok: true, msg: '' };
     }
 
     function maybeReleaseAutoInterpretGateByManualAdjust() {
@@ -1540,6 +1606,158 @@
         return !checkbox || !!checkbox.checked;
     }
 
+    const AUTO_CALC_MANUAL_DEFAULTS_KEY = 'bm_69:auto_calc_manual_defaults';
+
+    function readAutoCalcManualInputNumber(id) {
+        const el = document.getElementById(id);
+        const n = Number(el && el.value);
+        return Number.isFinite(n) && n > 0 ? n : 0;
+    }
+
+    function readAutoCalcManualDefaults() {
+        return {
+            floorHeight: readAutoCalcManualInputNumber('autoCalcManualFloorHeight'),
+            beamDepth: readAutoCalcManualInputNumber('autoCalcManualBeamDepth'),
+            wallThickness: readAutoCalcManualInputNumber('autoCalcManualWallThickness'),
+            slabThickness: readAutoCalcManualInputNumber('autoCalcManualSlabThickness'),
+            applyBeforeRun: !(document.getElementById('autoCalcManualApplyBeforeRun') && !document.getElementById('autoCalcManualApplyBeforeRun').checked)
+        };
+    }
+
+    function pickManualV3ForType(type, defaults) {
+        const t = String(type || '');
+        if (['C_VOL', 'C_COL', 'E_DIG', 'M_COL', 'M_WALL'].includes(t)) {
+            return defaults.floorHeight || 0;
+        }
+        if (t === 'M_BEAM_SIDES' || t === 'M_BEAM_ALL') {
+            return defaults.beamDepth || 0;
+        }
+        if (t === 'M_FOOTING_EDGE') {
+            return defaults.slabThickness || 0;
+        }
+        return 0;
+    }
+
+    function getAutoCalcManualRequiredHints(type) {
+        const t = String(type || '');
+        const hints = ['平面：長、寬（自動判讀）'];
+        if (['C_VOL', 'C_COL', 'E_DIG', 'M_COL'].includes(t)) {
+            hints.push('需人工：柱／體積 高或深 (v3) ← 用「樓高」預設');
+        }
+        if (t === 'M_WALL') {
+            hints.push('需人工：牆高 (v3) ← 用「樓高」；窗／開口扣除 ← 模板區');
+        }
+        if (t === 'M_BEAM_SIDES' || t === 'M_BEAM_ALL') {
+            hints.push('需人工：樑側淨高 (v3) ← 用「梁深」；樑長 (v1) 可自動');
+        }
+        if (t === 'M_FOOTING_EDGE') {
+            hints.push('需人工：版厚 (v3) ← 用「版厚」預設');
+        }
+        if (t.startsWith('R_')) {
+            hints.push('鋼筋：規格與支數需 OCR 或手填');
+        }
+        if (t === 'M_STAIR' || t === 'C_STAIR') {
+            hints.push('樓梯：踏高／投影／梯寬需立面或手填');
+        }
+        hints.push('版模：電梯／管道／地板開口 ← 模板區個數與尺寸');
+        return hints;
+    }
+
+    function updateAutoCalcManualInputsHint(typeOverride) {
+        const hintEl = document.getElementById('autoCalcManualInputsHint');
+        if (!hintEl) return;
+        const typeEl = document.getElementById('calcType');
+        const type = typeOverride || (typeEl ? typeEl.value : '');
+        const defaults = readAutoCalcManualDefaults();
+        const hints = getAutoCalcManualRequiredHints(type);
+        const presetParts = [];
+        if (defaults.floorHeight) presetParts.push(`樓高 ${defaults.floorHeight.toFixed(2)} m`);
+        if (defaults.beamDepth) presetParts.push(`梁深 ${defaults.beamDepth.toFixed(2)} m`);
+        if (defaults.wallThickness) presetParts.push(`牆厚 ${defaults.wallThickness.toFixed(2)} m`);
+        if (defaults.slabThickness) presetParts.push(`版厚 ${defaults.slabThickness.toFixed(2)} m`);
+        const presetText = presetParts.length ? `已設預設：${presetParts.join(' · ')}` : '尚未填預設（自動判讀後可能提示待補 v3）';
+        hintEl.innerHTML = `${presetText}<br>${hints.join(' · ')}`;
+    }
+
+    function syncAutoCalcManualInputsPref() {
+        const payload = readAutoCalcManualDefaults();
+        try {
+            localStorage.setItem(AUTO_CALC_MANUAL_DEFAULTS_KEY, JSON.stringify(payload));
+        } catch (_e) { /* ignore */ }
+        updateAutoCalcManualInputsHint();
+    }
+
+    function applyAutoCalcManualInputsPrefFromStorage() {
+        try {
+            const raw = localStorage.getItem(AUTO_CALC_MANUAL_DEFAULTS_KEY);
+            if (!raw) {
+                updateAutoCalcManualInputsHint();
+                return;
+            }
+            const data = JSON.parse(raw);
+            const setNum = (id, key) => {
+                const el = document.getElementById(id);
+                if (!el || data[key] == null) return;
+                const n = Number(data[key]);
+                if (Number.isFinite(n) && n > 0) el.value = String(n);
+            };
+            setNum('autoCalcManualFloorHeight', 'floorHeight');
+            setNum('autoCalcManualBeamDepth', 'beamDepth');
+            setNum('autoCalcManualWallThickness', 'wallThickness');
+            setNum('autoCalcManualSlabThickness', 'slabThickness');
+            const applyEl = document.getElementById('autoCalcManualApplyBeforeRun');
+            if (applyEl && typeof data.applyBeforeRun === 'boolean') applyEl.checked = data.applyBeforeRun;
+        } catch (_e) { /* ignore */ }
+        updateAutoCalcManualInputsHint();
+    }
+
+    function setInputIfEmptyOrOverwrite(id, value, overwrite) {
+        const el = document.getElementById(id);
+        if (!el || !(Number(value) > 0)) return false;
+        if (!overwrite && String(el.value || '').trim()) return false;
+        el.value = Number(value).toFixed(2);
+        return true;
+    }
+
+    function applyAutoCalcManualInputsToWorkspace(typeOverride, options) {
+        const opts = options || {};
+        const typeEl = document.getElementById('calcType');
+        const type = String(typeOverride || (typeEl ? typeEl.value : '') || '');
+        const defaults = readAutoCalcManualDefaults();
+        const overwrite = !!opts.overwrite;
+        let changed = 0;
+
+        if (defaults.floorHeight > 0) {
+            if (setInputIfEmptyOrOverwrite('templateFloorHeight', defaults.floorHeight, overwrite)) changed += 1;
+        }
+        if (defaults.beamDepth > 0) {
+            if (setInputIfEmptyOrOverwrite('templateBeamHeight', defaults.beamDepth, overwrite)) changed += 1;
+        }
+        if (defaults.wallThickness > 0) {
+            if (setInputIfEmptyOrOverwrite('templateWallThickness', defaults.wallThickness, overwrite)) changed += 1;
+            if (type === 'M_WALL' && setInputIfEmptyOrOverwrite('v2', defaults.wallThickness, overwrite)) changed += 1;
+        }
+        if (defaults.slabThickness > 0) {
+            if (setInputIfEmptyOrOverwrite('templateSlabThickness', defaults.slabThickness, overwrite)) changed += 1;
+        }
+
+        const manualV3 = pickManualV3ForType(type, defaults);
+        if (manualV3 > 0 && setInputIfEmptyOrOverwrite('v3', manualV3, overwrite)) changed += 1;
+
+        if (typeof previewCalc === 'function') previewCalc();
+        updateAutoCalcManualInputsHint(type);
+        if (opts.toast !== false && changed > 0 && typeof showToast === 'function') {
+            showToast(`已套用人工尺寸預設（${changed} 欄）`);
+        }
+        return changed;
+    }
+
+    function maybeApplyAutoCalcManualInputsBeforeRun() {
+        const defaults = readAutoCalcManualDefaults();
+        if (!defaults.applyBeforeRun) return;
+        applyAutoCalcManualInputsToWorkspace(undefined, { toast: false });
+    }
+
     function shouldAutoInterpretPreserveManualDepth(type) {
         if (!isAutoInterpretPlanOnlyModeEnabled()) return false;
         return ['C_VOL', 'C_COL', 'M_COL', 'M_BEAM_SIDES', 'M_BEAM_ALL', 'E_DIG'].includes(String(type || ''));
@@ -1579,12 +1797,21 @@
         }
 
         const manualDepthValue = Number(v3El && v3El.value) || 0;
+        let resolvedManualDepth = manualDepthValue;
+        if (preserveManualDepth && !resolvedManualDepth) {
+            const defaults = readAutoCalcManualDefaults();
+            const autoV3 = pickManualV3ForType(type, defaults);
+            if (autoV3 > 0 && v3El) {
+                v3El.value = autoV3.toFixed(2);
+                resolvedManualDepth = autoV3;
+            }
+        }
         return {
             preserveManualDepth,
-            depthMissing: preserveManualDepth && !manualDepthValue,
+            depthMissing: preserveManualDepth && !resolvedManualDepth,
             depthLabel,
             planSummary,
-            manualDepthValue
+            manualDepthValue: resolvedManualDepth
         };
     }
 
@@ -3046,7 +3273,10 @@
 
     async function runGuidedPrecisionAutoInterpret() {
         if (!ensureCalcAdvancedPageReady('第2頁全功能精準辨識區尚未載入')) return;
-        if (!(await ensureFeatureAccess('guidedPrecisionAuto', '極強精準辨識僅開放會員3（專家）'))) return;
+        maybeApplyAutoCalcManualInputsBeforeRun();
+        if (typeof ensureProAutoCalcAccess === 'function') {
+            if (!(await ensureProAutoCalcAccess())) return;
+        } else if (!(await ensureFeatureAccess('guidedPrecisionAuto', '極強精準辨識僅開放會員3（專家）'))) return;
         if (autoInterpretBusy) return showToast('單一運算進行中，請稍候完成');
         if (!img.src) return showToast('請先上傳圖紙再做極強精準辨識');
         autoInterpretBusy = true;
@@ -3132,7 +3362,13 @@
     async function autoInterpretBlueprintAndCalculate() {
         if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做看圖自動判讀')) return;
         if (!ensureCalcAdvancedPageReady('第2頁全功能自動計算區尚未載入')) return;
-        if (!(await ensureFeatureAccess('blueprintAutoInterpret', '看圖自動判讀僅開放會員3（專家）'))) return;
+        if (isProPrecisionNativeShell()) {
+            return runGuidedPrecisionAutoInterpret();
+        }
+        maybeApplyAutoCalcManualInputsBeforeRun();
+        if (typeof ensureProAutoCalcAccess === 'function') {
+            if (!(await ensureProAutoCalcAccess())) return;
+        } else if (!(await ensureFeatureAccess('blueprintAutoInterpret', '看圖自動判讀僅開放會員3（專家）'))) return;
         if (autoInterpretBusy) return showToast('單一運算進行中，請稍候完成');
         if (!img.src) return showToast('請先上傳圖紙再做自動判讀');
         clearGuidedPrecisionCalcState(true);
@@ -3341,7 +3577,7 @@
     }
 
     async function runAutoBlueprintPlusBIM() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做 IBM 自動計算')) return;
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第2頁全功能計算模式再做 BIM 自動計算')) return;
         if (!ensureCalcAdvancedPageReady('第2頁全功能自動計算區尚未載入')) return;
         if (!(await ensureFeatureAccess('autoBlueprintBim', '此功能僅限會員3（專家）'))) {
             return;
@@ -3350,11 +3586,15 @@
             return showToast('AI 流程執行中，請稍候');
         }
         if (!img.src) {
-            return showToast('請先上傳圖紙再執行「自動看圖計算+BIM」');
+            return showToast('請先上傳圖紙再執行「看圖／BIM 自動計算」');
         }
 
         updateBlueprintAutoInterpretStatus('一鍵流程：步驟1/2 看圖自動判讀中...', '#bfe7ff');
-        await autoInterpretBlueprintAndCalculate();
+        if (isProPrecisionNativeShell()) {
+            await runGuidedPrecisionAutoInterpret();
+        } else {
+            await autoInterpretBlueprintAndCalculate();
+        }
         if (autoInterpretNeedsReview) {
             const reason = autoInterpretGateReason || '自動判讀需複核';
             const infoBox = document.getElementById('bimAutoCalcInfo');
@@ -3365,15 +3605,15 @@
         if (!bimModelData || !Array.isArray(bimModelData.elements) || !bimModelData.elements.length) {
             const infoBox = document.getElementById('bimAutoCalcInfo');
             if (infoBox) infoBox.innerText = '一鍵流程完成：圖紙判讀成功（未載入 BIM 模型，已跳過 BIM 自動計算）';
-            return showToast('流程完成：已自動看圖計算（未載入 BIM，跳過 BIM 自動計算）');
+            return showToast('流程完成：已看圖判讀（未載入 BIM，跳過 BIM 自動計算）');
         }
 
-        updateBlueprintAutoInterpretStatus('一鍵流程：步驟2/2 IBM 自動計算中...', '#bfe7ff');
+        updateBlueprintAutoInterpretStatus('一鍵流程：步驟2/2 BIM 自動計算中...', '#bfe7ff');
         runBimTechAutoCalculation();
-        updateBlueprintAutoInterpretStatus('一鍵流程完成：看圖判讀 + IBM 自動計算已完成', '#9fffc0');
+        updateBlueprintAutoInterpretStatus('一鍵流程完成：看圖判讀 + BIM 自動計算已完成', '#9fffc0');
         const infoBox = document.getElementById('bimAutoCalcInfo');
-        if (infoBox) infoBox.innerText = `一鍵流程完成：圖紙自動判讀 + IBM 自動計算｜執行時間 ${new Date().toLocaleTimeString('zh-TW')}`;
-        showToast('✅ 一鍵完成：自動看圖計算 + IBM 自動計算');
+        if (infoBox) infoBox.innerText = `一鍵流程完成：圖紙自動判讀 + BIM 自動計算｜執行時間 ${new Date().toLocaleTimeString('zh-TW')}`;
+        showToast('✅ 一鍵完成：看圖判讀 + BIM 自動計算');
     }
 
     function fitBlueprintToViewport() {
@@ -5936,6 +6176,12 @@
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', applyBlueprintAutoCalcAfterUploadPref);
+        document.addEventListener('DOMContentLoaded', applyAutoCalcManualInputsPrefFromStorage);
     } else {
         applyBlueprintAutoCalcAfterUploadPref();
+        applyAutoCalcManualInputsPrefFromStorage();
     }
+
+    window.syncAutoCalcManualInputsPref = syncAutoCalcManualInputsPref;
+    window.applyAutoCalcManualInputsToWorkspace = applyAutoCalcManualInputsToWorkspace;
+    window.updateAutoCalcManualInputsHint = updateAutoCalcManualInputsHint;

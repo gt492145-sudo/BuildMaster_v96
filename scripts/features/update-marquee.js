@@ -1,10 +1,12 @@
 (function (global) {
     'use strict';
 
-    const UPDATE_BUILD = '9644';
+    const UPDATE_BUILD = '9645';
     const DISMISS_PREFIX = 'bm_update_marquee_dismiss_';
     const UPDATE_ITEM_KEYS = [
-        'update.itemBuild9644',
+        'update.itemProTrial',
+        'update.itemArLiDAR',
+        'update.itemBuild9645',
         'update.itemModes',
         'update.itemFieldAlign',
         'update.itemStair',

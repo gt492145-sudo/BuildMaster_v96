@@ -469,7 +469,6 @@
         smartMeasure: true,
         aiVision: true,
         advancedEstimateExport: true,
-        quantumStake: false,
         stakingDesktopPipeline: true,
         bimLayoutQa: true,
         measureQaReport: true,
@@ -717,7 +716,6 @@
     let bimLayoutPoints = [];
     let bimLayoutQaResult = null;
     let bimLayoutPrecisionPass = 0;
-    let quantumStakeAutoRuns = 0;
     let layoutAlignmentState = null;
     let layoutConfidenceFilterMode = 'all';
     let layoutSpotCheckSelection = [];
@@ -789,7 +787,6 @@
     const AI_COACH_ENDPOINT_KEY = 'bm_69:ai_coach_endpoint';
     const USER_LEVEL_KEY = 'bm_69:user_level';
     const WORK_MODE_KEY = 'bm_69:work_mode';
-    const IBM_QUANTUM_KEY_STORAGE = 'bm_69:ibm_quantum_key';
     const CONTRAST_MODE_KEY = 'bm_69:contrast_mode';
     const CONTRAST_AUTO_KEY = 'bm_69:contrast_auto';
     const SUNLIGHT_MODE_KEY = 'bm_69:sunlight_mode';
@@ -1120,7 +1117,6 @@
         [
             AI_COACH_API_KEY,
             AI_COACH_ENDPOINT_KEY,
-            IBM_QUANTUM_KEY_STORAGE,
             MEMBER_CODES_STORAGE_KEY,
             STORAGE_KEY,
             MEASUREMENT_LOG_STORAGE_KEY,

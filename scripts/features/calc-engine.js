@@ -441,6 +441,7 @@
             lp.innerText = (type.startsWith('M_')) ? '發包單價 ($/M²)' : '發包單價 ($/M³)';
         }
         syncTemplateFormulaPanel();
+        if (typeof updateAutoCalcManualInputsHint === 'function') updateAutoCalcManualInputsHint(type);
         previewCalc();
     }
 
@@ -1018,6 +1019,12 @@
         if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再匯出精算報表')) return;
         if (!(await ensureFeatureAccess('advancedEstimateExport', '此報表僅限會員3（專家）匯出'))) {
             return;
+        }
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) {
+                return showToast(`⚠️ ${gate.msg}`);
+            }
         }
         const baseTotal = getVisibleCostBaseTotal();
         if (baseTotal <= 0) {

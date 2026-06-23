@@ -79,6 +79,7 @@
             <a id="lidarMeasureGuideLink" class="header-meta-chip header-meta-chip--link" href="lidar-measure-guide.html" target="_blank" rel="noopener noreferrer" data-i18n="header.lidarGuide" data-i18n-title="header.lidarGuideTitle" title="LiDAR 測距圖文教學">📖 LiDAR 教學</a>
             <span class="header-meta-chip support-chip" data-i18n="header.support" data-i18n-title="header.support" title="開發者聯絡">支援：asd0900101511@icloud.com</span>
             <span id="billingStatusChip" class="header-meta-chip billing-status-chip" hidden></span>
+            <span id="proAccessChip" class="header-meta-chip pro-access-chip" hidden data-i18n-title="proAccess.chipTrialTitle"></span>
         </div>
     </div>
     <div class="work-switch">
@@ -464,7 +465,7 @@
                 <div class="action-cluster-header">
                     <div>
                         <div class="action-cluster-title" data-i18n="stake.execTitle">放樣執行設定</div>
-                        <div class="action-cluster-note" data-i18n="stake.execNote">先選擇構件類型與放樣精度。一般放樣（一鍵／產點／強化等）依會員等級；⚛️ IBM 雲端放樣另需後台為該帳號勾選「IBM 雲端」權限。</div>
+                        <div class="action-cluster-note" data-i18n="stake.execNote">先選擇構件類型與放樣精度。一般放樣（一鍵／產點／強化等）依會員等級執行。</div>
                     </div>
                     <div class="action-cluster-chip" data-i18n="stake.chipStaking">Page 4 Staking</div>
                 </div>
@@ -477,7 +478,6 @@
                 <div class="action-cluster-grid">
                 <button class="tool-btn" style="border-color:#9fa8da; color:#e5e8ff;" onclick="runDesktopStakingPipeline()" data-i18n="stake.btnPipeline">🚀 一鍵放樣流程</button>
                 <button type="button" class="tool-btn native-ar-open-btn work-mode-only-stake" style="border-color:#7ee7ff; color:#dff5ff;" onclick="openNativeAR({ source: 'stake-toolbar' })" data-i18n="ar.openFromStake">📡 LiDAR 現場 AR</button>
-                <button class="tool-btn" style="border-color:#b388ff; color:#e8d9ff;" onclick="runQuantumAutoStakeLayout()" data-i18n="stake.btnIbmCloud">⚛️ IBM 雲端放樣</button>
                 <button class="tool-btn" onclick="generateBimLayoutPoints()" data-i18n="stake.btnGeneratePoints">📍 產生放樣點</button>
                 <button class="tool-btn" style="border-color:#00e5ff; color:#bff8ff;" onclick="enhanceBimStakingQuality()" data-i18n="stake.btnEnhance">🛡️ 強化放樣</button>
                 </div>
@@ -606,16 +606,6 @@
                         <input id="layoutCp3DesignY" type="number" data-i18n-placeholder="stake.phDesignY" placeholder="設計Y">
                         <input id="layoutCp3FieldX" type="number" data-i18n-placeholder="stake.phFieldX" placeholder="現地X">
                         <input id="layoutCp3FieldY" type="number" data-i18n-placeholder="stake.phFieldY" placeholder="現地Y">
-                    </div>
-                </div>
-            </div>
-            <div class="input-row" style="margin-top: 10px; border: 1px dashed #b388ff; padding: 10px; border-radius: 6px; background: rgba(179, 136, 255, 0.05);">
-                <div class="input-wrapper">
-                    <label style="color: #b388ff; font-weight: bold; font-size: 0.85em;" data-i18n="stake.ibmProxyLabel">🔐 IBM Quantum 後端代理</label>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="password" id="ibmQuantumKey" data-i18n-placeholder="stake.ibmKeyPh" placeholder="正式金鑰已移至後端安全代理" style="border-color: #b388ff; box-shadow: 0 0 8px rgba(179,136,255,0.2);">
-                        <button class="tool-btn" type="button" id="ibmQuantumKeyToggleBtn" onclick="toggleIBMQuantumKeyVisibility()" style="border-color:#b388ff; color:#e8d9ff; white-space:nowrap;" data-i18n="stake.ibmBackendBtn">後端代理</button>
-                        <button class="tool-btn" type="button" onclick="clearIBMQuantumKey()" style="border-color:#ff9aa2; color:#ffd7dc; white-space:nowrap;" data-i18n="stake.ibmClearBtn">🧹 清除</button>
                     </div>
                 </div>
             </div>
@@ -987,7 +977,7 @@
             </div>
         </div>
         <div id="stakeMemberWrap" class="member-wrap level-hide-basic work-mode-only-calc calc-subpage-block calc-subpage-block-2">
-            <div class="bim-note" style="margin-top:0;">會員管理（後端）：可新增會員帳號、更新密碼。下方勾選<strong>僅管控 IBM Quantum／後端雲端呼叫</strong>（第四頁「⚛️ IBM 雲端放樣」按鈕）；<strong>一般放樣流程不由這裡控制</strong>，依會員等級。（請以具管理權限的帳號登入，例如預設 owner；僅存取碼無法寫入後台。）</div>
+            <div class="bim-note" style="margin-top:0;">會員管理（後端）：可新增會員帳號、更新密碼。一般放樣與試算依會員等級。（請以具管理權限的帳號登入，例如預設 owner；僅存取碼無法寫入後台。）</div>
             <div class="input-row">
                 <div class="input-wrapper">
                     <label>會員帳號</label>
@@ -995,11 +985,7 @@
                 </div>
                 <div class="input-wrapper">
                     <label>會員密碼</label>
-                    <input type="password" id="memberPasswordInput" placeholder="新會員必填；留空可只更新權限">
-                </div>
-                <div class="input-wrapper">
-                    <label>IBM 雲端</label>
-                    <label class="tool-mini"><input type="checkbox" id="memberQuantumAccessInput"> 允許呼叫 IBM Quantum／後端代理（不含一般放樣）</label>
+                    <input type="password" id="memberPasswordInput" placeholder="新會員必填；留空表示不變更密碼">
                 </div>
             </div>
             <div class="bim-actions">
@@ -1265,8 +1251,8 @@
         </table>
 
         <div class="calc-subpage-block calc-subpage-block-2">
-        <div class="group-title level-only-pro">進階試算與 IBM 自動計算</div>
-        <div id="calcAdvancedPage" class="group-title level-only-pro" hidden aria-hidden="true">計算第三頁｜IBM 自動計算與進階試算</div>
+        <div class="group-title level-only-pro">進階試算與 BIM 自動計算</div>
+        <div id="calcAdvancedPage" class="group-title level-only-pro" hidden aria-hidden="true">計算第三頁｜BIM 自動計算與進階試算</div>
         <div id="calcMeasureCluster" class="action-cluster action-cluster--accent level-only-pro" style="margin-bottom:10px;">
             <div class="action-cluster-header">
                 <div>
@@ -1342,6 +1328,48 @@
                 <div class="bim-note" style="margin-top:6px;">若流程中出現比例或構件類型確認視窗，仍需您手動輸入；關閉此選項則維持手動按鈕。</div>
         </div>
         </div>
+        <div id="autoCalcManualInputsPanel" class="bim-rule-wrap level-only-pro" style="margin-top:10px; border-color: rgba(255, 209, 102, 0.35); background: rgba(255, 209, 102, 0.06);">
+            <div class="action-cluster-header">
+                <div>
+                    <div class="action-cluster-title">📐 自動計算｜人工尺寸預設</div>
+                    <div class="action-cluster-note">平面圖抓不到的高度／深度在此先填好；跑看圖自動判讀前會套用到 v3 與模板扣除欄。</div>
+                </div>
+                <div class="action-cluster-chip">Manual</div>
+            </div>
+            <div class="input-row" style="margin-top:8px;">
+                <div class="input-wrapper">
+                    <label for="autoCalcManualFloorHeight">樓高 (m)</label>
+                    <input type="number" id="autoCalcManualFloorHeight" step="0.01" min="0" placeholder="如 3.00" oninput="syncAutoCalcManualInputsPref()">
+                    <div class="bim-note" style="margin-top:4px;">柱、牆、混凝土、土方之 <strong>高／深 (v3)</strong></div>
+                </div>
+                <div class="input-wrapper">
+                    <label for="autoCalcManualBeamDepth">梁深／梁高 (m)</label>
+                    <input type="number" id="autoCalcManualBeamDepth" step="0.01" min="0" placeholder="如 0.60" oninput="syncAutoCalcManualInputsPref()">
+                    <div class="bim-note" style="margin-top:4px;">梁模板 <strong>樑側淨高 (v3)</strong>、模板「樑高」</div>
+                </div>
+                <div class="input-wrapper">
+                    <label for="autoCalcManualWallThickness">牆厚 (m)</label>
+                    <input type="number" id="autoCalcManualWallThickness" step="0.01" min="0" placeholder="如 0.20" oninput="syncAutoCalcManualInputsPref()">
+                </div>
+                <div class="input-wrapper">
+                    <label for="autoCalcManualSlabThickness">版厚 (m)</label>
+                    <input type="number" id="autoCalcManualSlabThickness" step="0.01" min="0" placeholder="如 0.15" oninput="syncAutoCalcManualInputsPref()">
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <label class="tool-mini" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+                        <input type="checkbox" id="autoCalcManualApplyBeforeRun" checked onchange="syncAutoCalcManualInputsPref()">
+                        跑自動判讀前先套用以上預設
+                    </label>
+                </div>
+                <div class="input-wrapper" style="display:flex; align-items:flex-end;">
+                    <button type="button" class="tool-btn" style="border-color:#ffd166; color:#fff1b8;" onclick="applyAutoCalcManualInputsToWorkspace()">⬇️ 立即套用到計算欄</button>
+                </div>
+            </div>
+            <div id="autoCalcManualInputsHint" class="bim-note" style="margin-top:8px; color:#ffe9b0;">人工尺寸：請先選工項類型，上方顯示本類型仍需手填的項目。</div>
+            <div class="bim-note" style="margin-top:6px; color:#a8c0d8; font-size:0.78em;">門窗／牆面開口／電梯井／樓梯等 <strong>扣除</strong> 請在下方「模板公式」區填寬高與個數；BIM 模型則走 BIM 自動計算。</div>
+        </div>
         <div id="calcAiVisionCluster" class="action-cluster level-only-pro" style="margin-top:8px;">
             <div class="action-cluster-header">
                 <div>
@@ -1351,28 +1379,28 @@
                 <div class="action-cluster-chip">AI Vision</div>
             </div>
             <div class="action-cluster-grid">
-            <button class="tool-btn" style="border-color:#7ed6df; color:#dffcff;" onclick="autoInterpretBlueprintAndCalculate()">🤖 第三頁看圖自動判讀試算</button>
+            <button class="tool-btn" style="border-color:#7ed6df; color:#dffcff;" onclick="autoInterpretBlueprintAndCalculate()" data-i18n-title="proAccess.autoCalcGuidedDefault" title="原生 App：自動改走極強精準">🤖 第三頁看圖自動判讀試算</button>
                 <button class="tool-btn" style="border-color:#ffd166; color:#fff1b8;" onclick="runGuidedPrecisionAutoInterpret()">🎯 精準辨識</button>
             <button class="tool-btn" style="border-color:#ffd59c; color:#fff1d6;" onclick="readBlueprintSizeAnnotations()">🔎 讀柱樑尺寸標註</button>
-                <button class="tool-btn" style="border-color:#b39ddb; color:#efe3ff;" onclick="runAutoBlueprintPlusBIM()">🤖+⚛️ 串接 IBM 自動計算</button>
+                <button class="tool-btn" style="border-color:#b39ddb; color:#efe3ff;" onclick="runAutoBlueprintPlusBIM()">🤖+📐 串接 BIM 自動計算</button>
                 <button class="tool-btn" style="border-color:#8be9fd; color:#dfffff;" onclick="startBackendAutoInterpretLearning()">☁️ 後台自動學習</button>
         </div>
         </div>
         <div id="calcIbmCluster" class="bim-rule-wrap level-only-pro" style="margin-top:10px; border-color: rgba(128, 216, 255, 0.32); background: rgba(88, 170, 255, 0.08);">
             <div class="action-cluster-header">
                 <div>
-                    <div class="action-cluster-title">IBM / BIM 自動估算</div>
+                    <div class="action-cluster-title">BIM 自動估算</div>
                     <div class="action-cluster-note">這裡只做計算與估價；BIM 模型上傳、放樣點、放樣 QA 固定在第四頁。</div>
                 </div>
-                <div class="action-cluster-chip">IBM Auto Calc</div>
+                <div class="action-cluster-chip">BIM Auto Calc</div>
             </div>
             <div class="action-cluster-grid" style="margin-top:8px;">
                 <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('stake')">📍 去第四頁準備 BIM/放樣</button>
-                <button class="tool-btn" style="border-color:#80d8ff; color:#d8f3ff;" onclick="runBimTechAutoCalculation()">⚛️ IBM 自動計算</button>
-                <button class="tool-btn" onclick="generateBIMEstimate()">🧮 IBM/BIM 自動估價預覽</button>
-                <button class="tool-btn" onclick="importBIMEstimateToList()">📥 匯入 IBM/BIM 估價到清單</button>
+                <button class="tool-btn" style="border-color:#80d8ff; color:#d8f3ff;" onclick="runBimTechAutoCalculation()">📐 BIM 自動計算</button>
+                <button class="tool-btn" onclick="generateBIMEstimate()">🧮 BIM 自動估價預覽</button>
+                <button class="tool-btn" onclick="importBIMEstimateToList()">📥 匯入 BIM 估價到清單</button>
             </div>
-            <div id="bimAutoCalcInfo" class="bim-note" style="margin-top:6px;">IBM 自動計算：尚未執行</div>
+            <div id="bimAutoCalcInfo" class="bim-note" style="margin-top:6px;">BIM 自動計算：尚未執行</div>
             <div class="bim-estimate-wrap">
                 <table>
                     <thead><tr><th>構件類型</th><th>對應材料</th><th>數量</th><th>單價</th><th>小計</th></tr></thead>
@@ -1542,9 +1570,10 @@
 <script src="scripts/features/motor-simulator.js?v=v9644-update-marquee"></script>
 <script src="scripts/features/field-simulator.js?v=v9644-update-marquee"></script>
 <script src="scripts/features/stair-stake-guide.js?v=v9644-update-marquee"></script>
-<script src="scripts/features/update-marquee.js?v=v9644-update-marquee"></script>
+<script src="scripts/features/update-marquee.js?v=v9645-pro-access"></script>
 <script src="scripts/features/feature-demo.js?v=v9627-demo-ios-lottie"></script>
-<script src="scripts/features/native-ar-bridge.js?v=v9642-native-ar"></script>
+<script src="scripts/features/pro-access.js?v=v9645-pro-access"></script>
+<script src="scripts/features/native-ar-bridge.js?v=v9645-pro-access"></script>
 <script src="scripts/app-main.js?v=v9627-demo-ios-lottie"></script>
 </body>
 </html>

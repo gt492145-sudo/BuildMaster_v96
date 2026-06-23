@@ -47,7 +47,7 @@
 <main>
     <section class="card">
         <h1>Construction Master 隱私權政策</h1>
-        <p>最後更新：2026-06-23（V9.7.2 · build 9644 · 免費 App＋第三方廣告）</p>
+        <p>最後更新：2026-06-23（V9.7.3 · build 9644 · 免費 App＋第三方廣告＋iOS AR／LiDAR）</p>
         <p class="policy-note">本頁為<strong>站內摘要</strong>（build 9644 · 免費 App＋第三方廣告）。對外正式版本請同步至 Google Sites；若兩者不一致，以 Google Sites 公開版為優先。</p>
         <p>
             公開隱私權網址（正式版）：
@@ -75,11 +75,11 @@
         </ul>
         <p>Construction Master 為<strong>免費 App</strong>：<strong>無需付費、無需登入</strong>即可使用主要功能。自 build 9644 起，App 會顯示<strong>第三方廣告</strong>（由 Google AdMob 提供，Banner 橫幅），以支持免費營運。<strong>不提供 App 內訂閱或付費去廣告</strong>。</p>
 
-        <h2>2. 本版 App 功能範圍（V9.7.2 · build 9644）</h2>
+        <h2>2. 本版 App 功能範圍（V9.7.3 · build 9644）</h2>
         <ul>
-            <li><strong>本版已提供</strong>：五種工作區（🧮 計算、📍 放樣、⚡ 電機、📦 資料轉換）、工程試算、圖面量測、放樣與 QA 工具、現場對位、第 1 頁本機群組聊天、解說員與操作示範／教學動畫、介面語言（繁中／英／日／越）等。</li>
-            <li><strong>本版尚未開放</strong>：原生 AR／LiDAR 現場量測 App 入口（相關程式保留供後續版本）。</li>
-            <li><strong>本版新增／調整</strong>：免費 App 接入第三方廣告、後端 <code>/api/ads/config</code> 與 <code>/api/privacy/meta</code> 政策對照 API。</li>
+            <li><strong>本版已提供</strong>：五種工作區（🧮 計算、📍 放樣、⚡ 電機、📦 資料轉換）、工程試算、圖面量測、放樣與 QA 工具、現場對位、<strong>iOS 原生 AR／LiDAR 現場量測</strong>（圖紙貼牆、USDZ 模型、量測匯出）、第 1 頁本機群組聊天、解說員與操作示範／教學動畫、介面語言（繁中／英／日／越）等。</li>
+            <li><strong>本版新增／調整</strong>：免費 App 接入第三方廣告、iOS 開放原生 AR／LiDAR、後端 <code>/api/ads/config</code> 與 <code>/api/privacy/meta</code> 政策對照 API。</li>
+            <li><strong>平台差異</strong>：原生 AR／LiDAR 目前於 <strong>iOS App（LiDAR 機型）</strong>提供；Android App 網頁工作區可見相關按鈕，原生 AR 將於後續 Android 更新加入。</li>
         </ul>
 
         <h2>2.0 工作模式（計算／放樣／電機／資料轉換）</h2>
@@ -137,6 +137,14 @@
             <li><strong>免費、無訂閱</strong>：App 使用<strong>不收費</strong>；<strong>不提供</strong>付費去廣告或 App 內訂閱方案。</li>
             <li><strong>第三方政策</strong>：Google 隱私說明請參閱 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 隱私權政策</a>；您可於 iOS「設定 → 隱私權與安全性 → 追蹤」管理追蹤偏好。</li>
             <li><strong>我們不出售</strong>您的個人資料；廣告相關資料主要由廣告平台依其政策處理。</li>
+        </ul>
+
+        <h2>2.10 原生 AR／LiDAR（iOS · build 9644 起）</h2>
+        <ul>
+            <li><strong>功能</strong>：在支援 LiDAR 的 iPhone 上，App 可從網頁工作區開啟<strong>原生 AR 全螢幕量測</strong>，包含圖紙 1:1 牆面對位、USDZ 模型放置、LiDAR 網格量測與本機 CSV 匯出等。</li>
+            <li><strong>權限</strong>：使用 AR 時需要<strong>相機</strong>權限；語音相關功能若啟用可能使用<strong>麥克風</strong>與<strong>語音辨識</strong>。量測截圖儲存可能使用<strong>相簿</strong>讀寫權限。</li>
+            <li><strong>資料處理</strong>：您選取之圖紙、USDZ 模型、AR 量測結果與匯出 CSV<strong>僅在裝置本機處理</strong>，不會因此自動上傳至開發者伺服器。</li>
+            <li><strong>裝置需求</strong>：完整 LiDAR 功能需 Apple 支援 LiDAR 的 iPhone 機型；非 LiDAR 機型可能無法使用部分量測功能。</li>
         </ul>
 
         <h2>3. 我們是否會收集您的資料？（build 9644）</h2>

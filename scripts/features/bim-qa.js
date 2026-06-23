@@ -1,5 +1,4 @@
     async function initUtilityWidgets() {
-        initQuantumTokenField();
         renderUnmatchedMaterialOptions();
         renderUnmatchedWizard();
         initUnitSelectors();
@@ -22,40 +21,6 @@
         match: null,
         similarity: 0
     };
-
-    function initQuantumTokenField() {
-        const input = document.getElementById('ibmQuantumKey');
-        if (!input) return;
-        const toggleBtn = document.getElementById('ibmQuantumKeyToggleBtn');
-        input.value = '';
-        input.type = 'password';
-        input.readOnly = true;
-        input.disabled = true;
-        input.placeholder = backendSessionState.integrations && backendSessionState.integrations.ibmQuantumConfigured
-            ? '已改由後端安全代理；需管理者額外開通 IBM 權限'
-            : '後端尚未設定 IBM Quantum 金鑰';
-        if (toggleBtn) {
-            toggleBtn.disabled = true;
-            toggleBtn.textContent = '後端代理';
-            toggleBtn.title = '正式金鑰已搬到後端';
-        }
-    }
-
-    function toggleIBMQuantumKeyVisibility() {
-        const input = document.getElementById('ibmQuantumKey');
-        const btn = document.getElementById('ibmQuantumKeyToggleBtn');
-        if (!input || !btn) return;
-        const revealing = input.type === 'password';
-        input.type = revealing ? 'text' : 'password';
-        btn.textContent = revealing ? '🙈 隱藏' : '👁️ 顯示';
-    }
-
-    function clearIBMQuantumKey() {
-        const input = document.getElementById('ibmQuantumKey');
-        if (input) input.value = '';
-        safeStorage.remove(localStorage, IBM_QUANTUM_KEY_STORAGE);
-        showToast('瀏覽器端 IBM 金鑰已停用，請改用後端代理設定');
-    }
 
     function normalizeMemberAccount(account) {
         return String(account || '').trim().toLowerCase();
@@ -90,7 +55,6 @@
                     const account = normalizeMemberAccount(member && member.account);
                     if (!account) return;
                     memberCodeMap[account] = {
-                        ibmEnabled: !!(member && member.featureOverrides && member.featureOverrides.quantumStake),
                         level: normalizeUserLevel(member.level || 'pro'),
                         updatedAt: String(member.updatedAt || '')
                     };
@@ -111,13 +75,11 @@
     function refreshMemberEditorFromInput() {
         const accInput = document.getElementById('memberAccountInput');
         const pwdInput = document.getElementById('memberPasswordInput');
-        const quantumInput = document.getElementById('memberQuantumAccessInput');
         const account = normalizeMemberAccount(accInput && accInput.value);
         const member = account ? memberCodeMap[account] : null;
-        if (quantumInput) quantumInput.checked = !!(member && member.ibmEnabled);
         if (pwdInput) {
             pwdInput.placeholder = member
-                ? '留空可只更新 IBM 權限；輸入則同步改密碼'
+                ? '留空表示不變更密碼；輸入則同步改密碼'
                 : '新會員必填（至少6碼）';
         }
     }
@@ -136,8 +98,7 @@
         accounts.forEach(acc => {
             const member = memberCodeMap[acc] || {};
             const levelText = member && member.level ? getUserLevelLabel(member.level) : '';
-            const ibmText = member && member.ibmEnabled ? 'IBM 放樣：開' : 'IBM 放樣：關';
-            const permissionText = [levelText, ibmText].filter(Boolean).join('｜');
+            const permissionText = levelText || '—';
             const tr = document.createElement('tr');
             tr.innerHTML = `<td>${escapeHTML(acc)}</td><td>${escapeHTML(permissionText)}</td><td><button class="tool-btn" style="padding:4px 8px;" onclick="useMemberCode('${escapeHTML(acc)}')">編輯</button> <button class="tool-btn" style="padding:4px 8px;" onclick="deleteMemberCode('${escapeHTML(acc)}')">刪除</button></td>`;
             body.appendChild(tr);
@@ -148,12 +109,10 @@
         const acc = normalizeMemberAccount(account);
         const accInput = document.getElementById('memberAccountInput');
         const pwdInput = document.getElementById('memberPasswordInput');
-        const quantumInput = document.getElementById('memberQuantumAccessInput');
         const member = memberCodeMap[acc];
         if (!accInput || !member) return;
         accInput.value = acc;
         if (pwdInput) pwdInput.value = '';
-        if (quantumInput) quantumInput.checked = !!member.ibmEnabled;
         refreshMemberEditorFromInput();
         showToast(`已帶入會員「${acc}」設定`);
     }
@@ -161,7 +120,6 @@
     async function saveMemberCode() {
         const accInput = document.getElementById('memberAccountInput');
         const pwdInput = document.getElementById('memberPasswordInput');
-        const quantumInput = document.getElementById('memberQuantumAccessInput');
         const account = normalizeMemberAccount(accInput && accInput.value);
         const password = String((pwdInput && pwdInput.value) || '').trim();
         if (!account) return showToast('請輸入會員帳號');
@@ -174,16 +132,13 @@
                 method: 'POST',
                 body: {
                     account,
-                    featureOverrides: {
-                        quantumStake: !!(quantumInput && quantumInput.checked)
-                    },
+                    featureOverrides: {},
                     password,
                     level: 'pro'
                 },
                 retries: 0
             });
             memberCodeMap[account] = {
-                ibmEnabled: !!(payload && payload.member && payload.member.featureOverrides && payload.member.featureOverrides.quantumStake),
                 level: normalizeUserLevel(payload && payload.member ? payload.member.level : 'pro'),
                 updatedAt: payload && payload.member ? String(payload.member.updatedAt || '') : ''
             };
@@ -2035,19 +1990,36 @@
     }
 
     function runBimTechAutoCalculation() {
-        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做 IBM 自動計算')) return;
+        if (typeof ensureProAutoCalcAccess === 'function') {
+            Promise.resolve(ensureProAutoCalcAccess()).then(function (ok) {
+                if (!ok) return;
+                runBimTechAutoCalculationCore();
+            });
+            return;
+        }
+        runBimTechAutoCalculationCore();
+    }
+
+    function runBimTechAutoCalculationCore() {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) {
+                return showToast(`⚠️ ${gate.msg}`);
+            }
+        }
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做 BIM 自動計算')) return;
         if (!bimModelData || !bimModelData.totalEntities) {
-            setBimAutoCalcInfo('IBM 自動計算：請先上傳模型檔', '#ffd48a');
+            setBimAutoCalcInfo('BIM 自動計算：請先上傳模型檔', '#ffd48a');
             return showToast('請先上傳模型檔');
         }
         if (!materialCatalog.length) {
-            setBimAutoCalcInfo('IBM 自動計算：尚未載入材料價格', '#ffd48a');
+            setBimAutoCalcInfo('BIM 自動計算：尚未載入材料價格', '#ffd48a');
             return showToast('尚未載入材料價格資料');
         }
 
         generateBIMEstimate();
         if (!bimEstimateRows.length) {
-            setBimAutoCalcInfo('IBM 自動計算：估價筆數為 0', '#ffd48a');
+            setBimAutoCalcInfo('BIM 自動計算：估價筆數為 0', '#ffd48a');
             return showToast('目前沒有可計算的 BIM 估價項目');
         }
 
@@ -2076,7 +2048,7 @@
         }
 
         if (!imported) {
-            setBimAutoCalcInfo('IBM 自動計算：沒有可匯入項目（請補齊材料對應）', '#ffd48a');
+            setBimAutoCalcInfo('BIM 自動計算：沒有可匯入項目（請補齊材料對應）', '#ffd48a');
             return showToast('沒有可匯入的 BIM 估價項目');
         }
 
@@ -2084,18 +2056,18 @@
         renderTable();
         const unmatched = bimEstimateRows.filter(r => !r.price).length;
         const estimatedTotal = bimEstimateRows.reduce((sum, row) => sum + (Number(row.subtotal) || 0), 0);
-        addAuditLog('IBM自動計算', `估價 ${bimEstimateRows.length} 筆、匯入 ${imported} 筆、替換舊自動 ${removedAuto} 筆`);
+        addAuditLog('BIM自動計算', `估價 ${bimEstimateRows.length} 筆、匯入 ${imported} 筆、替換舊自動 ${removedAuto} 筆`);
         setBimAutoCalcInfo(
-            `IBM 自動計算完成：估價 ${bimEstimateRows.length} 筆｜匯入 ${imported} 筆｜未匹配 ${unmatched} 筆｜預估 ${Math.round(estimatedTotal).toLocaleString()} 元`,
+            `BIM 自動計算完成：估價 ${bimEstimateRows.length} 筆｜匯入 ${imported} 筆｜未匹配 ${unmatched} 筆｜預估 ${Math.round(estimatedTotal).toLocaleString()} 元`,
             '#9ef5c2'
         );
-        showToast(`IBM 自動計算完成：已匯入 ${imported} 筆（已替換舊自動 ${removedAuto} 筆）`);
+        showToast(`BIM 自動計算完成：已匯入 ${imported} 筆（已替換舊自動 ${removedAuto} 筆）`);
     }
 
     function importBIMEstimateToList() {
         if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再匯入 BIM 估價')) return;
         if (!bimEstimateRows.length) {
-            return showToast('請先執行 IBM/BIM 自動估價預覽');
+            return showToast('請先執行 BIM 自動估價預覽');
         }
         createDataSnapshot('匯入估價前', true);
         const floor = document.getElementById('floor_tag').value.trim() || 'BIM';
@@ -2534,6 +2506,10 @@
     }
 
     async function exportBimConstructionPackage() {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) return showToast(`⚠️ ${gate.msg}`);
+        }
         if (!bimLayoutPoints.length) return showToast('請先產生放樣點');
         runBimLayoutConfidenceLayering(stakingConservativeMode, true);
         if (!bimLayoutQaResult) await runBimLayoutQa();
@@ -2752,7 +2728,7 @@
             return;
         }
         const level = getQaLevelByScore(bimLayoutQaResult.qaScore);
-        box.innerText = `放樣 QA：等級 ${level}（${bimLayoutQaResult.qaScore} / 100），重複 ${bimLayoutQaResult.duplicatePointCount}，缺漏 ${bimLayoutQaResult.missingGeometryCount}，越界 ${bimLayoutQaResult.outOfRangeCount}，命名 ${bimLayoutQaResult.namingInvalidCount || 0}，樓層缺漏 ${bimLayoutQaResult.missingFloorTagCount || 0}，點距穩定度 ${bimLayoutQaResult.spacingStabilityScore || 0}，分群穩定度 ${bimLayoutQaResult.groupStabilityScore || 0}（${bimLayoutQaResult.groupCount || 0} 組），高精度修正 ${bimLayoutPrecisionPass} 次，核心自進 ${quantumStakeAutoRuns} 次｜制度 ${getQaProfileConfig().label} / 規格 ${getBimSpecPreset().label}`;
+        box.innerText = `放樣 QA：等級 ${level}（${bimLayoutQaResult.qaScore} / 100），重複 ${bimLayoutQaResult.duplicatePointCount}，缺漏 ${bimLayoutQaResult.missingGeometryCount}，越界 ${bimLayoutQaResult.outOfRangeCount}，命名 ${bimLayoutQaResult.namingInvalidCount || 0}，樓層缺漏 ${bimLayoutQaResult.missingFloorTagCount || 0}，點距穩定度 ${bimLayoutQaResult.spacingStabilityScore || 0}，分群穩定度 ${bimLayoutQaResult.groupStabilityScore || 0}（${bimLayoutQaResult.groupCount || 0} 組），高精度修正 ${bimLayoutPrecisionPass} 次｜制度 ${getQaProfileConfig().label} / 規格 ${getBimSpecPreset().label}`;
         if (alignBox) {
             alignBox.innerText = formatLayoutAlignmentSummary(layoutAlignmentState);
         }
@@ -3146,64 +3122,6 @@
         showToast(`一鍵放樣完成：${bimLayoutPoints.length} 點｜QA ${qaLevel} ${qaScore}｜${costMs}ms`);
     }
 
-    async function runQuantumAutoStakeLayout() {
-        if (!bimModelData || !Array.isArray(bimModelData.elements) || !bimModelData.elements.length) {
-            return showToast('⚠️ 核心雷達未偵測到目標：請先上傳模型檔');
-        }
-        if (!(await ensureFeatureAccess('quantumStake', '核心自進放樣需管理者額外開通 IBM 權限'))) {
-            return;
-        }
-
-        setWorkMode('stake');
-        generateBimLayoutPoints();
-        if (!bimLayoutPoints.length) return;
-
-        showToast('🌌 [核心引擎] 啟動！正在將放樣座標矩陣轉換為 QASM 指令...');
-
-        const qubitCount = Math.max(1, Math.min(bimLayoutPoints.length, 5));
-        const qasmCode = [
-            'OPENQASM 2.0;',
-            'include "qelib1.inc";',
-            `qreg q[${qubitCount}];`,
-            `creg c[${qubitCount}];`,
-            'h q;',
-            'measure q -> c;'
-        ].join('\n');
-
-        document.body.style.transition = 'box-shadow 0.5s ease-in-out';
-        document.body.style.boxShadow = 'inset 0 0 80px rgba(179, 136, 255, 0.8)';
-
-        try {
-            await apiRequest('/ibm/quantum-job', {
-                method: 'POST',
-                body: {
-                    program: qasmCode,
-                    backend: 'ibmq_qasm_simulator'
-                },
-                retries: 0,
-                timeoutMs: 20000
-            });
-
-            showToast('⚡ [IBM 實驗室] 運算中... 高速最佳化處理中！');
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            const highPrecisionToggle = document.getElementById('layoutHighPrecisionToggle');
-            if (highPrecisionToggle && !highPrecisionToggle.checked) highPrecisionToggle.checked = true;
-            optimizeBimLayoutPointsForPrecision();
-            groupBimLayoutPointsForQa();
-            await runBimLayoutQa();
-            quantumStakeAutoRuns += 1;
-            renderBimLayoutQaSummary();
-            addAuditLog('真・核心自進放樣', `成功呼叫 IBM API / 第 ${quantumStakeAutoRuns} 次 / 點位 ${bimLayoutPoints.length}`);
-            showToast('⚛️ IBM 雲端運算完成！已自動濾除重複點並得出最佳放樣路徑！');
-        } catch (error) {
-            console.error('核心通訊錯誤:', error);
-            showToast('❌ 雲端通道受干擾！請確認金鑰是否正確或伺服器狀態。');
-        } finally {
-            document.body.style.boxShadow = 'none';
-        }
-    }
-
     async function autoQuantumScan() {
         // 🐒 猴子防禦機制：如果已經在掃描了，直接把連續點擊擋在門外。
         if (isQuantumScanning) {
@@ -3479,6 +3397,10 @@
     }
 
     function exportBimLayoutPoints() {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) return showToast(`⚠️ ${gate.msg}`);
+        }
         if (!bimLayoutPoints.length) return showToast('請先產生放樣點');
         let csv = '\uFEFF點位ID,來源構件,構件類型,點位類型,X,Y,Z,樓層,群組,座標來源,狀態\n';
         bimLayoutPoints.forEach(p => {
@@ -3506,6 +3428,10 @@
     }
 
     async function exportBimLayoutQaReport() {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) return showToast(`⚠️ ${gate.msg}`);
+        }
         if (!bimLayoutPoints.length) return showToast('請先產生放樣點');
         if (!bimLayoutQaResult) await runBimLayoutQa();
         const qa = bimLayoutQaResult || {};

@@ -102,6 +102,9 @@
     }
 
     function openNativeAR(options) {
+        if (global.BuildMasterProAccess && !global.BuildMasterProAccess.guardAR()) {
+            return false;
+        }
         const payload = Object.assign({ source: 'web-ui' }, options || {});
         if (postNativeMessage(OPEN_MESSAGE, payload)) {
             return true;
@@ -131,6 +134,9 @@
     }
 
     function sendBlueprintAndOpenNativeAR(options) {
+        if (global.BuildMasterProAccess && !global.BuildMasterProAccess.guardAR()) {
+            return false;
+        }
         const blueprint = collectBlueprintPayloadFromPage();
         if (!blueprint) {
             return openNativeAR(Object.assign({ source: 'web-open-without-blueprint' }, options || {}));
@@ -161,6 +167,9 @@
     }
 
     function sendUSDZAndOpenNativeAR(usdzPayload, options) {
+        if (global.BuildMasterProAccess && !global.BuildMasterProAccess.guardAR()) {
+            return false;
+        }
         const payload = Object.assign({ kind: 'usdz', source: 'web-usdz-and-open' }, options || {}, usdzPayload || {});
         if (!payload.dataUrl) {
             if (typeof global.showToast === 'function') {

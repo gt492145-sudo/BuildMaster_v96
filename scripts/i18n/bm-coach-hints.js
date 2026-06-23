@@ -24,12 +24,12 @@
     {
         "sel": "#calcIbmCluster",
         "key": "calcIbmCluster",
-        "msg": "這一組是第三頁 IBM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。"
+        "msg": "這一組是第三頁 BIM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。"
     },
     {
         "sel": "#stakeExecutionCluster",
         "key": "stakeExecutionCluster",
-        "msg": "這一組是第四頁放樣執行設定：先勾選柱、牆、梁與放樣高精度，再執行一鍵放樣流程或 IBM 雲端放樣。"
+        "msg": "這一組是第四頁放樣執行設定：先勾選柱、牆、梁與放樣高精度，再執行一鍵放樣流程。"
     },
     {
         "sel": "#stakeQaCluster",
@@ -99,17 +99,12 @@
     {
         "sel": "button[onclick=\"generateBIMEstimate()\"]",
         "key": "generateBIMEstimate",
-        "msg": "依構件類型與材料單價自動產生 IBM/BIM 估價預覽表。"
+        "msg": "依構件類型與材料單價自動產生 BIM 估價預覽表。"
     },
     {
         "sel": "button[onclick=\"importBIMEstimateToList()\"]",
         "key": "importBIMEstimateToList",
-        "msg": "把 IBM/BIM 估價結果一鍵匯入主清單，直接進入總價彙整。"
-    },
-    {
-        "sel": "button[onclick=\"runQuantumAutoStakeLayout()\"]",
-        "key": "runQuantumAutoStakeLayout",
-        "msg": "核心自進放樣：自動執行生成點位、高精度修正、分群 QA 與放樣 QA。"
+        "msg": "把 BIM 估價結果一鍵匯入主清單，直接進入總價彙整。"
     },
     {
         "sel": "button[onclick=\"generateBimLayoutPoints()\"]",
@@ -209,7 +204,7 @@
     {
         "sel": "#bimEstimateBody",
         "key": "bimEstimateBody",
-        "msg": "這裡是 IBM/BIM 估價預覽，可先確認匹配結果再匯入。"
+        "msg": "這裡是 BIM 估價預覽，可先確認匹配結果再匯入。"
     },
     {
         "sel": "#regionSelect",
@@ -374,7 +369,7 @@
     {
         "sel": "#workCalcBtn",
         "key": "workCalcBtn",
-        "msg": "計算模式：固定對應第1到3頁，包含工種試算、智慧量圖、AI 看圖辨識、IBM 自動估算與報表輸出。"
+        "msg": "計算模式：固定對應第1到3頁，包含工種試算、智慧量圖、AI 看圖辨識、BIM 自動估算與報表輸出。"
     },
     {
         "sel": "#workStakeBtn",
@@ -424,7 +419,7 @@
     {
         "sel": "#calcPage2Btn",
         "key": "calcPage2Btn",
-        "msg": "第2頁：圖面量測與完整工程功能（含進階試算、IBM 工具）。"
+        "msg": "第2頁：圖面量測與完整工程功能（含進階試算、BIM 工具）。"
     },
     {
         "sel": "#btnWarRoom') || target.closest('#btnCtrlWarRoom",
@@ -654,7 +649,7 @@
             'coach.hint.startSmartCalibration': "【說明】用兩點＋真實長度建立圖面比例。【操作】按此鈕→在圖上點兩點→輸入實際距離→看到「比例已設」再量圖。",
             'coach.hint.startSmartMeasure': "【說明】依已設比例量取構件尺寸。【操作】按此鈕→在圖上點起點與終點→數值自動填入右側 v1/v2 欄。",
             'coach.hint.calcAiVisionCluster': "這一組是第三頁 AI 看圖辨識：依序可做快速判讀、精準辨識、讀柱樑尺寸標註，再把結果送進自動估算。",
-            'coach.hint.calcIbmCluster': "這一組是第三頁 IBM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。",
+            'coach.hint.calcIbmCluster': "這一組是第三頁 BIM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。",
             'coach.hint.stakeExecutionCluster': "【說明】放樣執行區：選構件類型與精度後產點放樣。【操作】①上傳 IFC ②勾選柱/牆/梁 ③按「生成放樣點」或「一鍵放樣」。",
             'coach.hint.stakeQaCluster': "【說明】放樣 QA：檢查偏差、重複點與穩定度。【操作】填控制點 design/field 座標→按「控制點配準」→再按「執行放樣 QA」看分數。",
             'coach.hint.stakeExportCluster': "【說明】QA 通過後的輸出與現場工具。【操作】按「匯出放樣點 CSV」交儀器；或「匯出 QA 報告」存稽核；現場對照可開現場對位。",
@@ -669,9 +664,8 @@
             'coach.hint.exportBimRules': "匯出目前 BIM 規則檔（JSON），可跨裝置共用。",
             'coach.hint.triggerImportBimRules': "匯入規則檔（JSON），快速套用既有 BIM 匹配設定。",
             'coach.hint.resetBimRules': "清空全部 BIM 規則，恢復系統預設匹配。",
-            'coach.hint.generateBIMEstimate': "依構件類型與材料單價自動產生 IBM/BIM 估價預覽表。",
-            'coach.hint.importBIMEstimateToList': "把 IBM/BIM 估價結果一鍵匯入主清單，直接進入總價彙整。",
-            'coach.hint.runQuantumAutoStakeLayout': "核心自進放樣：自動執行生成點位、高精度修正、分群 QA 與放樣 QA。",
+            'coach.hint.generateBIMEstimate': "依構件類型與材料單價自動產生 BIM 估價預覽表。",
+            'coach.hint.importBIMEstimateToList': "把 BIM 估價結果一鍵匯入主清單，直接進入總價彙整。",
             'coach.hint.generateBimLayoutPoints': "【說明】從模型抽柱心、牆端、梁端放樣點。【操作】確認已上傳 IFC 且勾選構件→按此→在表格預覽→再跑 QA。",
             'coach.hint.runBimLayoutQa': "執行放樣 QA，檢查重複點、缺漏與越界，產生分數。",
             'coach.hint.exportBimLayoutPoints': "匯出放樣點 CSV，可交給儀器或現場施工使用。",
@@ -691,7 +685,7 @@
             'coach.hint.rollbackLatestSnapshot': "只回滾最近快照中的 BIM 估價表，不會改動規則與主清單。",
             'coach.hint.exportSnapshots': "匯出所有快照為 JSON，可做備份或跨裝置還原。",
             'coach.hint.triggerImportSnapshots': "匯入快照 JSON，把歷史版本帶回本機。",
-            'coach.hint.bimEstimateBody': "這裡是 IBM/BIM 估價預覽，可先確認匹配結果再匯入。",
+            'coach.hint.bimEstimateBody': "這裡是 BIM 估價預覽，可先確認匹配結果再匯入。",
             'coach.hint.regionSelect': "可選地區價目；若地區資料筆數太少，系統會自動改用全台完整價目。",
             'coach.hint.autoDetectRegion': "按這裡才會要求抓取目前工地，並把所在地區套用到價目與天氣。",
             'coach.hint.siteWeatherInfo': "這裡顯示工地即時天氣與施工建議，系統會自動更新。",
@@ -781,8 +775,8 @@
             'coach.hint.startSmartCalibration': "What: set drawing scale. How: tap → pick 2 points → enter real distance → wait for scale ready.",
             'coach.hint.startSmartMeasure': "What: measure with scale set. How: tap → pick start/end on drawing → values fill v1/v2 fields.",
             'coach.hint.calcAiVisionCluster': "Page 3 AI vision: quick read, precise detect, column/beam tags, then send to auto estimate.",
-            'coach.hint.calcIbmCluster': "Page 3 IBM auto calc: estimate and import list; staking is on page 4, not here.",
-            'coach.hint.stakeExecutionCluster': "Page 4 layout setup: pick column/wall/beam and precision, then one-click layout or IBM cloud layout.",
+            'coach.hint.calcIbmCluster': "Page 3 BIM auto calc: estimate and import list; staking is on page 4, not here.",
+            'coach.hint.stakeExecutionCluster': "Page 4 layout setup: pick column/wall/beam and precision, then one-click layout.",
             'coach.hint.stakeQaCluster': "Page 4 layout QA: control points, deviation heatmap, stability retest, grouping, layout QA.",
             'coach.hint.stakeExportCluster': "Page 4 export & field tools: after QA, export points, QA report, field package, fill suggestions, spot check.",
             'coach.hint.ifcInput': "Upload a model file for BIM QA parsing and element statistics.",
@@ -794,9 +788,8 @@
             'coach.hint.exportBimRules': "Export BIM rules JSON for backup or sharing.",
             'coach.hint.triggerImportBimRules': "Import rules JSON.",
             'coach.hint.resetBimRules': "Clear all BIM rules; restore defaults.",
-            'coach.hint.generateBIMEstimate': "Build IBM/BIM estimate preview from types and prices.",
-            'coach.hint.importBIMEstimateToList': "Import IBM/BIM estimate into the main list.",
-            'coach.hint.runQuantumAutoStakeLayout': "Auto layout: points, precision, group QA, layout QA.",
+            'coach.hint.generateBIMEstimate': "Build BIM estimate preview from types and prices.",
+            'coach.hint.importBIMEstimateToList': "Import BIM estimate into the main list.",
             'coach.hint.generateBimLayoutPoints': "Extract layout points from the model.",
             'coach.hint.runBimLayoutQa': "Run layout QA for duplicates, gaps, score.",
             'coach.hint.exportBimLayoutPoints': "Export layout points CSV.",
@@ -816,7 +809,7 @@
             'coach.hint.rollbackLatestSnapshot': "Roll back to latest snapshot.",
             'coach.hint.exportSnapshots': "Export all snapshots as JSON.",
             'coach.hint.triggerImportSnapshots': "Import snapshot JSON.",
-            'coach.hint.bimEstimateBody': "IBM/BIM estimate preview — confirm matches before import.",
+            'coach.hint.bimEstimateBody': "BIM estimate preview — confirm matches before import.",
             'coach.hint.regionSelect': "Pick regional prices; sparse region files fall back to nationwide catalog.",
             'coach.hint.autoDetectRegion': "Detect site and apply region to prices and weather.",
             'coach.hint.siteWeatherInfo': "這裡顯示工地即時天氣與施工建議，系統會自動更新。",
@@ -851,7 +844,7 @@
             'coach.hint.levelBasicBtn': "Tier 1 (Basic): essentials for quick start.",
             'coach.hint.levelStandardBtn': "Tier 2 (Standard): measure assist, QA export, some advanced tools.",
             'coach.hint.levelProBtn': "Tier 3 (Pro): full BIM, rules, snapshots, and more.",
-            'coach.hint.workCalcBtn': "Calc mode: pages 1–3 — trades, smart measure, AI vision, IBM, reports.",
+            'coach.hint.workCalcBtn': "Calc mode: pages 1–3 — trades, smart measure, AI vision, BIM, reports.",
             'coach.hint.workStakeBtn': "Stake mode: page 4 — model QA, layout points, alignment, QA, field package.",
             'coach.hint.workElectricalBtn': "Electrical mode: voltage/current/script settings; export mecha_config.txt locally for Python or field tests.",
             'coach.hint.aiCoachToggle': "AI coach adds flexible tips beyond rule text (needs backend proxy).",
@@ -906,8 +899,8 @@
         ja: {
             'coach.hint.calcMeasureCluster': "第1〜3ページのスマート計測：スマート尺度→スマート計測。寸法は右側の計算欄へ。",
             'coach.hint.calcAiVisionCluster': "第3ページAI視覚：快速読取・精密認識・柱梁寸法→自動見積へ。",
-            'coach.hint.calcIbmCluster': "第3ページIBM自動計算：見積とリスト取込。墨出しは第4ページ。",
-            'coach.hint.stakeExecutionCluster': "第4ページ墨出し設定：柱・壁・梁と高精度を選び一括／IBMクラウド墨出し。",
+            'coach.hint.calcIbmCluster': "第3ページBIM自動計算：見積とリスト取込。墨出しは第4ページ。",
+            'coach.hint.stakeExecutionCluster': "第4ページ墨出し設定：柱・壁・梁と高精度を選び一括墨出し。",
             'coach.hint.stakeQaCluster': "第4ページ墨出しQA：基準点合わせ、偏差、安定度、グループQA。",
             'coach.hint.stakeExportCluster': "第4ページ出力：QA後に点・QAレポート・施工パッケージ、補点・抽検。",
             'coach.hint.ifcInput': "モデルをアップロードしてBIM QA解析と部材統計。",
@@ -919,9 +912,8 @@
             'coach.hint.exportBimRules': "匯出目前 BIM 規則檔（JSON），可跨裝置共用。",
             'coach.hint.triggerImportBimRules': "匯入規則檔（JSON），快速套用既有 BIM 匹配設定。",
             'coach.hint.resetBimRules': "清空全部 BIM 規則，恢復系統預設匹配。",
-            'coach.hint.generateBIMEstimate': "依構件類型與材料單價自動產生 IBM/BIM 估價預覽表。",
-            'coach.hint.importBIMEstimateToList': "把 IBM/BIM 估價結果一鍵匯入主清單，直接進入總價彙整。",
-            'coach.hint.runQuantumAutoStakeLayout': "核心自進放樣：自動執行生成點位、高精度修正、分群 QA 與放樣 QA。",
+            'coach.hint.generateBIMEstimate': "依構件類型與材料單價自動產生 BIM 估價預覽表。",
+            'coach.hint.importBIMEstimateToList': "把 BIM 估價結果一鍵匯入主清單，直接進入總價彙整。",
             'coach.hint.generateBimLayoutPoints': "【說明】從模型抽柱心、牆端、梁端放樣點。【操作】確認已上傳 IFC 且勾選構件→按此→在表格預覽→再跑 QA。",
             'coach.hint.runBimLayoutQa': "執行放樣 QA，檢查重複點、缺漏與越界，產生分數。",
             'coach.hint.exportBimLayoutPoints': "匯出放樣點 CSV，可交給儀器或現場施工使用。",
@@ -941,7 +933,7 @@
             'coach.hint.rollbackLatestSnapshot': "直近スナップショットへロールバック。",
             'coach.hint.exportSnapshots': "匯出所有快照為 JSON，可做備份或跨裝置還原。",
             'coach.hint.triggerImportSnapshots': "匯入快照 JSON，把歷史版本帶回本機。",
-            'coach.hint.bimEstimateBody': "IBM/BIM見積プレビュー — 取込前にマッチを確認。",
+            'coach.hint.bimEstimateBody': "BIM見積プレビュー — 取込前にマッチを確認。",
             'coach.hint.regionSelect': "地域単価を選択。件数が少ないと全国版に切替。",
             'coach.hint.autoDetectRegion': "按這裡才會要求抓取目前工地，並把所在地區套用到價目與天氣。",
             'coach.hint.siteWeatherInfo': "這裡顯示工地即時天氣與施工建議，系統會自動更新。",
@@ -976,7 +968,7 @@
             'coach.hint.levelBasicBtn': "会員1（ベーシック）：必要最小機能。",
             'coach.hint.levelStandardBtn': "会員2（標準）：計測補助・QA出力等。",
             'coach.hint.levelProBtn': "会員3（プロ）：BIM・ルール・スナップショット全機能。",
-            'coach.hint.workCalcBtn': "計算モード：第1〜3ページ（工種・計測・AI・IBM）。",
+            'coach.hint.workCalcBtn': "計算モード：第1〜3ページ（工種・計測・AI・BIM）。",
             'coach.hint.workStakeBtn': "墨出しモード：第4ページ（モデル・墨出し・QA）。",
             'coach.hint.workElectricalBtn': "電気モード：電圧・電流・スクリプト設定、mecha_config.txt を端末へ出力。",
             'coach.hint.aiCoachToggle': "AI解説：ルール外の柔軟なアドバイス（バックエンド要）。",
