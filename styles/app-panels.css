@@ -316,6 +316,31 @@
         gap: 8px;
         margin: 4px 0 8px;
     }
+    .member-chat-channel-tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 10px;
+    }
+    .member-chat-tab {
+        flex: 1 1 0;
+        border: 1px solid rgba(130, 190, 255, 0.28);
+        background: rgba(8, 18, 32, 0.55);
+        color: #b8d4f0;
+        border-radius: 999px;
+        padding: 6px 6px;
+        font-size: 0.74rem;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+    .member-chat-tab.is-active {
+        border-color: rgba(120, 220, 255, 0.72);
+        background: linear-gradient(135deg, rgba(24, 72, 110, 0.88), rgba(12, 40, 68, 0.92));
+        color: #e8f6ff;
+        box-shadow: 0 0 16px rgba(64, 180, 255, 0.18);
+    }
+    .member-chat-panel.is-public-lobby #memberChatLocalTools {
+        display: none;
+    }
     .member-chat-quick-badge {
         display: inline-flex;
         align-items: center;
@@ -386,6 +411,111 @@
         align-items: center;
         margin-top: 8px;
     }
+    .member-chat-voice-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+    .member-chat-voice-btn {
+        border-color: rgba(255, 138, 176, 0.72);
+        color: #ffe9f0;
+        background: linear-gradient(135deg, rgba(196, 58, 108, 0.42), rgba(72, 24, 52, 0.52));
+        min-width: 132px;
+        touch-action: none;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .member-chat-voice-mic-icon {
+        display: inline-block;
+        width: 12px;
+        height: 18px;
+        border-radius: 6px 6px 3px 3px;
+        background: currentColor;
+        position: relative;
+        flex: 0 0 auto;
+    }
+    .member-chat-voice-mic-icon::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -5px;
+        width: 14px;
+        height: 8px;
+        border: 2px solid currentColor;
+        border-top: 0;
+        border-radius: 0 0 10px 10px;
+        transform: translateX(-50%);
+    }
+    .member-chat-voice-mic-icon::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -9px;
+        width: 2px;
+        height: 5px;
+        background: currentColor;
+        transform: translateX(-50%);
+    }
+    .member-chat-voice-mic-label {
+        line-height: 1.2;
+    }
+    .member-chat-voice-btn.is-recording {
+        border-color: rgba(255, 96, 120, 0.95);
+        box-shadow: 0 0 18px rgba(255, 72, 112, 0.35);
+        animation: member-chat-voice-pulse 1s ease-in-out infinite;
+    }
+    @keyframes member-chat-voice-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+    }
+    .member-chat-voice-status {
+        color: #ffb8cc;
+        font-size: 0.78em;
+        font-weight: 700;
+    }
+    .member-chat-voice-bubble {
+        min-width: 132px;
+    }
+    .member-chat-voice-play {
+        width: 100%;
+        border: 0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.12);
+        color: inherit;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        text-align: left;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .member-chat-voice-play:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+    .member-chat-voice-play-icon {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 10px solid currentColor;
+        flex: 0 0 auto;
+    }
+    .member-chat-preview-voice {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .member-chat-voice-play-text {
+        line-height: 1.2;
+    }
     .member-chat-quick-hint,
     .member-chat-identity,
     .member-chat-empty {
@@ -445,6 +575,9 @@
         font-size: 1em;
         font-weight: 800;
         margin-bottom: 8px;
+    }
+    .member-chat-panel-head #memberChatToggleBtn {
+        margin-left: auto;
     }
     .member-chat-status {
         border: 1px solid rgba(162, 211, 255, 0.46);

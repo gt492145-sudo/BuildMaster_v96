@@ -19,7 +19,7 @@
     {
         "sel": "#calcAiVisionCluster",
         "key": "calcAiVisionCluster",
-        "msg": "這一組是第三頁 AI 看圖辨識：依序可做快速判讀、精準辨識、讀柱樑尺寸標註，再把結果送進自動估算。"
+        "msg": "這一組是第三頁智慧看圖辨識：依序可做快速判讀、精準辨識、讀柱樑尺寸標註，再把結果送進自動估算。"
     },
     {
         "sel": "#calcIbmCluster",
@@ -369,7 +369,7 @@
     {
         "sel": "#workCalcBtn",
         "key": "workCalcBtn",
-        "msg": "計算模式：固定對應第1到3頁，包含工種試算、智慧量圖、AI 看圖辨識、BIM 自動估算與報表輸出。"
+        "msg": "計算模式：固定對應第1到3頁，包含工種試算、智慧量圖、智慧看圖辨識、BIM 自動估算與報表輸出。"
     },
     {
         "sel": "#workStakeBtn",
@@ -384,17 +384,17 @@
     {
         "sel": "#aiCoachToggle",
         "key": "aiCoachToggle",
-        "msg": "AI 解說員：可在規則解說外補充更彈性的操作建議（需先完成後端代理設定）。"
+        "msg": "智慧解說員：可在規則解說外補充更彈性的操作建議（需先完成後端代理設定）。"
     },
     {
         "sel": "#coachAiInput",
         "key": "coachAiInput",
-        "msg": "可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按問AI。"
+        "msg": "可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按智慧問答。"
     },
     {
         "sel": "#coachAiAskBtn",
         "key": "coachAiAskBtn",
-        "msg": "送出你輸入的問題給 AI 解說員，回覆會顯示在氣泡中。"
+        "msg": "送出你輸入的問題給智慧解說員，回覆會顯示在氣泡中。"
     },
     {
         "sel": "#coachGuideBtn",
@@ -434,7 +434,7 @@
     {
         "sel": "#btnCtrlAiVision",
         "key": "btnCtrlAiVision",
-        "msg": "AI 盤點總開關：控制 AI 看圖辨識相關按鈕是否顯示。"
+        "msg": "智慧盤點總開關：控制智慧看圖辨識相關按鈕是否顯示。"
     },
     {
         "sel": "#btnCtrlLaser",
@@ -524,7 +524,7 @@
     {
         "sel": "button[onclick=\"startEdgeAIVision()\"]",
         "key": "startEdgeAIVision",
-        "msg": "AI 視覺點料：用相機或圖面自動辨識構件數量。"
+        "msg": "智慧視覺點料：用相機或圖面自動辨識構件數量。"
     },
     {
         "sel": "#calcType",
@@ -648,7 +648,7 @@
             'coach.hint.calcMeasureCluster': "【說明】智慧量測區，尺寸會回填右側試算欄。【操作】①上傳圖紙 ②按「🧠智慧定比例」點兩點輸入真實長度 ③按「✨智慧量圖」量尺寸；不懂可按「▶30秒示範」。",
             'coach.hint.startSmartCalibration': "【說明】用兩點＋真實長度建立圖面比例。【操作】按此鈕→在圖上點兩點→輸入實際距離→看到「比例已設」再量圖。",
             'coach.hint.startSmartMeasure': "【說明】依已設比例量取構件尺寸。【操作】按此鈕→在圖上點起點與終點→數值自動填入右側 v1/v2 欄。",
-            'coach.hint.calcAiVisionCluster': "這一組是第三頁 AI 看圖辨識：依序可做快速判讀、精準辨識、讀柱樑尺寸標註，再把結果送進自動估算。",
+            'coach.hint.calcAiVisionCluster': "這一組是第三頁智慧看圖辨識：依序可做快速判讀、精準辨識、讀柱樑尺寸標註，再把結果送進自動估算。",
             'coach.hint.calcIbmCluster': "這一組是第三頁 BIM 自動計算區：先做估算與匯入清單，第四頁放樣功能不會在這裡顯示。",
             'coach.hint.stakeExecutionCluster': "【說明】放樣執行區：選構件類型與精度後產點放樣。【操作】①上傳 IFC ②勾選柱/牆/梁 ③按「生成放樣點」或「一鍵放樣」。",
             'coach.hint.stakeQaCluster': "【說明】放樣 QA：檢查偏差、重複點與穩定度。【操作】填控制點 design/field 座標→按「控制點配準」→再按「執行放樣 QA」看分數。",
@@ -721,9 +721,9 @@
             'coach.hint.workCalcBtn': "【說明】計算模式＝第1～3頁（試算、量圖、報表）。【操作】按此切換→再按「第1頁」或「第2頁」開始。",
             'coach.hint.workStakeBtn': "【說明】放樣模式＝第4頁（模型、QA、輸出）。【操作】按此切換→上傳 IFC→依序：執行→QA→匯出。",
             'coach.hint.workElectricalBtn': "【說明】電機模式：電壓/腳本/繼電器設定。【操作】填硬體參數→選腳本模式→按匯出 mecha_config.txt（僅存本機）。",
-            'coach.hint.aiCoachToggle': "AI 解說員：可在規則解說外補充更彈性的操作建議（需先完成後端代理設定）。",
-            'coach.hint.coachAiInput': "可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按問AI。",
-            'coach.hint.coachAiAskBtn': "送出你輸入的問題給 AI 解說員，回覆會顯示在氣泡中。",
+            'coach.hint.aiCoachToggle': "智慧解說員：可在規則解說外補充更彈性的操作建議（需先完成後端代理設定）。",
+            'coach.hint.coachAiInput': "可直接問 BIM/IFC 問題，例如「IFC 裡柱有幾根？未匹配有哪些？」再按智慧問答。",
+            'coach.hint.coachAiAskBtn': "送出你輸入的問題給智慧解說員，回覆會顯示在氣泡中。",
             'coach.hint.coachGuideBtn': "【說明】逐步新手導覽（含聊天、卡片、隱私）。【操作】按此開始→跟著高亮步驟走→完成後可隨時重跑。",
             'coach.hint.contrastToggle': "高對比模式：加強文字與按鈕對比，夜間或戶外較好辨識。",
             'coach.hint.contrastAutoToggle': "自動高對比：傍晚到清晨自動切換，白天恢復一般模式。",
@@ -731,7 +731,7 @@
             'coach.hint.calcPage2Btn': "【說明】第2頁：圖面量測與完整工程功能。【操作】左側上傳圖紙→智慧定比例→智慧量圖→右側加入清單/匯出。",
             'coach.hint.btnWarRoom': "戰情室：連線後可同步雲端資料列；離線時仍可本機試算。",
             'coach.hint.btnCtrlVoice': "語音助理總開關：開啟後可在藍圖頁用麥克風口述尺寸自動填欄。",
-            'coach.hint.btnCtrlAiVision': "AI 盤點總開關：控制 AI 看圖辨識相關按鈕是否顯示。",
+            'coach.hint.btnCtrlAiVision': "智慧盤點總開關：控制智慧看圖辨識相關按鈕是否顯示。",
             'coach.hint.btnCtrlLaser': "藍牙雷射尺總開關：關閉後隱藏連線雷射尺相關功能。",
             'coach.hint.btnWarRoomRows': "控制是否在清單中顯示戰情室雲端資料列。",
             'coach.hint.startVoiceAgent': "工地語音助理：對著手機說尺寸（如長5寬3高2），系統會自動填入欄位。",
@@ -749,7 +749,7 @@
             'coach.hint.toggle3DView': "3D 檢視：把圖面轉成立體視角觀看。",
             'coach.hint.toggle360Spin': "360 翻轉：自動旋轉 3D 視角。",
             'coach.hint.reset3DView': "重設 3D 視角到預設位置。",
-            'coach.hint.startEdgeAIVision': "AI 視覺點料：用相機或圖面自動辨識構件數量。",
+            'coach.hint.startEdgeAIVision': "智慧視覺點料：用相機或圖面自動辨識構件數量。",
             'coach.hint.calcType': "【說明】選工種公式（混凝土、模板等）。【操作】下拉選工種→填 v1/v2/v3→看預覽列→按「加入清單」。",
             'coach.hint.customName': "自訂部位名稱：例如 C2柱、外牆A區。",
             'coach.hint.v1': "尺寸欄 v1：通常是長度或規格。",
@@ -999,7 +999,7 @@
             'coach.hint.toggle3DView': "3D 檢視：把圖面轉成立體視角觀看。",
             'coach.hint.toggle360Spin': "360 翻轉：自動旋轉 3D 視角。",
             'coach.hint.reset3DView': "重設 3D 視角到預設位置。",
-            'coach.hint.startEdgeAIVision': "AI 視覺點料：用相機或圖面自動辨識構件數量。",
+            'coach.hint.startEdgeAIVision': "智慧視覺點料：用相機或圖面自動辨識構件數量。",
             'coach.hint.calcType': "工種公式選択。",
             'coach.hint.customName': "部位名（例：C2柱）。",
             'coach.hint.v1': "寸法v1：長さ等。",

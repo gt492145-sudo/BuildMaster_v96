@@ -538,8 +538,1040 @@
 
     const MEMBER_CHAT_FRIENDS_KEY = 'bm_69:member_chat_friends';
     const MEMBER_CHAT_LOGS_KEY = 'bm_69:member_chat_logs';
+    const MEMBER_CHAT_CHANNEL_KEY = 'bm_69:member_chat_channel';
+    const PUBLIC_CHAT_POLL_MS = 5000;
+    const DIRECT_CHAT_POLL_MS = 5000;
+    const GROUP_CHAT_POLL_MS = 5000;
     let memberChatActiveFriend = '';
+    let memberChatActiveGroupId = 0;
     let memberChatAnimateLast = false;
+    let memberChatChannelMode = 'local';
+    let publicChatMessages = [];
+    let publicChatSinceId = 0;
+    let publicChatPollTimer = null;
+    let publicChatRefreshing = false;
+    let serverFriendContacts = [];
+    let directChatMessages = [];
+    let directChatSinceId = 0;
+    let directChatPollTimer = null;
+    let directChatRefreshing = false;
+    let directChatVoiceCache = new Map();
+    let directChatVoiceRecorder = null;
+    let directChatVoiceStream = null;
+    let directChatVoiceChunks = [];
+    let directChatVoiceRecording = false;
+    let directChatVoiceRecordStartedAt = 0;
+    let directChatVoiceRecordTimer = null;
+    let directChatVoiceAudioEl = null;
+    const DIRECT_CHAT_VOICE_MAX_MS = 60000;
+    let serverGroups = [];
+    let groupChatMessages = [];
+    let groupChatSinceId = 0;
+    let groupChatPollTimer = null;
+    let groupChatRefreshing = false;
+
+    function normalizeMemberChatChannelMode(mode) {
+        if (mode === 'public') return 'public';
+        if (mode === 'friends') return 'friends';
+        if (mode === 'groups') return 'groups';
+        return 'local';
+    }
+
+    function loadMemberChatChannelMode() {
+        try {
+            return normalizeMemberChatChannelMode(localStorage.getItem(MEMBER_CHAT_CHANNEL_KEY));
+        } catch (_e) {
+            return 'local';
+        }
+    }
+
+    function isPublicChatChannelMode() {
+        return memberChatChannelMode === 'public';
+    }
+
+    function isFriendsChatChannelMode() {
+        return memberChatChannelMode === 'friends';
+    }
+
+    function isGroupChatChannelMode() {
+        return memberChatChannelMode === 'groups';
+    }
+
+    function isLocalChatChannelMode() {
+        return memberChatChannelMode === 'local';
+    }
+
+    function canUseMemberChatApi() {
+        return typeof isMemberSession === 'function'
+            && isMemberSession()
+            && typeof shouldSkipRemoteApi === 'function'
+            && !shouldSkipRemoteApi()
+            && typeof apiRequest === 'function';
+    }
+
+    function canUsePublicChatApi() {
+        return canUseMemberChatApi();
+    }
+
+    function formatPublicChatTime(iso) {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return '';
+        return d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    function mapPublicChatMessageRow(msg) {
+        return {
+            type: 'text',
+            sender: msg.account,
+            text: msg.text,
+            time: formatPublicChatTime(msg.createdAt),
+            ts: new Date(msg.createdAt).getTime(),
+            status: 'delivered',
+            publicId: Number(msg.id) || 0
+        };
+    }
+
+    function mergePublicChatMessages(incoming, reset) {
+        if (reset) {
+            publicChatMessages = incoming.slice();
+        } else if (incoming.length) {
+            const seen = new Set(publicChatMessages.map((row) => row.publicId));
+            incoming.forEach((row) => {
+                if (!seen.has(row.publicId)) {
+                    publicChatMessages.push(row);
+                    seen.add(row.publicId);
+                }
+            });
+            publicChatMessages.sort((a, b) => (a.publicId || 0) - (b.publicId || 0));
+            if (publicChatMessages.length > 200) {
+                publicChatMessages = publicChatMessages.slice(-200);
+            }
+        }
+        publicChatSinceId = publicChatMessages.reduce(
+            (max, row) => Math.max(max, row.publicId || 0),
+            publicChatSinceId
+        );
+    }
+
+    function stopPublicChatPolling() {
+        if (publicChatPollTimer) {
+            clearInterval(publicChatPollTimer);
+            publicChatPollTimer = null;
+        }
+    }
+
+    function startPublicChatPolling() {
+        stopPublicChatPolling();
+        if (!isPublicChatChannelMode() || !canUsePublicChatApi()) return;
+        publicChatPollTimer = setInterval(() => {
+            if (!isPublicChatChannelMode()) {
+                stopPublicChatPolling();
+                return;
+            }
+            refreshPublicChatMessages().catch(() => {});
+        }, PUBLIC_CHAT_POLL_MS);
+    }
+
+    async function refreshPublicChatMessages(options = {}) {
+        if (!isPublicChatChannelMode()) return;
+        if (publicChatRefreshing) return;
+        if (!canUsePublicChatApi()) {
+            publicChatMessages = [];
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+            return;
+        }
+        publicChatRefreshing = true;
+        try {
+            const since = options.initial ? 0 : publicChatSinceId;
+            const payload = await apiRequest(`/chat/public/messages?since=${since}&limit=100`);
+            const incoming = (Array.isArray(payload.messages) ? payload.messages : [])
+                .map(mapPublicChatMessageRow);
+            mergePublicChatMessages(incoming, !!options.initial);
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+        } catch (error) {
+            if (options.showError) {
+                showToast(error.message || bmT('toast.publicChatLoadFailed'));
+            }
+        } finally {
+            publicChatRefreshing = false;
+        }
+    }
+
+    async function sendPublicChatMessage(text) {
+        if (!canUsePublicChatApi()) {
+            showToast(bmT('toast.publicChatLoginRequired'));
+            return false;
+        }
+        const trimmed = String(text || '').trim().slice(0, 280);
+        if (!trimmed) {
+            showToast(bmT('toast.needMessage'));
+            return false;
+        }
+        try {
+            const payload = await apiRequest('/chat/public/messages', {
+                method: 'POST',
+                body: { text: trimmed }
+            });
+            if (payload && payload.message) {
+                mergePublicChatMessages([mapPublicChatMessageRow(payload.message)], false);
+                memberChatAnimateLast = true;
+                renderMemberChatMessages();
+                renderMemberChatQuickPreview();
+                memberChatAnimateLast = false;
+            } else {
+                await refreshPublicChatMessages({ initial: true, showError: true });
+            }
+            return true;
+        } catch (error) {
+            showToast(error.message || bmT('toast.publicChatSendFailed'));
+            return false;
+        }
+    }
+
+    function isDirectChatVoicePlaceholderText(text) {
+        const normalized = String(text || '').trim();
+        return normalized === '語音訊息'
+            || normalized.endsWith('語音訊息')
+            || /voice message/i.test(normalized);
+    }
+
+    function mapDirectChatMessageRow(msg) {
+        let messageType = String(msg.messageType || 'text').trim().toLowerCase() === 'voice'
+            ? 'voice'
+            : 'text';
+        if (messageType !== 'voice' && (msg.hasVoice || Number(msg.audioDurationMs) > 0)) {
+            messageType = 'voice';
+        }
+        if (messageType !== 'voice' && isDirectChatVoicePlaceholderText(msg.text)) {
+            messageType = 'voice';
+        }
+        const row = {
+            type: messageType,
+            sender: msg.senderAccount,
+            text: String(msg.text || ''),
+            time: formatPublicChatTime(msg.createdAt),
+            ts: new Date(msg.createdAt).getTime(),
+            status: 'delivered',
+            directId: Number(msg.id) || 0,
+            audioMime: String(msg.audioMime || ''),
+            audioDurationMs: Math.max(0, Number(msg.audioDurationMs) || 0),
+            hasVoice: messageType === 'voice' || !!msg.hasVoice
+        };
+        if (msg.audioBase64) {
+            directChatVoiceCache.set(row.directId, {
+                mime: row.audioMime || 'audio/webm',
+                base64: String(msg.audioBase64),
+                durationMs: row.audioDurationMs
+            });
+        }
+        return row;
+    }
+
+    function mergeDirectChatMessages(incoming, reset) {
+        if (reset) {
+            directChatMessages = incoming.slice();
+        } else if (incoming.length) {
+            const seen = new Set(directChatMessages.map((row) => row.directId));
+            incoming.forEach((row) => {
+                if (!seen.has(row.directId)) {
+                    directChatMessages.push(row);
+                    seen.add(row.directId);
+                }
+            });
+            directChatMessages.sort((a, b) => (a.directId || 0) - (b.directId || 0));
+            if (directChatMessages.length > 200) {
+                directChatMessages = directChatMessages.slice(-200);
+            }
+        }
+        directChatSinceId = directChatMessages.reduce(
+            (max, row) => Math.max(max, row.directId || 0),
+            directChatSinceId
+        );
+    }
+
+    function getMutualFriendContacts() {
+        return serverFriendContacts.filter((entry) => entry && entry.canChat);
+    }
+
+    function getFriendContact(account) {
+        const peer = normalizeMemberAccount(account);
+        return serverFriendContacts.find((entry) => normalizeMemberAccount(entry.account) === peer) || null;
+    }
+
+    function stopDirectChatPolling() {
+        if (directChatPollTimer) {
+            clearInterval(directChatPollTimer);
+            directChatPollTimer = null;
+        }
+    }
+
+    function startDirectChatPolling() {
+        stopDirectChatPolling();
+        if (!isFriendsChatChannelMode() || !canUseMemberChatApi() || !memberChatActiveFriend) return;
+        if (!getFriendContact(memberChatActiveFriend)?.canChat) return;
+        directChatPollTimer = setInterval(() => {
+            if (!isFriendsChatChannelMode()) {
+                stopDirectChatPolling();
+                return;
+            }
+            refreshDirectChatMessages().catch(() => {});
+        }, DIRECT_CHAT_POLL_MS);
+    }
+
+    async function refreshServerFriendContacts(options = {}) {
+        if (!isFriendsChatChannelMode()) return;
+        if (!canUseMemberChatApi()) {
+            serverFriendContacts = [];
+            renderMemberChatFriends();
+            return;
+        }
+        try {
+            const payload = await apiRequest('/chat/friends');
+            serverFriendContacts = Array.isArray(payload.friends) ? payload.friends : [];
+            renderMemberChatFriends();
+            if (options.showError === false) return;
+        } catch (error) {
+            if (options.showError) {
+                showToast(error.message || bmT('toast.friendListLoadFailed'));
+            }
+        }
+    }
+
+    async function refreshDirectChatMessages(options = {}) {
+        if (!isFriendsChatChannelMode() || !memberChatActiveFriend) return;
+        if (directChatRefreshing) return;
+        const peer = normalizeMemberAccount(memberChatActiveFriend);
+        const contact = getFriendContact(peer);
+        if (!contact || !contact.canChat) {
+            directChatMessages = [];
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            return;
+        }
+        if (!canUseMemberChatApi()) {
+            directChatMessages = [];
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+            return;
+        }
+        directChatRefreshing = true;
+        try {
+            const since = options.initial ? 0 : directChatSinceId;
+            const payload = await apiRequest(
+                `/chat/direct/messages?peer=${encodeURIComponent(peer)}&since=${since}&limit=100`
+            );
+            const incoming = (Array.isArray(payload.messages) ? payload.messages : [])
+                .map(mapDirectChatMessageRow);
+            mergeDirectChatMessages(incoming, !!options.initial);
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+        } catch (error) {
+            if (options.showError) {
+                showToast(error.message || bmT('toast.directChatLoadFailed'));
+            }
+        } finally {
+            directChatRefreshing = false;
+        }
+    }
+
+    async function sendDirectChatMessage(text) {
+        const peer = normalizeMemberAccount(memberChatActiveFriend);
+        const contact = getFriendContact(peer);
+        if (!peer || !contact || !contact.canChat) {
+            showToast(bmT('toast.directChatNeedMutual'));
+            return false;
+        }
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.directChatLoginRequired'));
+            return false;
+        }
+        const trimmed = String(text || '').trim().slice(0, 280);
+        if (!trimmed) {
+            showToast(bmT('toast.needMessage'));
+            return false;
+        }
+        try {
+            const payload = await apiRequest('/chat/direct/messages', {
+                method: 'POST',
+                body: { peer, text: trimmed }
+            });
+            if (payload && payload.message) {
+                mergeDirectChatMessages([mapDirectChatMessageRow(payload.message)], false);
+                memberChatAnimateLast = true;
+                renderMemberChatMessages();
+                renderMemberChatQuickPreview();
+                memberChatAnimateLast = false;
+            } else {
+                await refreshDirectChatMessages({ initial: true, showError: true });
+            }
+            return true;
+        } catch (error) {
+            showToast(error.message || bmT('toast.directChatSendFailed'));
+            return false;
+        }
+    }
+
+    function formatMemberChatVoiceDuration(ms) {
+        const totalSec = Math.max(1, Math.round((Number(ms) || 0) / 1000));
+        const min = Math.floor(totalSec / 60);
+        const sec = totalSec % 60;
+        return `${min}:${String(sec).padStart(2, '0')}`;
+    }
+
+    function getDirectChatVoiceMimeType() {
+        if (typeof MediaRecorder === 'undefined') return '';
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus';
+        if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm';
+        if (MediaRecorder.isTypeSupported('audio/mp4')) return 'audio/mp4';
+        return '';
+    }
+
+    function canUseDirectChatVoice() {
+        return isFriendsChatChannelMode()
+            && canUseMemberChatApi()
+            && !!memberChatActiveFriend
+            && !!getFriendContact(memberChatActiveFriend)?.canChat
+            && typeof navigator !== 'undefined'
+            && !!navigator.mediaDevices
+            && typeof navigator.mediaDevices.getUserMedia === 'function'
+            && typeof MediaRecorder !== 'undefined'
+            && !!getDirectChatVoiceMimeType();
+    }
+
+    function updateDirectChatVoiceStatus(text, visible) {
+        const statusEl = document.getElementById('memberChatVoiceStatus');
+        if (!statusEl) return;
+        statusEl.hidden = !visible;
+        statusEl.textContent = String(text || '');
+    }
+
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = String(reader.result || '');
+                const base64 = result.includes(',') ? result.split(',')[1] : result;
+                resolve(base64);
+            };
+            reader.onerror = () => reject(new Error('VOICE_ENCODE_FAILED'));
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    function stopDirectChatVoiceStream() {
+        if (directChatVoiceStream) {
+            directChatVoiceStream.getTracks().forEach((track) => track.stop());
+            directChatVoiceStream = null;
+        }
+    }
+
+    function stopDirectChatVoiceRecording(options = {}) {
+        if (directChatVoiceRecordTimer) {
+            clearInterval(directChatVoiceRecordTimer);
+            directChatVoiceRecordTimer = null;
+        }
+        const recorder = directChatVoiceRecorder;
+        directChatVoiceRecorder = null;
+        directChatVoiceRecording = false;
+        directChatVoiceRecordStartedAt = 0;
+        const holdBtn = document.getElementById('memberChatVoiceHoldBtn');
+        if (holdBtn) holdBtn.classList.remove('is-recording');
+        if (!options.keepStatus) {
+            updateDirectChatVoiceStatus('', false);
+        }
+        if (recorder && recorder.state !== 'inactive') {
+            try {
+                recorder.stop();
+            } catch (_e) {}
+        } else {
+            stopDirectChatVoiceStream();
+        }
+    }
+
+    async function sendDirectChatVoiceBlob(blob, durationMs, mimeType) {
+        const peer = normalizeMemberAccount(memberChatActiveFriend);
+        if (!peer || !getFriendContact(peer)?.canChat) {
+            showToast(bmT('toast.directChatNeedMutual'));
+            return false;
+        }
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.directChatLoginRequired'));
+            return false;
+        }
+        try {
+            const audioBase64 = await blobToBase64(blob);
+            const payload = await apiRequest('/chat/direct/voice', {
+                method: 'POST',
+                body: {
+                    peer,
+                    mimeType,
+                    audioBase64,
+                    durationMs
+                }
+            });
+            if (payload && payload.message) {
+                mergeDirectChatMessages([mapDirectChatMessageRow(payload.message)], false);
+                memberChatAnimateLast = true;
+                renderMemberChatMessages();
+                renderMemberChatQuickPreview();
+                memberChatAnimateLast = false;
+                showToast(bmT('toast.directChatVoiceSent'));
+            } else {
+                await refreshDirectChatMessages({ initial: true, showError: true });
+            }
+            return true;
+        } catch (error) {
+            showToast(error.message || bmT('toast.directChatVoiceSendFailed'));
+            return false;
+        }
+    }
+
+    async function startDirectChatVoiceRecording() {
+        if (directChatVoiceRecording) return;
+        if (!canUseDirectChatVoice()) {
+            showToast(bmT('toast.directChatVoiceUnavailable'));
+            return;
+        }
+        try {
+            directChatVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            const mimeType = getDirectChatVoiceMimeType();
+            directChatVoiceChunks = [];
+            directChatVoiceRecorder = new MediaRecorder(directChatVoiceStream, mimeType ? { mimeType } : undefined);
+            directChatVoiceRecorder.addEventListener('dataavailable', (event) => {
+                if (event.data && event.data.size > 0) {
+                    directChatVoiceChunks.push(event.data);
+                }
+            });
+            directChatVoiceRecorder.addEventListener('stop', async () => {
+                const chunks = directChatVoiceChunks.slice();
+                const startedAt = directChatVoiceRecordStartedAt;
+                const usedMime = mimeType || 'audio/webm';
+                stopDirectChatVoiceStream();
+                directChatVoiceChunks = [];
+                updateDirectChatVoiceStatus('', false);
+                const durationMs = Math.max(500, Date.now() - startedAt);
+                if (!chunks.length) return;
+                const blob = new Blob(chunks, { type: usedMime });
+                if (durationMs < 500) {
+                    showToast(bmT('toast.directChatVoiceTooShort'));
+                    return;
+                }
+                await sendDirectChatVoiceBlob(blob, Math.min(durationMs, DIRECT_CHAT_VOICE_MAX_MS), usedMime || 'audio/webm');
+            }, { once: true });
+            directChatVoiceRecorder.start();
+            directChatVoiceRecording = true;
+            directChatVoiceRecordStartedAt = Date.now();
+            const holdBtn = document.getElementById('memberChatVoiceHoldBtn');
+            if (holdBtn) holdBtn.classList.add('is-recording');
+            updateDirectChatVoiceStatus(bmT('page1.friendsVoiceRecording', { sec: 0 }), true);
+            directChatVoiceRecordTimer = setInterval(() => {
+                if (!directChatVoiceRecording) return;
+                const elapsed = Date.now() - directChatVoiceRecordStartedAt;
+                const sec = Math.floor(elapsed / 1000);
+                updateDirectChatVoiceStatus(bmT('page1.friendsVoiceRecording', { sec }), true);
+                if (elapsed >= DIRECT_CHAT_VOICE_MAX_MS) {
+                    stopDirectChatVoiceRecording({ keepStatus: true });
+                }
+            }, 250);
+        } catch (error) {
+            stopDirectChatVoiceRecording();
+            showToast(bmT('toast.directChatVoiceMicDenied'));
+        }
+    }
+
+    function cancelDirectChatVoiceRecording() {
+        if (!directChatVoiceRecording) return;
+        const recorder = directChatVoiceRecorder;
+        directChatVoiceRecorder = null;
+        directChatVoiceChunks = [];
+        directChatVoiceRecording = false;
+        directChatVoiceRecordStartedAt = 0;
+        if (directChatVoiceRecordTimer) {
+            clearInterval(directChatVoiceRecordTimer);
+            directChatVoiceRecordTimer = null;
+        }
+        const holdBtn = document.getElementById('memberChatVoiceHoldBtn');
+        if (holdBtn) holdBtn.classList.remove('is-recording');
+        updateDirectChatVoiceStatus('', false);
+        if (recorder && recorder.state !== 'inactive') {
+            recorder.onstop = null;
+            try {
+                recorder.stop();
+            } catch (_e) {}
+        }
+        stopDirectChatVoiceStream();
+    }
+
+    async function fetchDirectChatVoicePayload(directId) {
+        const cached = directChatVoiceCache.get(Number(directId));
+        if (cached && cached.base64) return cached;
+        const peer = normalizeMemberAccount(memberChatActiveFriend);
+        if (!peer) throw new Error('PEER_REQUIRED');
+        const payload = await apiRequest(
+            `/chat/direct/voice?peer=${encodeURIComponent(peer)}&id=${encodeURIComponent(Number(directId) || 0)}`
+        );
+        const msg = payload && payload.message;
+        if (!msg || !msg.audioBase64) throw new Error('VOICE_NOT_FOUND');
+        const entry = {
+            mime: msg.audioMime || 'audio/webm',
+            base64: String(msg.audioBase64),
+            durationMs: Number(msg.audioDurationMs) || 0
+        };
+        directChatVoiceCache.set(Number(directId), entry);
+        return entry;
+    }
+
+    async function playDirectChatVoice(directId) {
+        const id = Number(directId) || 0;
+        if (!id) return;
+        try {
+            const entry = await fetchDirectChatVoicePayload(id);
+            if (directChatVoiceAudioEl) {
+                directChatVoiceAudioEl.pause();
+                directChatVoiceAudioEl = null;
+            }
+            directChatVoiceAudioEl = new Audio(`data:${entry.mime};base64,${entry.base64}`);
+            await directChatVoiceAudioEl.play();
+        } catch (error) {
+            showToast(error.message || bmT('toast.directChatVoicePlayFailed'));
+        }
+    }
+
+    function bindDirectChatVoiceControls() {
+        const holdBtn = document.getElementById('memberChatVoiceHoldBtn');
+        if (!holdBtn || holdBtn.dataset.boundVoice === '1') return;
+        holdBtn.dataset.boundVoice = '1';
+        holdBtn.addEventListener('pointerdown', (event) => {
+            if (!canUseDirectChatVoice()) return;
+            event.preventDefault();
+            if (holdBtn.setPointerCapture) {
+                try { holdBtn.setPointerCapture(event.pointerId); } catch (_e) {}
+            }
+            startDirectChatVoiceRecording();
+        });
+        const finish = (event) => {
+            if (!directChatVoiceRecording) return;
+            event.preventDefault();
+            stopDirectChatVoiceRecording();
+        };
+        holdBtn.addEventListener('pointerup', finish);
+        holdBtn.addEventListener('pointerleave', cancelDirectChatVoiceRecording);
+        holdBtn.addEventListener('pointercancel', cancelDirectChatVoiceRecording);
+    }
+
+    async function addServerFriendContact(account) {
+        const peer = normalizeMemberAccount(account);
+        if (!peer) return showToast(bmT('toast.needFriendName'));
+        const me = normalizeMemberAccount(backendSessionState && backendSessionState.account);
+        if (peer === me) return showToast(bmT('toast.friendSameAsSelf'));
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.directChatLoginRequired'));
+            return;
+        }
+        try {
+            const payload = await apiRequest('/chat/friends', {
+                method: 'POST',
+                body: { account: peer }
+            });
+            await refreshServerFriendContacts();
+            memberChatActiveFriend = peer;
+            if (payload && payload.friend && payload.friend.canChat) {
+                directChatSinceId = 0;
+                await refreshDirectChatMessages({ initial: true });
+                startDirectChatPolling();
+                showToast(bmT('toast.friendMutualReady', { friend: peer }));
+            } else {
+                showToast(bmT('toast.friendWaitingMutual', { friend: peer }));
+            }
+        } catch (error) {
+            showToast(error.message || bmT('toast.friendAddFailed'));
+        }
+    }
+
+    function mapGroupChatMessageRow(msg) {
+        return {
+            type: 'text',
+            sender: msg.senderAccount,
+            text: msg.text,
+            time: formatPublicChatTime(msg.createdAt),
+            ts: new Date(msg.createdAt).getTime(),
+            status: 'delivered',
+            groupId: Number(msg.groupId) || 0,
+            groupMsgId: Number(msg.id) || 0
+        };
+    }
+
+    function mergeGroupChatMessages(incoming, reset) {
+        if (reset) {
+            groupChatMessages = incoming.slice();
+        } else if (incoming.length) {
+            const seen = new Set(groupChatMessages.map((row) => row.groupMsgId));
+            incoming.forEach((row) => {
+                if (!seen.has(row.groupMsgId)) {
+                    groupChatMessages.push(row);
+                    seen.add(row.groupMsgId);
+                }
+            });
+            groupChatMessages.sort((a, b) => (a.groupMsgId || 0) - (b.groupMsgId || 0));
+            if (groupChatMessages.length > 200) {
+                groupChatMessages = groupChatMessages.slice(-200);
+            }
+        }
+        groupChatSinceId = groupChatMessages.reduce(
+            (max, row) => Math.max(max, row.groupMsgId || 0),
+            groupChatSinceId
+        );
+    }
+
+    function getActiveGroupEntry() {
+        const id = Number(memberChatActiveGroupId) || 0;
+        return serverGroups.find((entry) => Number(entry.id) === id) || null;
+    }
+
+    function stopGroupChatPolling() {
+        if (groupChatPollTimer) {
+            clearInterval(groupChatPollTimer);
+            groupChatPollTimer = null;
+        }
+    }
+
+    function startGroupChatPolling() {
+        stopGroupChatPolling();
+        if (!isGroupChatChannelMode() || !canUseMemberChatApi() || !memberChatActiveGroupId) return;
+        if (!getActiveGroupEntry()) return;
+        groupChatPollTimer = setInterval(() => {
+            if (!isGroupChatChannelMode()) {
+                stopGroupChatPolling();
+                return;
+            }
+            refreshGroupChatMessages().catch(() => {});
+        }, GROUP_CHAT_POLL_MS);
+    }
+
+    async function refreshServerGroups(options = {}) {
+        if (!isGroupChatChannelMode()) return;
+        if (!canUseMemberChatApi()) {
+            serverGroups = [];
+            renderMemberChatGroups();
+            return;
+        }
+        try {
+            const payload = await apiRequest('/chat/groups');
+            serverGroups = Array.isArray(payload.groups) ? payload.groups : [];
+            renderMemberChatGroups();
+            if (options.showError === false) return;
+        } catch (error) {
+            if (options.showError) {
+                showToast(error.message || bmT('toast.groupListLoadFailed'));
+            }
+        }
+    }
+
+    async function refreshGroupChatMessages(options = {}) {
+        if (!isGroupChatChannelMode() || !memberChatActiveGroupId) return;
+        if (groupChatRefreshing) return;
+        const groupId = Number(memberChatActiveGroupId) || 0;
+        if (!groupId || !getActiveGroupEntry()) {
+            groupChatMessages = [];
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            return;
+        }
+        if (!canUseMemberChatApi()) {
+            groupChatMessages = [];
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+            return;
+        }
+        groupChatRefreshing = true;
+        try {
+            const since = options.initial ? 0 : groupChatSinceId;
+            const payload = await apiRequest(
+                `/chat/groups/messages?group=${encodeURIComponent(groupId)}&since=${since}&limit=100`
+            );
+            const incoming = (Array.isArray(payload.messages) ? payload.messages : [])
+                .map(mapGroupChatMessageRow);
+            mergeGroupChatMessages(incoming, !!options.initial);
+            renderMemberChatMessages();
+            renderMemberChatQuickPreview();
+            updateMemberChatIdentity();
+        } catch (error) {
+            if (options.showError) {
+                showToast(error.message || bmT('toast.groupChatLoadFailed'));
+            }
+        } finally {
+            groupChatRefreshing = false;
+        }
+    }
+
+    async function sendGroupChatMessage(text) {
+        const groupId = Number(memberChatActiveGroupId) || 0;
+        if (!groupId || !getActiveGroupEntry()) {
+            showToast(bmT('toast.groupChatPickFirst'));
+            return false;
+        }
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.groupChatLoginRequired'));
+            return false;
+        }
+        const trimmed = String(text || '').trim().slice(0, 280);
+        if (!trimmed) {
+            showToast(bmT('toast.needMessage'));
+            return false;
+        }
+        try {
+            const payload = await apiRequest('/chat/groups/messages', {
+                method: 'POST',
+                body: { groupId, text: trimmed }
+            });
+            if (payload && payload.message) {
+                mergeGroupChatMessages([mapGroupChatMessageRow(payload.message)], false);
+                memberChatAnimateLast = true;
+                renderMemberChatMessages();
+                renderMemberChatQuickPreview();
+                memberChatAnimateLast = false;
+            } else {
+                await refreshGroupChatMessages({ initial: true, showError: true });
+            }
+            return true;
+        } catch (error) {
+            showToast(error.message || bmT('toast.groupChatSendFailed'));
+            return false;
+        }
+    }
+
+    async function createServerGroup(name) {
+        const groupName = String(name || '').trim().slice(0, 48);
+        if (!groupName) return showToast(bmT('toast.needGroupName'));
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.groupChatLoginRequired'));
+            return;
+        }
+        try {
+            const payload = await apiRequest('/chat/groups', {
+                method: 'POST',
+                body: { name: groupName }
+            });
+            await refreshServerGroups();
+            if (payload && payload.group && payload.group.id) {
+                memberChatActiveGroupId = Number(payload.group.id) || 0;
+                groupChatSinceId = 0;
+                await refreshGroupChatMessages({ initial: true });
+                startGroupChatPolling();
+            }
+            showToast(bmT('toast.groupCreated', { name: groupName }));
+        } catch (error) {
+            showToast(error.message || bmT('toast.groupCreateFailed'));
+        }
+    }
+
+    async function addServerGroupMember(account) {
+        const peer = normalizeMemberAccount(account);
+        const groupId = Number(memberChatActiveGroupId) || 0;
+        if (!groupId) return showToast(bmT('toast.groupChatPickFirst'));
+        if (!peer) return showToast(bmT('toast.needFriendName'));
+        const me = normalizeMemberAccount(backendSessionState && backendSessionState.account);
+        if (peer === me) return showToast(bmT('toast.friendSameAsSelf'));
+        if (!canUseMemberChatApi()) {
+            showToast(bmT('toast.groupChatLoginRequired'));
+            return;
+        }
+        try {
+            await apiRequest('/chat/groups/members', {
+                method: 'POST',
+                body: { groupId, account: peer }
+            });
+            await refreshServerGroups();
+            showToast(bmT('toast.groupMemberAdded', { account: peer }));
+        } catch (error) {
+            showToast(error.message || bmT('toast.groupMemberAddFailed'));
+        }
+    }
+
+    function syncMemberChatChannelUi() {
+        const localTab = document.getElementById('memberChatTabLocal');
+        const friendsTab = document.getElementById('memberChatTabFriends');
+        const groupsTab = document.getElementById('memberChatTabGroups');
+        const publicTab = document.getElementById('memberChatTabPublic');
+        const badge = document.getElementById('memberChatChannelBadge');
+        const localTools = document.getElementById('memberChatLocalTools');
+        const groupTools = document.getElementById('memberChatGroupTools');
+        const localHint = document.getElementById('memberChatLocalHint');
+        const friendsHint = document.getElementById('memberChatFriendsHint');
+        const groupsHint = document.getElementById('memberChatGroupsHint');
+        const publicHint = document.getElementById('memberChatPublicHint');
+        const panel = document.getElementById('memberChatPanel');
+        const quickInput = document.getElementById('memberChatQuickInput');
+        const messageInput = getMemberChatInputElement();
+        const isPublic = isPublicChatChannelMode();
+        const isFriends = isFriendsChatChannelMode();
+        const isGroups = isGroupChatChannelMode();
+
+        if (localTab) localTab.classList.toggle('is-active', isLocalChatChannelMode());
+        if (friendsTab) friendsTab.classList.toggle('is-active', isFriends);
+        if (groupsTab) groupsTab.classList.toggle('is-active', isGroups);
+        if (publicTab) publicTab.classList.toggle('is-active', isPublic);
+        if (badge) {
+            badge.textContent = isPublic
+                ? bmT('page1.publicBadge')
+                : (isFriends
+                    ? bmT('page1.friendsBadge')
+                    : (isGroups ? bmT('page1.groupsBadge') : bmT('page1.chatBadge')));
+        }
+        if (localTools) localTools.hidden = isPublic || isGroups;
+        if (groupTools) groupTools.hidden = !isGroups;
+        if (localHint) localHint.hidden = !isLocalChatChannelMode();
+        if (friendsHint) friendsHint.hidden = !isFriends;
+        if (groupsHint) groupsHint.hidden = !isGroups;
+        if (publicHint) publicHint.hidden = !isPublic;
+        if (panel) {
+            panel.classList.toggle('is-public-lobby', isPublic);
+            panel.classList.toggle('is-friends-chat', isFriends);
+            panel.classList.toggle('is-groups-chat', isGroups);
+        }
+        if (quickInput) {
+            quickInput.placeholder = isPublic
+                ? bmT('page1.publicQuickPh')
+                : (isFriends
+                    ? bmT('page1.friendsQuickPh')
+                    : (isGroups ? bmT('page1.groupsQuickPh') : bmT('page1.quickPh')));
+        }
+        if (messageInput) {
+            messageInput.placeholder = isPublic
+                ? bmT('page1.publicMessagePh')
+                : (isFriends
+                    ? bmT('page1.friendsMessagePh')
+                    : (isGroups ? bmT('page1.groupsMessagePh') : bmT('page1.messagePh')));
+        }
+        const voiceWrap = document.getElementById('memberChatVoiceWrap');
+        if (voiceWrap) {
+            voiceWrap.hidden = !isFriends || !canUseDirectChatVoice();
+        }
+        bindDirectChatVoiceControls();
+        updateMemberChatIdentity();
+        renderMemberChatMessages();
+        renderMemberChatQuickPreview();
+    }
+
+    function switchMemberChatChannelMode(mode) {
+        memberChatChannelMode = normalizeMemberChatChannelMode(mode);
+        try {
+            localStorage.setItem(MEMBER_CHAT_CHANNEL_KEY, memberChatChannelMode);
+        } catch (_e) {}
+        stopPublicChatPolling();
+        stopDirectChatPolling();
+        stopGroupChatPolling();
+        if (memberChatChannelMode === 'public') {
+            publicChatSinceId = 0;
+            refreshPublicChatMessages({ initial: true }).catch(() => {});
+            startPublicChatPolling();
+        } else if (memberChatChannelMode === 'friends') {
+            directChatSinceId = 0;
+            directChatMessages = [];
+            directChatVoiceCache.clear();
+            stopDirectChatVoiceRecording();
+            refreshServerFriendContacts().then(() => {
+                if (memberChatActiveFriend) {
+                    refreshDirectChatMessages({ initial: true }).catch(() => {});
+                    startDirectChatPolling();
+                }
+            }).catch(() => {});
+        } else if (memberChatChannelMode === 'groups') {
+            groupChatSinceId = 0;
+            groupChatMessages = [];
+            refreshServerGroups().then(() => {
+                if (memberChatActiveGroupId) {
+                    refreshGroupChatMessages({ initial: true }).catch(() => {});
+                    startGroupChatPolling();
+                }
+            }).catch(() => {});
+        }
+        syncMemberChatChannelUi();
+    }
+
+    window.refreshPublicChatAfterLogin = function refreshPublicChatAfterLogin(clearOnly) {
+        if (clearOnly) {
+            publicChatMessages = [];
+            publicChatSinceId = 0;
+            serverFriendContacts = [];
+            directChatMessages = [];
+            directChatSinceId = 0;
+            directChatVoiceCache.clear();
+            stopDirectChatVoiceRecording();
+            serverGroups = [];
+            groupChatMessages = [];
+            groupChatSinceId = 0;
+            stopPublicChatPolling();
+            stopDirectChatPolling();
+            stopGroupChatPolling();
+            if (isPublicChatChannelMode() || isFriendsChatChannelMode() || isGroupChatChannelMode()) {
+                syncMemberChatChannelUi();
+            }
+            return;
+        }
+        if (isGroupChatChannelMode()) {
+            refreshServerGroups().then(() => {
+                if (memberChatActiveGroupId) {
+                    groupChatSinceId = 0;
+                    refreshGroupChatMessages({ initial: true }).catch(() => {});
+                    startGroupChatPolling();
+                }
+                syncMemberChatChannelUi();
+            }).catch(() => {});
+        }
+        if (isFriendsChatChannelMode()) {
+            refreshServerFriendContacts().then(() => {
+                if (memberChatActiveFriend) {
+                    directChatSinceId = 0;
+                    refreshDirectChatMessages({ initial: true }).catch(() => {});
+                    startDirectChatPolling();
+                }
+                syncMemberChatChannelUi();
+            }).catch(() => {});
+        }
+        if (isPublicChatChannelMode()) {
+            publicChatSinceId = 0;
+            refreshPublicChatMessages({ initial: true }).catch(() => {});
+            startPublicChatPolling();
+            syncMemberChatChannelUi();
+        }
+    };
+
+    function renderMemberChatMessageRows(body, rows) {
+        let lastSender = '';
+        let lastRowType = '';
+        let lastDay = '';
+        const parts = [];
+        rows.forEach((row, index) => {
+            const dayKey = getMemberChatDayKey(row);
+            if (dayKey !== lastDay) {
+                parts.push(`<div class="member-chat-day-divider">${escapeHTML(formatMemberChatDayLabel(dayKey))}</div>`);
+                lastDay = dayKey;
+                lastSender = '';
+                lastRowType = '';
+            }
+            const me = isCurrentMemberChatSender(row.sender);
+            const rowType = row.type || 'text';
+            const compact = !me && row.sender === lastSender && rowType === 'text' && lastRowType === 'text';
+            lastSender = row.sender;
+            lastRowType = rowType;
+            const animate = memberChatAnimateLast && index === rows.length - 1;
+            if (rowType === 'calc-card') {
+                parts.push(buildMemberChatCalcCardMarkup(row, { compact, animate }));
+            } else {
+                parts.push(buildMemberChatBubbleMarkup(row, { compact, animate }));
+            }
+        });
+        body.innerHTML = parts.join('');
+        body.scrollTop = body.scrollHeight;
+    }
 
     function hashMemberChatHue(name) {
         const s = String(name || '訪客');
@@ -697,6 +1729,35 @@
         if (row && row.type === 'calc-card' && row.card) {
             return buildMemberChatCalcCardMarkup(row, options);
         }
+        if (row && (row.type === 'voice' || row.hasVoice)) {
+            const compact = !!options.compact;
+            const preview = !!options.preview;
+            const animate = !!options.animate;
+            const me = isCurrentMemberChatSender(row.sender);
+            const displayName = normalizeMemberChatDisplayName(row.sender);
+            const sender = escapeHTML(displayName);
+            const time = escapeHTML(String(row.time || ''));
+            const durationText = formatMemberChatVoiceDuration(row.audioDurationMs);
+            const playLabel = escapeHTML(bmT('page1.friendsVoicePlayShort', { duration: durationText }));
+            const tick = escapeHTML(row.status === 'delivered' ? '已送達' : '已送出');
+            const directId = Number(row.directId) || 0;
+            const rowCls = [
+                me ? 'member-chat-row me' : 'member-chat-row other',
+                'voice-row',
+                compact ? 'is-compact' : '',
+                animate ? 'is-enter' : ''
+            ].filter(Boolean).join(' ');
+            if (preview) {
+                return `<div class="member-chat-preview-row${me ? ' me' : ''}"><div class="member-chat-preview-bubble member-chat-preview-voice"><span class="member-chat-voice-play-icon" aria-hidden="true"></span><span>${playLabel}</span></div></div>`;
+            }
+            const senderLine = (!me && !compact)
+                ? `<div class="member-chat-sender">${sender}</div>`
+                : '';
+            const avatarStyle = getMemberChatAvatarStyle(displayName);
+            const initials = escapeHTML(getMemberChatInitials(displayName));
+            const avatar = `<div class="member-chat-avatar" style="${avatarStyle}" aria-hidden="true">${initials}</div>`;
+            return `<div class="${rowCls}">${avatar}<div class="member-chat-bubble-wrap">${senderLine}<div class="member-chat-bubble member-chat-voice-bubble"><button type="button" class="member-chat-voice-play" onclick="playDirectChatVoice(${directId})" aria-label="${escapeHTML(bmT('page1.friendsVoicePlay'))}"><span class="member-chat-voice-play-icon" aria-hidden="true"></span><span class="member-chat-voice-play-text">${playLabel}</span></button><div class="member-chat-meta"><span class="member-chat-time">${time}</span><span class="member-chat-tick">${tick}</span></div></div></div></div>`;
+        }
         const compact = !!options.compact;
         const preview = !!options.preview;
         const animate = !!options.animate;
@@ -729,6 +1790,27 @@
     function renderMemberChatQuickPreview() {
         const preview = document.getElementById('memberChatQuickPreview');
         if (!preview) return;
+        if (isPublicChatChannelMode()) {
+            const rows = publicChatMessages.slice(-3);
+            preview.innerHTML = rows.length
+                ? rows.map((row) => buildMemberChatBubbleMarkup(row, { preview: true })).join('')
+                : '';
+            return;
+        }
+        if (isFriendsChatChannelMode()) {
+            const rows = directChatMessages.slice(-3);
+            preview.innerHTML = rows.length
+                ? rows.map((row) => buildMemberChatBubbleMarkup(row, { preview: true })).join('')
+                : '';
+            return;
+        }
+        if (isGroupChatChannelMode()) {
+            const rows = groupChatMessages.slice(-3);
+            preview.innerHTML = rows.length
+                ? rows.map((row) => buildMemberChatBubbleMarkup(row, { preview: true })).join('')
+                : '';
+            return;
+        }
         const friends = loadMemberChatFriends();
         const channel = friends.includes('群組大廳') ? '群組大廳' : (friends[0] || '');
         if (!channel) {
@@ -742,6 +1824,10 @@
             return;
         }
         preview.innerHTML = rows.slice(-3).map((row) => buildMemberChatBubbleMarkup(row, { preview: true })).join('');
+    }
+
+    function getMemberChatGroupListElement() {
+        return document.getElementById('memberChatGroupSelect');
     }
 
     function getMemberChatFriendListElement() {
@@ -816,8 +1902,84 @@
         const toggleBtn = document.getElementById('memberChatToggleBtn');
         const panel = document.getElementById('memberChatPanel');
         const statusEl = document.getElementById('memberChatStatus');
-        const resolvedFriendCount = Number.isFinite(Number(friendCount)) ? Number(friendCount) : loadMemberChatFriends().length;
         const me = getCurrentMemberChatIdentity();
+
+        if (isPublicChatChannelMode()) {
+            if (identityEl) {
+                identityEl.innerText = canUsePublicChatApi()
+                    ? bmT('page1.publicIdentity', { account: me })
+                    : bmT('page1.publicIdentityGuest');
+            }
+            if (statusEl) {
+                statusEl.innerText = canUsePublicChatApi()
+                    ? bmT('page1.publicStatusOnline')
+                    : bmT('page1.publicStatusOffline');
+            }
+            if (toggleBtn && panel) {
+                toggleBtn.innerText = panel.hidden ? bmT('page1.toggleOpen') : bmT('page1.toggleClose');
+            }
+            return;
+        }
+
+        if (isFriendsChatChannelMode()) {
+            const mutualFriends = getMutualFriendContacts();
+            const pendingCount = serverFriendContacts.filter((entry) => entry && !entry.canChat).length;
+            if (identityEl) {
+                identityEl.innerText = canUseMemberChatApi()
+                    ? bmT('page1.friendsIdentity', { account: me })
+                    : bmT('page1.friendsIdentityGuest');
+            }
+            if (statusEl) {
+                if (!canUseMemberChatApi()) {
+                    statusEl.innerText = bmT('page1.friendsStatusOffline');
+                } else if (memberChatActiveFriend) {
+                    statusEl.innerText = bmT('page1.friendsStatusChat', {
+                        friend: memberChatActiveFriend,
+                        mutual: mutualFriends.length,
+                        pending: pendingCount
+                    });
+                } else {
+                    statusEl.innerText = bmT('page1.friendsStatusReady', {
+                        mutual: mutualFriends.length,
+                        pending: pendingCount
+                    });
+                }
+            }
+            if (toggleBtn && panel) {
+                toggleBtn.innerText = panel.hidden ? bmT('page1.toggleOpen') : bmT('page1.toggleClose');
+            }
+            return;
+        }
+
+        if (isGroupChatChannelMode()) {
+            const activeGroup = getActiveGroupEntry();
+            if (identityEl) {
+                identityEl.innerText = canUseMemberChatApi()
+                    ? bmT('page1.groupsIdentity', { account: me })
+                    : bmT('page1.groupsIdentityGuest');
+            }
+            if (statusEl) {
+                if (!canUseMemberChatApi()) {
+                    statusEl.innerText = bmT('page1.groupsStatusOffline');
+                } else if (activeGroup) {
+                    statusEl.innerText = bmT('page1.groupsStatusChat', {
+                        group: activeGroup.name,
+                        members: activeGroup.memberCount || 0,
+                        total: serverGroups.length
+                    });
+                } else {
+                    statusEl.innerText = bmT('page1.groupsStatusReady', {
+                        total: serverGroups.length
+                    });
+                }
+            }
+            if (toggleBtn && panel) {
+                toggleBtn.innerText = panel.hidden ? bmT('page1.toggleOpen') : bmT('page1.toggleClose');
+            }
+            return;
+        }
+
+        const resolvedFriendCount = Number.isFinite(Number(friendCount)) ? Number(friendCount) : loadMemberChatFriends().length;
         if (identityEl) {
             identityEl.innerText = memberChatActiveFriend
                 ? `目前身份：${me}｜對話對象：${memberChatActiveFriend}`
@@ -833,9 +1995,113 @@
         }
     }
 
+    function renderMemberChatGroups() {
+        const listEl = getMemberChatGroupListElement();
+        const hintEl = getMemberChatHintElement();
+
+        if (!listEl) return;
+        if (!canUseMemberChatApi()) {
+            listEl.innerHTML = `<option value="">${escapeHTML(bmT('page1.groupsLoginRequired'))}</option>`;
+            memberChatActiveGroupId = 0;
+            updateMemberChatIdentity(0);
+            renderMemberChatMessages();
+            return;
+        }
+
+        const optionParts = [];
+        if (!serverGroups.length) {
+            optionParts.push(`<option value="">${escapeHTML(bmT('page1.groupsCreateFirst'))}</option>`);
+            memberChatActiveGroupId = 0;
+        } else {
+            serverGroups.forEach((entry) => {
+                const label = bmT('page1.groupsOptionLabel', {
+                    name: entry.name,
+                    members: entry.memberCount || 0
+                });
+                optionParts.push(`<option value="${Number(entry.id) || 0}">${escapeHTML(label)}</option>`);
+            });
+            if (!memberChatActiveGroupId || !serverGroups.some((entry) => Number(entry.id) === Number(memberChatActiveGroupId))) {
+                memberChatActiveGroupId = Number(serverGroups[0].id) || 0;
+            }
+        }
+
+        listEl.innerHTML = optionParts.join('');
+        listEl.value = memberChatActiveGroupId ? String(memberChatActiveGroupId) : '';
+        const activeGroup = getActiveGroupEntry();
+        if (hintEl) {
+            hintEl.innerText = activeGroup
+                ? bmT('page1.groupsHintActive', {
+                    group: activeGroup.name,
+                    members: activeGroup.memberCount || 0,
+                    total: serverGroups.length
+                })
+                : bmT('page1.groupsHintIdle', { total: serverGroups.length });
+        }
+        updateMemberChatIdentity(serverGroups.length);
+        renderMemberChatMessages();
+    }
+
     function renderMemberChatFriends() {
         const listEl = getMemberChatFriendListElement();
         const hintEl = getMemberChatHintElement();
+
+        if (isGroupChatChannelMode()) {
+            renderMemberChatGroups();
+            return;
+        }
+
+        if (isFriendsChatChannelMode()) {
+            if (!listEl) return;
+            if (!canUseMemberChatApi()) {
+                if (listEl.tagName === 'SELECT') {
+                    listEl.innerHTML = `<option value="">${escapeHTML(bmT('page1.friendsLoginRequired'))}</option>`;
+                }
+                memberChatActiveFriend = '';
+                updateMemberChatIdentity(0);
+                renderMemberChatMessages();
+                return;
+            }
+
+            const mutualFriends = getMutualFriendContacts();
+            const pendingFriends = serverFriendContacts.filter((entry) => entry && !entry.canChat);
+            const optionParts = [];
+
+            if (!mutualFriends.length && !pendingFriends.length) {
+                optionParts.push(`<option value="">${escapeHTML(bmT('page1.friendsAddFirst'))}</option>`);
+                memberChatActiveFriend = '';
+            } else {
+                mutualFriends.forEach((entry) => {
+                    optionParts.push(`<option value="${escapeHTML(entry.account)}">${escapeHTML(entry.account)}</option>`);
+                });
+                pendingFriends.forEach((entry) => {
+                    const label = entry.addedByMe
+                        ? bmT('page1.friendsPendingOut', { account: entry.account })
+                        : bmT('page1.friendsPendingIn', { account: entry.account });
+                    optionParts.push(`<option value="" disabled>${escapeHTML(label)}</option>`);
+                });
+                if (!memberChatActiveFriend || !mutualFriends.some((entry) => entry.account === memberChatActiveFriend)) {
+                    memberChatActiveFriend = mutualFriends[0] ? mutualFriends[0].account : '';
+                }
+            }
+
+            if (listEl.tagName === 'SELECT') {
+                listEl.innerHTML = optionParts.join('');
+                listEl.value = memberChatActiveFriend || '';
+            }
+            if (hintEl) {
+                hintEl.innerText = memberChatActiveFriend
+                    ? bmT('page1.friendsHintActive', {
+                        friend: memberChatActiveFriend,
+                        mutual: mutualFriends.length,
+                        pending: pendingFriends.length
+                    })
+                    : bmT('page1.friendsHintIdle', { mutual: mutualFriends.length, pending: pendingFriends.length });
+            }
+            updateMemberChatIdentity(mutualFriends.length);
+            renderMemberChatMessages();
+            return;
+        }
+
         const friends = loadMemberChatFriends();
         if (!listEl) return;
         if (!friends.length) {
@@ -870,6 +2136,72 @@
     function renderMemberChatMessages() {
         const body = getMemberChatMessageBodyElement();
         if (!body) return;
+
+        if (isPublicChatChannelMode()) {
+            if (!canUsePublicChatApi()) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.publicLoginRequired'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            if (!publicChatMessages.length) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.publicNoMessages'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            renderMemberChatMessageRows(body, publicChatMessages);
+            renderMemberChatQuickPreview();
+            return;
+        }
+
+        if (isFriendsChatChannelMode()) {
+            if (!canUseMemberChatApi()) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.friendsLoginRequired'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            if (!memberChatActiveFriend) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.friendsPickFriend'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            const contact = getFriendContact(memberChatActiveFriend);
+            if (!contact || !contact.canChat) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.friendsNeedMutual', { friend: memberChatActiveFriend }))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            if (!directChatMessages.length) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.friendsNoMessages', { friend: memberChatActiveFriend }))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            renderMemberChatMessageRows(body, directChatMessages);
+            renderMemberChatQuickPreview();
+            return;
+        }
+
+        if (isGroupChatChannelMode()) {
+            if (!canUseMemberChatApi()) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.groupsLoginRequired'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            if (!memberChatActiveGroupId || !getActiveGroupEntry()) {
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.groupsPickGroup'))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            if (!groupChatMessages.length) {
+                const activeGroup = getActiveGroupEntry();
+                body.innerHTML = `<div class="member-chat-empty">${escapeHTML(bmT('page1.groupsNoMessages', { group: activeGroup ? activeGroup.name : '' }))}</div>`;
+                renderMemberChatQuickPreview();
+                return;
+            }
+            renderMemberChatMessageRows(body, groupChatMessages);
+            renderMemberChatQuickPreview();
+            return;
+        }
+
         if (!memberChatActiveFriend) {
             body.innerHTML = '<div class="member-chat-empty">請先新增好友並選擇對話對象。</div>';
             renderMemberChatQuickPreview();
@@ -882,34 +2214,48 @@
             renderMemberChatQuickPreview();
             return;
         }
-        let lastSender = '';
-        let lastRowType = '';
-        let lastDay = '';
-        const parts = [];
-        rows.forEach((row, index) => {
-            const dayKey = getMemberChatDayKey(row);
-            if (dayKey !== lastDay) {
-                parts.push(`<div class="member-chat-day-divider">${escapeHTML(formatMemberChatDayLabel(dayKey))}</div>`);
-                lastDay = dayKey;
-                lastSender = '';
-                lastRowType = '';
-            }
-            const me = isCurrentMemberChatSender(row.sender);
-            const rowType = row.type || 'text';
-            const compact = !me && row.sender === lastSender && rowType === 'text' && lastRowType === 'text';
-            lastSender = row.sender;
-            lastRowType = rowType;
-            const animate = memberChatAnimateLast && index === rows.length - 1;
-            parts.push(buildMemberChatBubbleMarkup(row, { compact, animate }));
-        });
-        body.innerHTML = parts.join('');
-        body.scrollTop = body.scrollHeight;
-        renderMemberChatQuickPreview();
+        renderMemberChatMessageRows(body, rows);
+    }
+
+    function createMemberChatGroup() {
+        const input = document.getElementById('memberChatGroupNameInput');
+        if (!input) return;
+        const name = String(input.value || '').trim().slice(0, 48);
+        if (!name) return showToast(bmT('toast.needGroupName'));
+        input.value = '';
+        createServerGroup(name);
+    }
+
+    function addMemberChatGroupMember() {
+        const input = document.getElementById('memberChatGroupMemberInput');
+        if (!input) return;
+        const account = normalizeMemberAccount(input.value);
+        if (!account) return showToast(bmT('toast.needFriendName'));
+        input.value = '';
+        addServerGroupMember(account);
+    }
+
+    function selectMemberChatGroup(groupId) {
+        const id = Number(groupId) || 0;
+        if (!id) return;
+        memberChatActiveGroupId = id;
+        groupChatSinceId = 0;
+        refreshGroupChatMessages({ initial: true }).then(() => {
+            startGroupChatPolling();
+        }).catch(() => {});
+        renderMemberChatGroups();
     }
 
     function addMemberChatFriend() {
         const input = document.getElementById('memberChatFriendInput');
         if (!input) return;
+        if (isFriendsChatChannelMode()) {
+            const account = normalizeMemberAccount(input.value);
+            if (!account) return showToast(bmT('toast.needFriendName'));
+            input.value = '';
+            addServerFriendContact(account);
+            return;
+        }
         const friend = normalizeMemberChatName(input.value);
         if (!friend) return showToast(bmT('toast.needFriendName'));
         const me = getCurrentMemberChatIdentity();
@@ -924,9 +2270,19 @@
     }
 
     function selectMemberChatFriend(friend) {
-        const name = normalizeMemberChatName(friend);
+        const name = isFriendsChatChannelMode()
+            ? normalizeMemberAccount(friend)
+            : normalizeMemberChatName(friend);
         if (!name) return;
         memberChatActiveFriend = name;
+        if (isFriendsChatChannelMode()) {
+            directChatSinceId = 0;
+            directChatVoiceCache.clear();
+            stopDirectChatVoiceRecording();
+            refreshDirectChatMessages({ initial: true }).then(() => {
+                startDirectChatPolling();
+            }).catch(() => {});
+        }
         renderMemberChatFriends();
     }
 
@@ -938,8 +2294,26 @@
         const input = getMemberChatInputElement();
         if (!input) return;
         const text = String(input.value || '').trim().slice(0, 280);
-        if (!memberChatActiveFriend) return showToast(bmT('toast.selectFriendFirst'));
         if (!text) return showToast(bmT('toast.needMessage'));
+        if (isPublicChatChannelMode()) {
+            sendPublicChatMessage(text).then((ok) => {
+                if (ok) input.value = '';
+            });
+            return;
+        }
+        if (isFriendsChatChannelMode()) {
+            sendDirectChatMessage(text).then((ok) => {
+                if (ok) input.value = '';
+            });
+            return;
+        }
+        if (isGroupChatChannelMode()) {
+            sendGroupChatMessage(text).then((ok) => {
+                if (ok) input.value = '';
+            });
+            return;
+        }
+        if (!memberChatActiveFriend) return showToast(bmT('toast.selectFriendFirst'));
         const logs = loadMemberChatLogs();
         const friend = memberChatActiveFriend;
         const friendRows = Array.isArray(logs[friend]) ? logs[friend] : [];
@@ -955,10 +2329,53 @@
 
     function quickSendMemberChatMessage() {
         const quickInput = document.getElementById('memberChatQuickInput');
-        const quickHint = document.getElementById('memberChatQuickHint');
+        const quickHint = document.getElementById('memberChatLocalHint');
         if (!quickInput) return;
         const text = String(quickInput.value || '').trim().slice(0, 280);
         if (!text) return showToast(bmT('toast.needChatContent'));
+
+        if (isPublicChatChannelMode()) {
+            sendPublicChatMessage(text).then((ok) => {
+                if (!ok) return;
+                quickInput.value = '';
+                const panel = document.getElementById('memberChatPanel');
+                if (panel && panel.hidden) {
+                    panel.hidden = false;
+                    panel.classList.add('is-open');
+                }
+                showToast(bmT('toast.messageSent'));
+            });
+            return;
+        }
+
+        if (isFriendsChatChannelMode()) {
+            sendDirectChatMessage(text).then((ok) => {
+                if (!ok) return;
+                quickInput.value = '';
+                const panel = document.getElementById('memberChatPanel');
+                if (panel && panel.hidden) {
+                    panel.hidden = false;
+                    panel.classList.add('is-open');
+                }
+                showToast(bmT('toast.messageSent'));
+            });
+            return;
+        }
+
+        if (isGroupChatChannelMode()) {
+            sendGroupChatMessage(text).then((ok) => {
+                if (!ok) return;
+                quickInput.value = '';
+                const panel = document.getElementById('memberChatPanel');
+                if (panel && panel.hidden) {
+                    panel.hidden = false;
+                    panel.classList.add('is-open');
+                }
+                showToast(bmT('toast.messageSent'));
+            });
+            return;
+        }
+
         if (!memberChatActiveFriend) {
             const friends = loadMemberChatFriends();
             if (!friends.length) {
@@ -996,8 +2413,13 @@
         panel.hidden = false;
         panel.classList.add('is-open');
         updateMemberChatIdentity();
+        if (isPublicChatChannelMode()) {
+            refreshPublicChatMessages({ initial: !publicChatMessages.length }).catch(() => {});
+            startPublicChatPolling();
+        } else {
+            renderMemberChatFriends();
+        }
         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        renderMemberChatFriends();
         showToast(bmT('toast.memberChatOpened'));
     }
 
@@ -1022,10 +2444,15 @@
 
     Object.assign(window, {
         addMemberChatFriend,
+        addMemberChatGroupMember,
+        createMemberChatGroup,
         sendMemberChatMessage,
         quickSendMemberChatMessage,
         selectMemberChatFriend,
+        selectMemberChatGroup,
         switchMemberChatFriend,
+        switchMemberChatChannelMode,
+        playDirectChatVoice,
         openMemberChatPanel,
         closeMemberChatPanel,
         toggleMemberChatPanel,
@@ -1495,6 +2922,20 @@
         alert(getUserLevelGuideLines(level).join('\n'));
     }
 
+    function openBlueprintFilePicker() {
+        const mobileInput = document.getElementById('mobileBlueprintFileInput');
+        const desktopInput = document.getElementById('fileInput');
+        const useMobile = typeof isMobileViewport === 'function' && isMobileViewport() && mobileInput;
+        const target = useMobile ? mobileInput : desktopInput;
+        if (!target) {
+            showToast('找不到圖紙上傳入口，請重新整理頁面。');
+            return;
+        }
+        target.value = '';
+        target.click();
+    }
+    window.openBlueprintFilePicker = openBlueprintFilePicker;
+
     async function runMobileQuickAction(action) {
         appendMobileTestLog(`觸發功能: ${action}`);
         switch (action) {
@@ -1533,6 +2974,9 @@
             break;
         case 'fit-view':
             if (typeof fitBlueprintToViewport === 'function') fitBlueprintToViewport();
+            break;
+        case 'pick-blueprint':
+            if (typeof openBlueprintFilePicker === 'function') openBlueprintFilePicker();
             break;
         case 'enhance-image':
             if (typeof autoEnhanceImage === 'function') autoEnhanceImage();
@@ -1612,8 +3056,29 @@
         if (!memberChatActiveFriend) {
             memberChatActiveFriend = loadMemberChatFriends()[0] || '群組大廳';
         }
+        memberChatChannelMode = loadMemberChatChannelMode();
         updateMemberChatIdentity();
         renderMemberChatFriends();
         renderMemberChatQuickPreview();
+        bindDirectChatVoiceControls();
+        syncMemberChatChannelUi();
+        if (memberChatChannelMode === 'public') {
+            refreshPublicChatMessages({ initial: true }).catch(() => {});
+            startPublicChatPolling();
+        } else if (memberChatChannelMode === 'friends') {
+            refreshServerFriendContacts().then(() => {
+                if (memberChatActiveFriend) {
+                    refreshDirectChatMessages({ initial: true }).catch(() => {});
+                    startDirectChatPolling();
+                }
+            }).catch(() => {});
+        } else if (memberChatChannelMode === 'groups') {
+            refreshServerGroups().then(() => {
+                if (memberChatActiveGroupId) {
+                    refreshGroupChatMessages({ initial: true }).catch(() => {});
+                    startGroupChatPolling();
+                }
+            }).catch(() => {});
+        }
     }
 

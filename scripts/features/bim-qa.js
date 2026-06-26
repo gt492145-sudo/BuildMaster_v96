@@ -1989,6 +1989,207 @@
         if (color) box.style.color = color;
     }
 
+    function calcTypeToPseudoIfcType(calcType) {
+        const t = String(calcType || '');
+        const map = {
+            M_WALL: 'IFCWALL',
+            M_BEAM_SIDES: 'IFCBEAM',
+            M_BEAM_ALL: 'IFCBEAM',
+            M_COL: 'IFCCOLUMN',
+            C_COL: 'IFCCOLUMN',
+            C_VOL: 'IFCSLAB',
+            C_BASE: 'IFCSLAB',
+            C_STAIR: 'IFCSTAIR',
+            M_STAIR: 'IFCSTAIR',
+            M_FOOTING_EDGE: 'IFCFOOTING'
+        };
+        if (map[t]) return map[t];
+        if (t.startsWith('E_')) return 'IFCEXCVOLUME';
+        if (t.startsWith('R_')) return 'IFCREINFORCINGBAR';
+        return 'IFCMEMBER';
+    }
+
+    function mapCalcWorkspaceToMaterial(calcType, pseudoIfcType) {
+        const t = String(calcType || '');
+        if (t.startsWith('E_')) {
+            return findMaterialByKeywords(['土方', '挖掘', '開挖', '回填', '砂石']);
+        }
+        if (t.startsWith('R_')) {
+            return findMaterialByKeywords(['鋼筋', '鐵', '綁紮']);
+        }
+        return mapIfcTypeToMaterial(pseudoIfcType);
+    }
+
+    function getCalcTypeLabelFromSelect(calcType) {
+        const typeEl = document.getElementById('calcType');
+        if (!typeEl) return String(calcType || '');
+        const opt = typeEl.options[typeEl.selectedIndex];
+        if (!opt) return String(calcType || '');
+        return String(opt.text || calcType || '').split(' (')[0].trim() || String(calcType || '');
+    }
+
+    function buildBlueprintEstimateFromCalcWorkspace() {
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式')) {
+            return { ok: false, msg: '請先切到第三頁計算模式' };
+        }
+        if (!materialCatalog.length) {
+            return { ok: false, msg: '尚未載入材料價格資料' };
+        }
+        const type = document.getElementById('calcType') ? document.getElementById('calcType').value : '';
+        const v1 = typeof readInputNumber === 'function' ? readInputNumber('v1', 0) : 0;
+        const v2 = typeof readInputNumber === 'function' ? readInputNumber('v2', 0) : 0;
+        const v3 = typeof readInputNumber === 'function' ? readInputNumber('v3', 0) : 0;
+        const n = typeof readInputNumber === 'function' ? readInputNumber('qty', 1) : 1;
+        const up = typeof readInputNumber === 'function' ? readInputNumber('unitPrice', 0) : 0;
+        if (typeof validateCalcInputs === 'function') {
+            const validation = validateCalcInputs(type, v1, v2, v3, n, up);
+            if (!validation.ok) return { ok: false, msg: validation.msg || '計算欄位未完成' };
+        }
+        if (typeof calculateCoreLocally !== 'function') {
+            return { ok: false, msg: '核心計算模組尚未載入' };
+        }
+        const templateExtras = typeof getTemplateFormulaExtras === 'function' ? getTemplateFormulaExtras() : {};
+        const extraWasteRate = typeof getExtraWasteRateForType === 'function' ? getExtraWasteRateForType(type) : 0;
+        let calcResult;
+        try {
+            calcResult = calculateCoreLocally(type, v1, v2, v3, n, up, false, extraWasteRate, templateExtras);
+        } catch (error) {
+            return { ok: false, msg: (error && error.message) || '核心計算失敗' };
+        }
+        const pseudoIfcType = calcTypeToPseudoIfcType(type);
+        const material = mapCalcWorkspaceToMaterial(type, pseudoIfcType);
+        const price = material ? Number(material.price) : 0;
+        const sourceUnit = normalizeUnitToken(calcResult.unit || inferIfcQuantityUnit(pseudoIfcType));
+        const priceUnit = material && material.unit ? normalizeUnitToken(material.unit) : sourceUnit;
+        const calcQty = Number(calcResult.res) || 0;
+        const convertedQty = convertValueBetweenUnits(calcQty, sourceUnit, priceUnit);
+        const effectiveQty = Number.isFinite(convertedQty) ? convertedQty : calcQty;
+        const subtotal = effectiveQty * price;
+        const typeLabel = getCalcTypeLabelFromSelect(type);
+        const row = {
+            ifcType: pseudoIfcType,
+            calcType: type,
+            calcTypeLabel: typeLabel,
+            materialName: material ? material.name : '未匹配',
+            qty: calcQty,
+            unit: sourceUnit,
+            priceUnit,
+            effectiveQty,
+            price,
+            subtotal,
+            unitMismatch: !!material && sourceUnit !== priceUnit && !Number.isFinite(convertedQty),
+            blueprintSource: true
+        };
+        return { ok: true, rows: [row], calcResult, typeLabel };
+    }
+
+    function importBlueprintEstimateRowsToList(options = {}) {
+        const floorDefault = options.floorDefault || 'BLUEPRINT-AUTO';
+        const floor = (document.getElementById('floor_tag') && document.getElementById('floor_tag').value.trim()) || floorDefault;
+        const before = list.length;
+        const cleaned = list.filter(item => !String(item && item.name ? item.name : '').includes('[BLUEPRINT-AUTO]'));
+        const removedAuto = before - cleaned.length;
+        list = cleaned;
+        let imported = 0;
+        for (const row of bimEstimateRows) {
+            const qty = Number(row.effectiveQty ?? row.qty) || 0;
+            if (!row.price || qty <= 0) continue;
+            const label = row.calcTypeLabel || formatIfcTypeDisplay(row.ifcType);
+            list.push({
+                floor: escapeHTML(floor),
+                name: escapeHTML(`看圖-${label} [${row.materialName}] [BLUEPRINT-AUTO]`),
+                res: qty,
+                up: row.price,
+                totalCost: row.subtotal,
+                cat: inferCategoryFromName(row.materialName),
+                unit: row.priceUnit || row.unit,
+                sourceQty: row.qty
+            });
+            imported += 1;
+        }
+        if (!imported) {
+            return { ok: false, imported: 0, removedAuto, msg: '沒有可匯入的看圖估價項目（請補齊材料對應或單價）' };
+        }
+        saveData();
+        renderTable();
+        return { ok: true, imported, removedAuto };
+    }
+
+    function generateBlueprintEstimatePreview() {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) return showToast(`⚠️ ${gate.msg}`);
+        }
+        const built = buildBlueprintEstimateFromCalcWorkspace();
+        if (!built.ok) return showToast(built.msg || '看圖估價預覽失敗');
+        bimEstimateRows = built.rows;
+        renderBimEstimateTableFromRows();
+        const row = built.rows[0];
+        const unmatched = !row.price;
+        addAuditLog('看圖估價預覽', `${built.typeLabel}｜${row.effectiveQty} ${row.priceUnit || row.unit}｜${unmatched ? '未匹配材料' : row.materialName}`);
+        setBimAutoCalcInfo(
+            unmatched
+                ? `看圖估價預覽：${built.typeLabel}｜尚未匹配材料（可至 BIM 規則修復）`
+                : `看圖估價預覽：${built.typeLabel}｜${Math.round(row.subtotal).toLocaleString()} 元`,
+            unmatched ? '#ffd48a' : '#9ef5c2'
+        );
+        showToast(unmatched ? '看圖估價預覽完成（材料未匹配）' : '看圖估價預覽完成');
+        return true;
+    }
+
+    function runBlueprintAutoEstimateImportCore(options = {}) {
+        if (typeof evaluateAutoInterpretGate === 'function') {
+            const gate = evaluateAutoInterpretGate();
+            if (!gate.ok) {
+                showToast(`⚠️ ${gate.msg}`);
+                return false;
+            }
+        }
+        if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做看圖估價匯入')) {
+            return false;
+        }
+        const built = buildBlueprintEstimateFromCalcWorkspace();
+        if (!built.ok) {
+            setBimAutoCalcInfo(`看圖估價：${built.msg}`, '#ffd48a');
+            showToast(built.msg || '看圖估價失敗');
+            return false;
+        }
+        bimEstimateRows = built.rows;
+        renderBimEstimateTableFromRows();
+        createDataSnapshot('看圖估價匯入前', true);
+        const importResult = importBlueprintEstimateRowsToList(options);
+        if (!importResult.ok) {
+            setBimAutoCalcInfo(`看圖估價：${importResult.msg}`, '#ffd48a');
+            showToast(importResult.msg);
+            return false;
+        }
+        const row = built.rows[0];
+        const unmatched = bimEstimateRows.filter(r => !r.price).length;
+        const estimatedTotal = bimEstimateRows.reduce((sum, r) => sum + (Number(r.subtotal) || 0), 0);
+        addAuditLog(
+            '看圖估價匯入',
+            `${built.typeLabel}｜估價 ${bimEstimateRows.length} 筆｜匯入 ${importResult.imported} 筆｜替換舊自動 ${importResult.removedAuto} 筆`
+        );
+        const summary = `看圖估價完成：${built.typeLabel}｜匯入 ${importResult.imported} 筆｜未匹配 ${unmatched} 筆｜預估 ${Math.round(estimatedTotal).toLocaleString()} 元`;
+        setBimAutoCalcInfo(summary, '#9ef5c2');
+        if (!options.quietToast) {
+            showToast(`看圖估價完成：已匯入 ${importResult.imported} 筆（免 IFC）`);
+        }
+        if (options.fromChain) {
+            if (typeof updateBlueprintAutoInterpretStatus === 'function') {
+                updateBlueprintAutoInterpretStatus('一鍵流程完成：看圖判讀 + 看圖估價匯入', '#9fffc0');
+            }
+        }
+        return true;
+    }
+
+    async function runBlueprintAutoEstimateImport(options = {}) {
+        if (typeof ensureProAutoCalcAccess === 'function') {
+            if (!(await ensureProAutoCalcAccess())) return false;
+        }
+        return runBlueprintAutoEstimateImportCore(options);
+    }
+
     function runBimTechAutoCalculation() {
         if (typeof ensureProAutoCalcAccess === 'function') {
             Promise.resolve(ensureProAutoCalcAccess()).then(function (ok) {
@@ -2009,8 +2210,13 @@
         }
         if (typeof ensureWorkModeAccess === 'function' && !ensureWorkModeAccess('calc', '請先切到第三頁計算模式再做 BIM 自動計算')) return;
         if (!bimModelData || !bimModelData.totalEntities) {
-            setBimAutoCalcInfo('BIM 自動計算：請先上傳模型檔', '#ffd48a');
-            return showToast('請先上傳模型檔');
+            setBimAutoCalcInfo('BIM 自動計算：未載入 IFC，改以看圖欄位估價匯入…', '#bfe7ff');
+            if (typeof runBlueprintAutoEstimateImport === 'function') {
+                Promise.resolve(runBlueprintAutoEstimateImport()).catch(function () {});
+                return;
+            }
+            setBimAutoCalcInfo('BIM 自動計算：請先上傳模型檔，或先完成看圖判讀', '#ffd48a');
+            return showToast('請先上傳模型檔，或先完成看圖判讀後使用「看圖估價匯入」');
         }
         if (!materialCatalog.length) {
             setBimAutoCalcInfo('BIM 自動計算：尚未載入材料價格', '#ffd48a');

@@ -3,5 +3,5 @@
  * implementation lives in scripts/features/blueprint-measurement.js.
  */
 (function loadBuildMasterBlueprintBundle() {
-    document.write('<script src="scripts/features/blueprint-measurement.js?v=v9606"><\/script>');
+    document.write('<script src="scripts/features/blueprint-measurement.js?v=v9656-format-convert"><\/script>');
 }());

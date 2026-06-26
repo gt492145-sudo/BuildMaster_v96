@@ -97,7 +97,36 @@
             <li>當您按「吸入計算清單」或分享試算時，結果可能以<strong>📊試算卡片泡泡</strong>寫入本機聊天紀錄；同樣<strong>僅存於裝置本機</strong>，不會自動上傳至開發者伺服器。</li>
             <li>本機聊天<strong>不會</strong>自動同步到其他手機、平板或雲端；清除 App 資料或重新安裝後，本機聊天紀錄可能消失。</li>
             <li>App 內「解說員」為操作說明提示。單純閱讀解說員說明<strong>不會因此額外上傳</strong>您的聊天或試算內容。</li>
-            <li>若您<strong>另行啟用並使用</strong>需連線之 AI 解說（「問 AI」），您輸入的問題可能傳送至後端 API 以產生回覆；該功能需後端設定且非免費版必要功能。使用前 App 內會有相關提示。</li>
+            <li>若您<strong>另行啟用並使用</strong>需連線之智慧解說（「智慧問答」），您輸入的問題可能傳送至後端 API 以產生回覆；該功能需後端設定且非免費版必要功能。使用前 App 內會有相關提示。</li>
+        </ul>
+
+        <h2 id="public-chat">2.1a 公開大廳（需會員登入 · 短期伺服器中繼）</h2>
+        <ul>
+            <li>第 1 頁「<strong>公開大廳</strong>」與「本機示範」分開：公開大廳供<strong>已登入會員</strong>在固定頻道（<code>public-lobby</code>）交流，訊息會經後端 API 短期同步，供其他會員裝置讀取。</li>
+            <li>公開大廳<strong>不是</strong>永久聊天 archive：伺服器僅<strong>短期保留</strong>（預設約 30 天，到期自動刪除），並設發言頻率限制。</li>
+            <li>公開大廳訊息含<strong>會員帳號與文字內容</strong>，儲存於開發者後端資料庫（PostgreSQL）；請勿發送機密工程資料或個人敏感資訊。</li>
+            <li><strong>存取碼登入</strong>無法使用公開大廳發言；需使用<strong>會員帳號＋密碼</strong>登入。</li>
+            <li>本機示範聊天（含試算卡片）仍仅存裝置，與公開大廳無關。</li>
+        </ul>
+
+        <h2 id="friend-chat">2.1b 好友聊天（需會員登入 · 互加好友 · 短期伺服器中繼）</h2>
+        <ul>
+            <li>第 1 頁「<strong>好友聊天</strong>」與「本機示範」「公開大廳」分開：供<strong>已登入會員</strong>在<strong>互加好友</strong>後進行<strong>一對一文字</strong>交流；並可<strong>按住錄音</strong>傳送<strong>語音片段</strong>（僅限好友一對一，不開放於公開大廳或群組）。</li>
+            <li>加好友為單向請求；<strong>雙方都需按「加入好友」</strong>（互加）後才能發訊息。待確認的好友會顯示在列表中但無法聊天。</li>
+            <li>好友聊天<strong>不是</strong>永久 archive：伺服器僅<strong>短期保留</strong>（預設約 30 天，到期自動刪除），並設發言頻率限制。語音片段同樣短期保留，預設單則最長約 60 秒、大小上限約 512KB。</li>
+            <li>訊息含<strong>雙方會員帳號、文字或語音內容</strong>，儲存於開發者後端資料庫（PostgreSQL）；錄音需您<strong>允許麥克風權限</strong>。請勿發送機密工程資料或個人敏感資訊。</li>
+            <li><strong>存取碼登入</strong>無法使用好友聊天；需使用<strong>會員帳號＋密碼</strong>登入。不要求訂閱。</li>
+            <li>本機示範聊天仍仅存裝置，與好友聊天無關。</li>
+        </ul>
+
+        <h2 id="group-chat">2.1c 群組聊天（需會員登入 · 僅成員可見 · 短期伺服器中繼）</h2>
+        <ul>
+            <li>第 1 頁「<strong>群組聊天</strong>」與「本機示範」「好友聊天」「公開大廳」分開：供<strong>已登入會員</strong>建立<strong>私人群組</strong>，邀請其他會員加入後進行<strong>多人文字</strong>交流。</li>
+            <li>僅<strong>群組成員</strong>可讀寫該群組訊息；非成員無法看到群組內容。這<strong>不是</strong>公開大廳。</li>
+            <li>群組聊天<strong>不是</strong>永久 archive：伺服器僅<strong>短期保留</strong>（預設約 30 天，到期自動刪除），並設發言頻率限制。</li>
+            <li>訊息含<strong>群組名稱、成員帳號與文字內容</strong>，儲存於開發者後端資料庫（PostgreSQL）；請勿發送機密工程資料或個人敏感資訊。</li>
+            <li><strong>存取碼登入</strong>無法使用群組聊天；需使用<strong>會員帳號＋密碼</strong>登入。不要求訂閱。</li>
+            <li>本機示範聊天仍仅存裝置，與群組聊天無關。</li>
         </ul>
 
         <h2>2.2 操作示範與教學動畫</h2>

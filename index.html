@@ -16,15 +16,24 @@
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="styles/app-layout.css?v=v9644-update-marquee">
 <link rel="stylesheet" href="styles/blueprint-core.css?v=v9606-desktop">
-<link rel="stylesheet" href="styles/app-panels.css?v=v9644-update-marquee">
+<link rel="stylesheet" href="styles/app-panels.css?v=v9653-voice-glyphs">
 <link rel="stylesheet" href="styles/app-glass-panels.css?v=v9608-glass1">
 <link rel="stylesheet" href="styles/blueprint-effects.css?v=v831">
 <link rel="stylesheet" href="styles/app-overlays.css?v=v9627-demo-ios-lottie">
 <link rel="stylesheet" href="styles/weather-effects.css?v=v9608-wallfix">
 <link rel="stylesheet" href="styles/app-responsive.css?v=v9616-chat-spotlight">
+<script src="scripts/vendor/pdf.min.js?v=v9656-format-convert"></script>
+<script>
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'scripts/vendor/pdf.worker.min.js?v=v9656-format-convert';
+}
+</script>
+<script src="scripts/vendor/jspdf.umd.min.js?v=v9656-format-convert"></script>
+<script src="scripts/features/pdf-raster.js?v=v9656-format-convert"></script>
+<script src="scripts/features/report-pdf-export.js?v=v9656-format-convert"></script>
 <script src="scripts/i18n/bm-i18n-vi.js?v=v9642-vi"></script>
-<script src="scripts/i18n/bm-i18n.js?v=v9642-vi"></script>
-<script src="scripts/i18n/bm-coach-hints.js?v=v9631-coach-ops"></script>
+<script src="scripts/i18n/bm-i18n.js?v=v9656-format-convert"></script>
+<script src="scripts/i18n/bm-coach-hints.js?v=v9656-format-convert"></script>
 </head>
 <body>
 
@@ -94,7 +103,7 @@
     </div>
     <div class="header-actions">
         <button id="coachToggle" class="mode-btn" data-i18n="coach.on">解說員: 開</button>
-        <button id="aiCoachToggle" class="mode-btn level-only-pro" data-i18n="aiCoach.off">AI解說: 關</button>
+        <button id="aiCoachToggle" class="mode-btn level-only-pro" data-i18n="aiCoach.off">智慧解說: 關</button>
         <button id="btnWarRoom" class="mode-btn" style="border-color: #00e676; color: #00e676; font-weight: 900;" data-i18n="warRoom.offline">🌐 戰情室: 離線</button>
         <button id="coachGuideBtn" class="mode-btn" data-i18n="coach.guide">新手導覽</button>
         <button id="contrastToggle" class="mode-btn" data-i18n="contrast.off">高對比: 關</button>
@@ -246,8 +255,9 @@
             <div class="group-title calc-subpage-block calc-subpage-block-2" style="flex:1 1 100%; margin:0 0 4px; border:0; padding:0;" data-i18n="page2.title">第2頁｜圖面量測與全功能計算</div>
             <div class="tool-group tool-group--file">
                 <span class="tool-group-label" data-i18n="page2.group.blueprint">圖紙</span>
-                <input type="file" id="fileInput" class="mobile-toolbar-core toolbar-file-input" accept="image/*" onchange="loadImg(event)">
-                <input type="file" id="mobileBlueprintFileInput" class="toolbar-file-input" accept="image/*" aria-hidden="true" tabindex="-1" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;" onchange="loadImg(event)">
+                <button type="button" class="tool-btn mobile-toolbar-core tool-btn--warm" onclick="openBlueprintFilePicker()" data-i18n="page2.pickBlueprint">選擇圖紙</button>
+                <input type="file" id="fileInput" class="mobile-toolbar-core toolbar-file-input toolbar-file-input--native" accept="image/*,application/pdf,.pdf" onchange="loadImg(event)">
+                <input type="file" id="mobileBlueprintFileInput" class="toolbar-file-input" accept="image/*,application/pdf,.pdf" aria-hidden="true" tabindex="-1" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;" onchange="loadImg(event)">
                 <button class="tool-btn mobile-toolbar-core tool-btn--ghost" onclick="removeLoadedImage()" data-i18n="page2.removeBlueprint">移除圖紙</button>
                 <button type="button" class="tool-btn native-ar-open-btn tool-btn--accent" onclick="sendBlueprintAndOpenNativeAR({ source: 'page2-toolbar' })" data-i18n="ar.sendBlueprintToAR">📡 圖紙送 AR 貼牆</button>
             </div>
@@ -283,7 +293,7 @@
                 <button id="btnAutoScan3D" class="tool-btn level-hide-basic mobile-toolbar-extra tool-btn--accent" onclick="autoQuantumScan()" data-i18n="page2.scan3d">一鍵掃描 3D</button>
                 <button id="btnGyro" class="tool-btn level-only-pro mobile-toolbar-extra" onclick="toggleGyroMode()">陀螺儀: 關</button>
                 <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="calibrateGyroBaseline()">校正陀螺儀</button>
-                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="startEdgeAIVision()" data-i18n="page2.aiVision">AI視覺點料</button>
+                <button class="tool-btn level-only-pro mobile-toolbar-extra" onclick="startEdgeAIVision()" data-i18n="page2.aiVision">智慧視覺點料</button>
             </div>
             <div class="tool-group mobile-toolbar-extra">
                 <span class="tool-group-label" data-i18n="page2.group.quality">畫質</span>
@@ -304,7 +314,7 @@
         <div id="canvas-container" data-empty="true" aria-label="尚未上傳圖紙">
             <div class="canvas-empty-state">
                 <strong data-i18n="page2.emptyTitle">上傳圖紙開始量測</strong>
-                <span data-i18n="page2.emptyHint">按上方「選擇檔案」載入 JPG／PNG 圖面，再定比例與測量。</span>
+                <span data-i18n="page2.emptyHint">按上方「選擇圖紙」載入 JPG／PNG／PDF 圖面，再定比例與測量。</span>
             </div>
             <div class="blueprint-workspace-meta" aria-hidden="true">
                 <span class="blueprint-workspace-chip">Premium Touch</span>
@@ -336,7 +346,7 @@
         <div class="group-title">即時功能總控</div>
         <div class="control-grid">
             <button id="btnDemoMode" class="tool-btn" onclick="toggleDemoMode()">Demo模式: 開</button>
-            <button id="btnCtrlAiVision" class="tool-btn" onclick="toggleFeatureFlag('aiVision')">AI盤點: 開</button>
+            <button id="btnCtrlAiVision" class="tool-btn" onclick="toggleFeatureFlag('aiVision')">智慧盤點: 開</button>
             <button id="btnCtrlVoice" class="tool-btn" onclick="toggleFeatureFlag('voice')">語音助理: 關</button>
             <button id="btnCtrlLaser" class="tool-btn" onclick="toggleFeatureFlag('laser')">雷射尺: 開</button>
             <button id="btnCtrlWarRoom" class="tool-btn" onclick="toggleFeatureFlag('warRoom')">戰情室: 開</button>
@@ -895,22 +905,22 @@
 
         <!-- 資料轉換模式：USDZ 匯入說明 + 一鍵送 AR -->
         <section id="convertModePage" class="work-mode-only-convert convert-mode-page">
-            <div class="group-title" data-i18n="convert.title">🔄 資料轉換｜USDZ 3D 模型</div>
-            <p class="convert-mode-note" data-i18n="convert.note">選擇 .usdz 真 3D 模型，設定實際寬度後一鍵送到 LiDAR AR。可用 Mac Reality Converter 從 glTF/OBJ/FBX 轉出。</p>
+            <div class="group-title" data-i18n="convert.title">🔄 資料轉換｜3D 模型 → AR</div>
+            <p class="convert-mode-note" data-i18n="convert.note">選擇 .obj / .gltf / .glb 或 .usdz。iOS App 內可自動轉 USDZ 並一鍵送 LiDAR AR；也可從第 2 頁平面圖產生簡易 AR 預覽。</p>
             <div class="convert-panel">
                 <div class="convert-section convert-section--guide">
-                    <div class="convert-section-title" data-i18n="convert.sectionGuide">📘 如何取得 USDZ？</div>
+                    <div class="convert-section-title" data-i18n="convert.sectionGuide">📘 如何取得 3D 模型？</div>
                     <ol class="convert-guide-list">
-                        <li data-i18n="convert.guide1">在 Mac 使用 Apple Reality Converter（免費）匯入 glTF / OBJ / FBX</li>
-                        <li data-i18n="convert.guide2">或從 Blender / SketchUp 直接匯出 .usdz</li>
+                        <li data-i18n="convert.guide1">直接上傳 .obj / .gltf / .glb，iOS App 內自動轉 USDZ（免 Mac Reality Converter）</li>
+                        <li data-i18n="convert.guide2">或上傳現成 .usdz；Mac 仍可用 Reality Converter / Blender 預先轉檔</li>
                         <li data-i18n="convert.guide3">單檔建議 ≤ 40MB，太大請先簡化模型</li>
-                        <li data-i18n="convert.guide4">Revit 請先 Export IFC，再用外部工具轉 USDZ（第二階段可接自動轉檔）</li>
+                        <li data-i18n="convert.guide4">只有平面圖？可從第 2 頁產生簡易 AR 預覽板，或走看圖估價（免 IFC）</li>
                     </ol>
                 </div>
                 <div class="convert-section convert-section--upload">
-                    <div class="convert-section-title" data-i18n="convert.sectionUpload">📦 選擇 USDZ 檔案</div>
-                    <label for="convertUsdzInput" class="convert-upload-label" data-i18n="convert.uploadLabel">上傳 .usdz（本機檔案）</label>
-                    <input type="file" id="convertUsdzInput" class="convert-file-input" accept=".usdz,model/vnd.usdz+zip">
+                    <div class="convert-section-title" data-i18n="convert.sectionUpload">📦 選擇 3D 模型</div>
+                    <label for="convertUsdzInput" class="convert-upload-label" data-i18n="convert.uploadLabel">上傳 .obj / .gltf / .glb / .usdz</label>
+                    <input type="file" id="convertUsdzInput" class="convert-file-input" accept=".obj,.gltf,.glb,.usdz,model/vnd.usdz+zip">
                     <div class="convert-field-row">
                         <label for="convertUsdzWidthM" data-i18n="convert.widthLabel">目標寬度（公尺，可選）</label>
                         <input type="number" id="convertUsdzWidthM" class="security-input convert-number-input" value="2.0" min="0.2" max="20" step="0.05">
@@ -927,7 +937,8 @@
                     <div id="convertStatusBox" class="convert-status" data-ok="0" data-i18n="convert.statusIdle">請選擇 .usdz 檔案</div>
                 </div>
                 <div class="convert-section convert-section--actions">
-                    <button type="button" class="tool-btn convert-action-btn" onclick="sendUsdzAndOpenNativeAR()" data-i18n="convert.sendAr">📡 一鍵送 LiDAR AR</button>
+                    <button type="button" class="tool-btn convert-action-btn" onclick="sendConvertAndOpenNativeAR()" data-i18n="convert.sendAr">📡 轉換／送 LiDAR AR</button>
+                    <button type="button" class="tool-btn convert-action-btn" onclick="sendBlueprintFlatAndOpenNativeAR()" data-i18n="convert.sendBlueprintFlat">🖼️ 第 2 頁平面圖 → AR 預覽</button>
                     <a class="tool-btn" href="lidar-measure-guide.html#usdz-ar" target="_blank" rel="noopener noreferrer" data-i18n="convert.openGuide">📖 AR 完整教學（含 USDZ 排查）</a>
                     <button type="button" class="tool-btn" onclick="setWorkMode('calc')" data-i18n="convert.backCalc">↩️ 回計算模式</button>
                 </div>
@@ -942,15 +953,24 @@
                 <span id="freeWarRoomStatus" class="free-war-room-status" data-i18n="page1.warRoomStatus">戰情室：離線</span>
             </div>
             <p class="free-war-room-card-note" data-i18n="page1.cardNote">第1頁：簡單試算＋會員聊天群組。圖面量測與完整工程功能請切到第2頁。</p>
+            <div class="member-chat-channel-tabs" role="tablist" aria-label="聊天頻道">
+                <button type="button" id="memberChatTabLocal" class="member-chat-tab is-active" role="tab" aria-selected="true" onclick="switchMemberChatChannelMode('local')" data-i18n="page1.chatTabLocal">本機示範</button>
+                <button type="button" id="memberChatTabFriends" class="member-chat-tab" role="tab" aria-selected="false" onclick="switchMemberChatChannelMode('friends')" data-i18n="page1.chatTabFriends">好友聊天</button>
+                <button type="button" id="memberChatTabGroups" class="member-chat-tab" role="tab" aria-selected="false" onclick="switchMemberChatChannelMode('groups')" data-i18n="page1.chatTabGroups">群組聊天</button>
+                <button type="button" id="memberChatTabPublic" class="member-chat-tab" role="tab" aria-selected="false" onclick="switchMemberChatChannelMode('public')" data-i18n="page1.chatTabPublic">公開大廳</button>
+            </div>
             <div class="member-chat-quick-head">
-                <span class="member-chat-quick-badge" data-i18n="page1.chatBadge">群組大廳 · 免登入聊天</span>
+                <span id="memberChatChannelBadge" class="member-chat-quick-badge" data-i18n="page1.chatBadge">群組大廳 · 免登入聊天</span>
             </div>
             <div class="member-chat-quick-row">
                 <input type="text" id="memberChatQuickInput" class="security-input member-chat-quick-input" data-i18n-placeholder="page1.quickPh" placeholder="群組大廳：輸入訊息，Enter 送出" onkeydown="if(event.key==='Enter'){event.preventDefault();quickSendMemberChatMessage();}">
                 <button type="button" class="tool-btn member-chat-quick-send" onclick="quickSendMemberChatMessage()" data-i18n="page1.quickSend">快速送出</button>
             </div>
             <div id="memberChatQuickPreview" class="member-chat-quick-preview" aria-live="polite" aria-label="群組聊天預覽"></div>
-            <div id="memberChatQuickHint" class="member-chat-quick-hint">提示：訊息與試算📊卡片存於「群組大廳」本機（不需登入；換裝置不同步）。公開隱私權以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites</a> 為準，<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內摘要</a>。解說員可點區塊查看說明。</div>
+            <div id="memberChatLocalHint" class="member-chat-quick-hint">提示：訊息與試算📊卡片存於「群組大廳」<strong>本機</strong>（不需登入；換裝置不同步）。公開隱私權以 <a href="https://sites.google.com/view/buildmaster-privacy/%E9%A6%96%E9%A0%81" target="_blank" rel="noopener noreferrer">Google Sites</a> 為準，<a href="privacy.html" target="_blank" rel="noopener noreferrer">站內摘要</a>。</div>
+            <div id="memberChatFriendsHint" class="member-chat-quick-hint" hidden>提示：<strong>好友聊天</strong>需<strong>會員登入</strong>，且雙方互加好友後才能一對一發文字；可<strong>按住錄音</strong>傳語音片段（最長約 60 秒）。訊息經伺服器短期同步（約 30 天後自動刪除）。詳見 <a href="privacy.html#friend-chat" target="_blank" rel="noopener noreferrer">站內摘要 §2.1b</a>。</div>
+            <div id="memberChatGroupsHint" class="member-chat-quick-hint" hidden>提示：<strong>群組聊天</strong>需<strong>會員登入</strong>；建立群組並邀請成員後，僅群組內成員可讀寫文字；訊息經伺服器短期同步（約 30 天後自動刪除）。詳見 <a href="privacy.html#group-chat" target="_blank" rel="noopener noreferrer">站內摘要 §2.1c</a>。</div>
+            <div id="memberChatPublicHint" class="member-chat-quick-hint" hidden>提示：<strong>公開大廳</strong>需<strong>會員登入</strong>；訊息經伺服器短期同步（約 30 天後自動刪除），供多人即時交流。本機示範聊天仍仅存裝置。詳見 <a href="privacy.html#public-chat" target="_blank" rel="noopener noreferrer">站內摘要 §2.1a</a>。</div>
             <div class="free-war-room-actions">
                 <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--primary" onclick="toggleMemberChatPanel(true)" data-i18n="page1.openChat">開啟會員聊天群組</button>
                 <button type="button" class="tool-btn free-war-room-btn free-war-room-btn--alt" onclick="toggleWarRoom()" data-i18n="page1.openWarRoom">開啟戰情室</button>
@@ -960,20 +980,33 @@
             <div class="member-chat-panel-head">
                 <strong data-i18n="page1.chatTitle">👥 會員聊天群組</strong>
                 <span id="memberChatStatus" class="member-chat-status" data-i18n="page1.friendsZero">好友 0</span>
+                <button type="button" id="memberChatToggleBtn" class="tool-btn member-chat-btn member-chat-btn--ghost" onclick="toggleMemberChatPanel()" data-i18n="page1.toggleClose">收合</button>
             </div>
             <div id="memberChatIdentity" class="member-chat-identity" data-i18n="page1.identityGuest">目前身份：訪客</div>
-            <div class="member-chat-tools">
+            <div id="memberChatLocalTools" class="member-chat-tools">
                 <input type="text" id="memberChatFriendInput" class="security-input member-chat-input" data-i18n-placeholder="page1.friendPh" placeholder="輸入好友帳號（例：engineer02）">
                 <button type="button" class="tool-btn member-chat-btn" onclick="addMemberChatFriend()" data-i18n="page1.addFriend">加入好友</button>
                 <select id="memberChatFriendSelect" class="member-chat-select" onchange="switchMemberChatFriend(this.value)">
                     <option value="" data-i18n="page1.selectFriend">請先加入好友</option>
                 </select>
-                <button type="button" id="memberChatToggleBtn" class="tool-btn member-chat-btn member-chat-btn--ghost" onclick="toggleMemberChatPanel()" data-i18n="page1.toggleClose">收合</button>
+            </div>
+            <div id="memberChatGroupTools" class="member-chat-tools" hidden>
+                <input type="text" id="memberChatGroupNameInput" class="security-input member-chat-input" data-i18n-placeholder="page1.groupNamePh" placeholder="群組名稱（例：A棟土建）">
+                <button type="button" class="tool-btn member-chat-btn" onclick="createMemberChatGroup()" data-i18n="page1.createGroup">建立群組</button>
+                <input type="text" id="memberChatGroupMemberInput" class="security-input member-chat-input" data-i18n-placeholder="page1.groupMemberPh" placeholder="邀請會員帳號（例：engineer02）">
+                <button type="button" class="tool-btn member-chat-btn" onclick="addMemberChatGroupMember()" data-i18n="page1.addGroupMember">加入群組</button>
+                <select id="memberChatGroupSelect" class="member-chat-select" onchange="selectMemberChatGroup(Number(this.value))">
+                    <option value="" data-i18n="page1.selectGroup">請先建立群組</option>
+                </select>
             </div>
             <div id="memberChatMessageList" class="member-chat-message-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="群組聊天訊息" data-i18n="page1.noMessages">尚無對話，先加入好友或從上方快速送出到群組大廳。</div>
             <div class="member-chat-compose">
                 <input type="text" id="memberChatMessageInput" class="security-input member-chat-input" data-i18n-placeholder="page1.messagePh" placeholder="輸入聊天訊息">
                 <button type="button" class="tool-btn member-chat-btn" onclick="sendMemberChatMessage()" data-i18n="page1.sendMessage">送出訊息</button>
+            </div>
+            <div id="memberChatVoiceWrap" class="member-chat-voice-wrap" hidden>
+                <button type="button" id="memberChatVoiceHoldBtn" class="tool-btn member-chat-voice-btn"><span class="member-chat-voice-mic-icon" aria-hidden="true"></span><span class="member-chat-voice-mic-label" data-i18n="page1.friendsVoiceHold">按住錄音</span></button>
+                <span id="memberChatVoiceStatus" class="member-chat-voice-status" hidden></span>
             </div>
         </div>
         <div id="stakeMemberWrap" class="member-wrap level-hide-basic work-mode-only-calc calc-subpage-block calc-subpage-block-2">
@@ -1108,7 +1141,7 @@
                 <div style="display: flex; gap: 5px;">
                     <input type="number" id="qty" value="1" min="0" oninput="previewCalc()" style="flex: 1;">
                     <button class="tool-btn level-only-pro calc-subpage-block calc-subpage-block-2" style="border-color: #9c27b0; color: #e1bee7; padding: 0 10px; font-weight: bold;" onclick="startEdgeAIVision()">
-                        👁️ AI 盤點
+                        👁️ 智慧盤點
                     </button>
                 </div>
             </div>
@@ -1197,7 +1230,7 @@
         </div>
         <div class="input-row calc-subpage-block calc-subpage-block-2">
             <div class="input-wrapper">
-                <label>AI 盤點類別白名單（逗號分隔，留空=全部）</label>
+                <label>智慧盤點類別白名單（逗號分隔，留空=全部）</label>
                 <input type="text" id="aiVisionClassFilter" placeholder="例如: person,cell phone,bottle">
             </div>
         </div>
@@ -1291,7 +1324,7 @@
                 <input type="number" id="advSensitivityStep" min="1" max="50" step="1" value="10" oninput="refreshAdvancedEstimate(false)">
             </div>
             <div class="input-wrapper">
-                <label>AI 自動判讀門檻 (%)</label>
+                <label>智慧自動判讀門檻 (%)</label>
                 <input type="number" id="advAutoInterpretGate" min="90" max="99" step="1" value="90" oninput="refreshAdvancedEstimate(false); previewCalc();">
             </div>
             <div class="input-wrapper">
@@ -1373,10 +1406,10 @@
         <div id="calcAiVisionCluster" class="action-cluster level-only-pro" style="margin-top:8px;">
             <div class="action-cluster-header">
                 <div>
-                    <div class="action-cluster-title">AI 看圖辨識</div>
+                    <div class="action-cluster-title">智慧看圖辨識</div>
                     <div class="action-cluster-note">第三頁先做快速判讀、精準辨識與 OCR 尺寸標註，也可把手機圖、電腦截圖、正式藍圖送進後台自動學習。</div>
                 </div>
-                <div class="action-cluster-chip">AI Vision</div>
+                <div class="action-cluster-chip">智慧視覺</div>
             </div>
             <div class="action-cluster-grid">
             <button class="tool-btn" style="border-color:#7ed6df; color:#dffcff;" onclick="autoInterpretBlueprintAndCalculate()" data-i18n-title="proAccess.autoCalcGuidedDefault" title="原生 App：自動改走極強精準">🤖 第三頁看圖自動判讀試算</button>
@@ -1390,13 +1423,15 @@
             <div class="action-cluster-header">
                 <div>
                     <div class="action-cluster-title">BIM 自動估算</div>
-                    <div class="action-cluster-note">這裡只做計算與估價；BIM 模型上傳、放樣點、放樣 QA 固定在第四頁。</div>
+                    <div class="action-cluster-note">有 IFC 走模型估價；只有平面圖時可用「看圖估價」直接匯入清單（免 Revit）。放樣 QA 仍在第四頁。</div>
                 </div>
                 <div class="action-cluster-chip">BIM Auto Calc</div>
             </div>
             <div class="action-cluster-grid" style="margin-top:8px;">
                 <button class="tool-btn" style="border-color:#90caf9; color:#dceeff;" onclick="setWorkMode('stake')">📍 去第四頁準備 BIM/放樣</button>
                 <button class="tool-btn" style="border-color:#80d8ff; color:#d8f3ff;" onclick="runBimTechAutoCalculation()">📐 BIM 自動計算</button>
+                <button class="tool-btn" style="border-color:#7ed6df; color:#dffcff;" onclick="generateBlueprintEstimatePreview()">🧮 看圖估價預覽（免 IFC）</button>
+                <button class="tool-btn" style="border-color:#9fa8ff; color:#ecebff;" onclick="runBlueprintAutoEstimateImport()">📥 看圖估價匯入（免 IFC）</button>
                 <button class="tool-btn" onclick="generateBIMEstimate()">🧮 BIM 自動估價預覽</button>
                 <button class="tool-btn" onclick="importBIMEstimateToList()">📥 匯入 BIM 估價到清單</button>
             </div>
@@ -1412,6 +1447,10 @@
         <div id="autoInterpretQaSummary" class="bim-note level-only-pro" style="margin-top:6px; color:#d8ebff;">看圖 QA：待命</div>
         <div class="group-title level-only-pro" style="margin-top:14px;">後台自動學習</div>
         <p class="bim-note level-only-pro" style="margin-top:4px; color:#a8c0d8; font-size:0.78em;">審核 gate：分數未達門檻或重跑用完會變「待人工審核」，通過後才寫入你的核心記憶；可選發布至全站共用池（跨會員僅匹配向量，不複製圖檔）。</p>
+        <label class="bim-note level-only-pro" style="display:flex; align-items:center; gap:8px; margin-top:6px; color:#cfe8ff; font-size:0.82em; cursor:pointer;">
+            <input type="checkbox" id="publishToSharedOnLearning">
+            達標／審核通過時，我同意發布判讀向量至全站共用池（不含圖檔）
+        </label>
         <div id="autoInterpretLearningSummary" class="bim-note level-only-pro" style="margin-top:6px; color:#d7e9ff;">後台學習：尚未建立任務</div>
         <div class="bim-actions level-only-pro" style="margin-top:8px;">
             <button class="tool-btn" style="border-color:#9bc2e5; color:#d7ebff;" onclick="renderAutoInterpretLearningPanel()">🔄 重新整理後台學習</button>
@@ -1426,12 +1465,18 @@
         <div id="advSensitivitySummary" class="bim-note level-only-pro" style="margin-top:6px; color:#cfe8ff;">敏感度：待命</div>
         <div id="advPrecisionAudit" class="bim-note level-only-pro" style="margin-top:6px; color:#c6dcff;">精算稽核：待命</div>
 
-        <div class="group-title level-only-pro">AI 看圖學習記憶庫</div>
-        <p class="bim-note level-only-pro" style="margin-top:4px; color:#a8c0d8; font-size:0.78em;">個人庫與雲端工作區同步；另會向伺服器載入「全站共用池」向量供匹配（不會把共用筆寫進你的清單）。</p>
+        <div class="group-title level-only-pro">智慧看圖學習記憶庫</div>
+        <p class="bim-note level-only-pro" style="margin-top:4px; color:#a8c0d8; font-size:0.78em;">個人庫與雲端工作區同步；另會向伺服器載入「全站共用池」向量供匹配（不會把共用筆寫進你的清單）。9648 第三階段：共用池 + 協作匯出。</p>
         <div class="bim-note level-only-pro" id="autoInterpretMemorySummary" style="margin-top:6px; color:#d7e9ff;">記憶庫：尚未建立</div>
         <div class="bim-actions level-only-pro" style="margin-top:8px;">
             <button class="tool-btn" style="border-color:#b39ddb; color:#efe3ff;" onclick="reloadAutoInterpretMemoryUi()">🔄 重新整理記憶（含共用池）</button>
             <button id="autoInterpretMemoryClearBtn" class="tool-btn" style="border-color:#ffcc80; color:#ffe9c7;" onclick="clearAutoInterpretMemory()">🧠 清空記憶庫</button>
+        </div>
+        <div class="group-title level-only-pro" style="margin-top:14px;">協作匯出（9648 · 非 Revit 級）</div>
+        <p class="bim-note level-only-pro" style="margin-top:4px; color:#a8c0d8; font-size:0.78em;">將目前看圖判讀結果匯出 JSON／簡化 IFC，供團隊或外部工具參考；不等於正式 BIM 模型。</p>
+        <div class="bim-actions level-only-pro" style="margin-top:8px;">
+            <button class="tool-btn" style="border-color:#80cbc4; color:#dffaf6;" onclick="downloadBlueprintInterpretJson()">📤 匯出判讀 JSON</button>
+            <button class="tool-btn" style="border-color:#a5d6a7; color:#eaffea;" onclick="downloadBlueprintSimplifiedIfc()">📤 匯出簡化 IFC</button>
         </div>
         <div class="bim-table-wrap level-only-pro" style="max-height:180px; margin-top:8px;">
             <table>
@@ -1495,6 +1540,7 @@
 
         <div class="btn-group calc-subpage-block calc-subpage-block-2">
             <button class="btn-export" onclick="exportToCSV()" data-i18n="page2.exportExcel">📥 匯出商用報表 (Excel)</button>
+            <button class="btn-export" onclick="exportToPDF()" data-i18n="page2.exportPdf">📄 匯出 PDF 報表</button>
             <button class="btn-export level-hide-basic" onclick="exportMeasureQaReport()" data-i18n="page2.exportQa">🧪 匯出量圖QA報告</button>
             <button class="btn-clear" onclick="clearAll()" data-i18n="page2.clearAll">🗑️ 重新開始</button>
         </div>
@@ -1519,7 +1565,7 @@
         <div id="coachText" data-i18n="coach.defaultText">哈囉，我是解說員：我會說明主要區塊的用途與操作步驟。細節可開「新手導覽」或各區「▶ 30秒示範」。第1頁含本機群組聊天與試算📊卡片；公開隱私權見 Google Sites 或 privacy 頁。</div>
         <div class="coach-ai-row">
             <input id="coachAiInput" class="coach-ai-input" type="text" data-i18n-placeholder="coach.aiPh" placeholder="可問：IFC有幾根柱？BIM估價風險是什麼？">
-            <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()" data-i18n="coach.aiAsk">問AI</button>
+            <button id="coachAiAskBtn" class="coach-ai-btn" onclick="askAiCoachManual()" data-i18n="coach.aiAsk">智慧問答</button>
         </div>
         <div id="coachGuidePanel" class="coach-guide hide">
             <div id="coachGuideStep" class="coach-guide-step"></div>
@@ -1555,17 +1601,17 @@
     </div>
 </div>
 
-<script src="scripts/bundles/bm-core.js?v=v9640-nativeapp-fix"></script>
-<script src="scripts/bundles/bm-blueprint.js?v=v9612"></script>
+<script src="scripts/bundles/bm-core.js?v=v9656-format-convert"></script>
+<script src="scripts/bundles/bm-blueprint.js?v=v9656-format-convert"></script>
 <script src="scripts/bundles/bm-calc.js?v=v9612"></script>
-<script src="scripts/features/app-shell.js?v=v9631-coach-ops"></script>
+<script src="scripts/features/app-shell.js?v=v9656-format-convert"></script>
 <script src="scripts/features/materials-weather.js?v=v9615-rating"></script>
 <script src="scripts/features/measurement-logs.js?v=v9612"></script>
-<script src="scripts/features/bim-qa.js?v=v9629-file-coords"></script>
+<script src="scripts/features/bim-qa.js?v=v9646-blueprint-estimate"></script>
 <script src="scripts/features/calc-engine.js?v=v9615-rating"></script>
 <script src="scripts/features/app-rating-prompt.js?v=v9618-electrical"></script>
 <script src="scripts/features/electrical-panel.js?v=v9644-update-marquee"></script>
-<script src="scripts/features/convert-panel.js?v=v9642-usdz-convert"></script>
+<script src="scripts/features/convert-panel.js?v=v9656-format-convert"></script>
 <script src="scripts/features/mep-engine.js?v=v9644-update-marquee"></script>
 <script src="scripts/features/motor-simulator.js?v=v9644-update-marquee"></script>
 <script src="scripts/features/field-simulator.js?v=v9644-update-marquee"></script>
@@ -1573,7 +1619,7 @@
 <script src="scripts/features/update-marquee.js?v=v9645-pro-access"></script>
 <script src="scripts/features/feature-demo.js?v=v9627-demo-ios-lottie"></script>
 <script src="scripts/features/pro-access.js?v=v9645-pro-access"></script>
-<script src="scripts/features/native-ar-bridge.js?v=v9645-pro-access"></script>
+<script src="scripts/features/native-ar-bridge.js?v=v9656-format-convert"></script>
 <script src="scripts/app-main.js?v=v9627-demo-ios-lottie"></script>
 </body>
 </html>

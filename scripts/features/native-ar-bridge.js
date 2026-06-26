@@ -4,6 +4,7 @@
     const OPEN_MESSAGE = 'bmOpenAR';
     const PASS_BLUEPRINT_MESSAGE = 'bmPassBlueprint';
     const PASS_USDZ_MESSAGE = 'bmPassUSDZ';
+    const CONVERT_MODEL3D_MESSAGE = 'bmConvertModel3D';
     const EXPORT_MESSAGE = 'bmExportARMeasurements';
 
     function hasNativeHandler(name) {
@@ -43,6 +44,8 @@
         return {
             enabled: cfg.enabled === true,
             canOpen: cfg.canOpen === true,
+            canConvertUSDZ: cfg.canConvertUSDZ === true || cfg.canOpen === true,
+            platform: String(cfg.platform || global.__bmNativePlatform || ''),
             source: String(cfg.source || 'native-shell')
         };
     }
@@ -189,6 +192,30 @@
         return false;
     }
 
+    function convertModel3DAndOpenNativeAR(modelPayload, options) {
+        const cfg = readNativeARConfig();
+        const convertOnly = cfg.canConvertUSDZ && !cfg.canOpen;
+        if (!convertOnly && global.BuildMasterProAccess && !global.BuildMasterProAccess.guardAR()) {
+            return false;
+        }
+        const payload = Object.assign({ source: 'web-convert-model3d' }, options || {}, modelPayload || {});
+        if (!payload.dataUrl) {
+            if (typeof global.showToast === 'function') {
+                global.showToast(global.BM_T ? global.BM_T('convert.toastMissingFile') : '請先選擇 3D 模型');
+            }
+            return false;
+        }
+        if (postNativeMessage(CONVERT_MODEL3D_MESSAGE, payload)) {
+            return true;
+        }
+        if (typeof global.showToast === 'function') {
+            global.showToast(global.BM_T
+                ? global.BM_T(convertOnly ? 'convert.toastNativeConvertOnlyMac' : 'convert.toastNativeConvertOnly')
+                : 'App 內轉 USDZ 需 iOS / Mac 原生殼');
+        }
+        return false;
+    }
+
     function exportNativeARMeasurements() {
         return postNativeMessage(EXPORT_MESSAGE, { action: 'export' });
     }
@@ -238,6 +265,8 @@
         openWithBlueprint: sendBlueprintAndOpenNativeAR,
         passUSDZ: passUSDZToNativeAR,
         sendUSDZAndOpen: sendUSDZAndOpenNativeAR,
+        convertModel3DAndOpen: convertModel3DAndOpenNativeAR,
+        onModel3DConverted: null,
         exportMeasurements: exportNativeARMeasurements,
         refreshUI: function () {
             applyNativeARUI();
@@ -250,6 +279,7 @@
     global.sendBlueprintAndOpenNativeAR = sendBlueprintAndOpenNativeAR;
     global.passUSDZToNativeAR = passUSDZToNativeAR;
     global.sendUSDZAndOpenNativeAR = sendUSDZAndOpenNativeAR;
+    global.convertModel3DAndOpenNativeAR = convertModel3DAndOpenNativeAR;
 
     if (global.document && global.document.readyState !== 'loading') {
         applyNativeARUI();

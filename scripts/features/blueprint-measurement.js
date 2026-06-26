@@ -69,9 +69,114 @@
         }, 700);
     }
 
+    function isPdfBlueprintFile(file) {
+        return /\.pdf$/i.test(String(file && file.name || ''))
+            || String(file && file.type || '').toLowerCase() === 'application/pdf';
+    }
+
+    function finishBlueprintImageLoad(file) {
+        img.onerror = function() {
+            console.warn('圖紙照片解碼失敗', file);
+            showToast('照片格式無法載入，請改用 JPG/PNG/PDF 或重新拍照後再上傳。');
+        };
+        img.onload = () => {
+            try {
+                if (!img.naturalWidth || !img.naturalHeight) {
+                    throw new Error('IMAGE_DIMENSION_UNAVAILABLE');
+                }
+                drawMode = 'none';
+                clickPoints = [];
+                calibrationPendingPoint = null;
+                if (manualPrecisionState) manualPrecisionState.active = false;
+                runBlueprintUploadStep('resetSmartMeasureSession', () => resetSmartMeasureSession({ preserveLastResult: false }));
+                if (blueprintPanState) blueprintPanState.active = false;
+                if (blueprintPinchState) blueprintPinchState.active = false;
+                suppressNextCanvasClick = false;
+                suppressNextCanvasTouch = false;
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                imageFilterState = { contrast: 1, brightness: 1 };
+                runBlueprintUploadStep('syncImageFilterUI', syncImageFilterUI);
+                runBlueprintUploadStep('applyImageFilter', applyImageFilter);
+                runBlueprintUploadStep('reset3DView', () => reset3DView(true));
+                runBlueprintUploadStep('syncCanvasEmptyState', syncCanvasEmptyState);
+                runBlueprintUploadStep('updateTouchInteractionMode', updateTouchInteractionMode);
+                runBlueprintUploadStep('syncMobileMeasureModeUI', syncMobileMeasureModeUI);
+                runBlueprintUploadStep('renderManualMeasurePad', renderManualMeasurePad);
+                runBlueprintUploadStep('fitBlueprintToViewport', fitBlueprintToViewport);
+                const qualityReport = runBlueprintUploadStep('updateBlueprintQualityStatus', updateBlueprintQualityStatus);
+                currentBlueprintUploadState = {
+                    ...(currentBlueprintUploadState || {}),
+                    width: Number(img.naturalWidth) || 0,
+                    height: Number(img.naturalHeight) || 0,
+                    orientation: img.naturalWidth >= img.naturalHeight ? 'landscape' : 'portrait',
+                    sourceType: currentBlueprintUploadState && currentBlueprintUploadState.sourceType
+                        ? currentBlueprintUploadState.sourceType
+                        : detectBlueprintSourceType(file)
+                };
+                runBlueprintUploadStep('updateAutoInterpretLearningSummary', () => updateAutoInterpretLearningSummary(`後台學習：已載入 ${currentBlueprintUploadState.sourceType || 'clean-blueprint'}｜待建立任務`, '#d7e9ff'));
+                if (qualityReport && qualityReport.quality === '待重拍') {
+                    showToast(`圖紙品質偏低（${qualityReport.issues.join('、')}），建議重拍再量測`);
+                } else if (qualityReport && qualityReport.quality === '可用') {
+                    showToast(`圖紙已載入（${qualityReport.issues.join('、')}，可先量測）`);
+                } else {
+                    showToast('圖紙載入完成，可拖曳/縮放（雙擊可回適配視圖）');
+                }
+                runBlueprintUploadStep('scheduleAutoBlueprintAutoCalcIfEnabled', scheduleAutoBlueprintAutoCalcIfEnabled);
+            } catch (error) {
+                console.warn('圖紙載入後初始化失敗', error);
+                showToast('照片已載入，但部分輔助功能暫時無法初始化；仍可手動量測。');
+            }
+        };
+    }
+
+    function loadBlueprintDataUrl(dataUrl, file, options) {
+        const opts = options || {};
+        currentBlueprintUploadState = {
+            fileName: String(file.name || 'blueprint.png'),
+            mimeType: String(file.type || 'image/png'),
+            sizeBytes: Number(file.size) || 0,
+            dataUrl: String(dataUrl || ''),
+            sourceType: opts.sourceType || detectBlueprintSourceType(file),
+            captureMode: opts.captureMode || 'single-image',
+            pdfPageCount: Number(opts.pdfPageCount) || 0,
+            pdfPageIndex: Number(opts.pdfPageIndex) || 0
+        };
+        finishBlueprintImageLoad(file);
+        img.src = String(dataUrl || '');
+    }
+
     function loadImg(e) {
         const file = e.target.files[0];
         if (!file) return;
+        if (isPdfBlueprintFile(file)) {
+            const raster = window.BuildMasterPdfRaster;
+            if (!raster || typeof raster.rasterizeFile !== 'function') {
+                showToast('PDF 轉換模組尚未載入，請重新整理頁面。');
+                return;
+            }
+            showToast('PDF 轉圖中，請稍候…');
+            raster.rasterizeFile(file, { page: 1 }).then(function(result) {
+                const pngName = String(file.name || 'blueprint.pdf').replace(/\.pdf$/i, '.png');
+                loadBlueprintDataUrl(result.dataUrl, {
+                    name: pngName,
+                    type: 'image/png',
+                    size: file.size
+                }, {
+                    sourceType: 'pdf-blueprint',
+                    captureMode: 'pdf-page-1',
+                    pdfPageCount: Number(result.pageCount) || 1,
+                    pdfPageIndex: Number(result.pageIndex) || 1
+                });
+                if ((Number(result.pageCount) || 1) > 1) {
+                    showToast(`PDF 共 ${result.pageCount} 頁，已載入第 ${result.pageIndex || 1} 頁`);
+                }
+            }).catch(function(error) {
+                console.warn('PDF 轉圖失敗', error);
+                showToast('PDF 無法轉為圖面，請改匯出 JPG/PNG 或換檔後再試。');
+            });
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(event) {
             const dataUrl = String(event && event.target && event.target.result || '');
@@ -79,70 +184,7 @@
                 showToast('照片讀取失敗，請重新選擇圖片');
                 return;
             }
-            currentBlueprintUploadState = {
-                fileName: String(file.name || 'blueprint.png'),
-                mimeType: String(file.type || 'image/png'),
-                sizeBytes: Number(file.size) || 0,
-                dataUrl,
-                sourceType: detectBlueprintSourceType(file),
-                captureMode: 'single-image'
-            };
-            img.onerror = function() {
-                console.warn('圖紙照片解碼失敗', file);
-                showToast('照片格式無法載入，請改用 JPG/PNG 或重新拍照後再上傳。');
-            };
-            img.src = dataUrl;
-            img.onload = () => {
-                try {
-                    if (!img.naturalWidth || !img.naturalHeight) {
-                        throw new Error('IMAGE_DIMENSION_UNAVAILABLE');
-                    }
-                    // Always reset interaction state on new upload to avoid being stuck
-                    // in calibration/measure mode where pan gestures are disabled.
-                    drawMode = 'none';
-                    clickPoints = [];
-                    calibrationPendingPoint = null;
-                    if (manualPrecisionState) manualPrecisionState.active = false;
-                    runBlueprintUploadStep('resetSmartMeasureSession', () => resetSmartMeasureSession({ preserveLastResult: false }));
-                    if (blueprintPanState) blueprintPanState.active = false;
-                    if (blueprintPinchState) blueprintPinchState.active = false;
-                    suppressNextCanvasClick = false;
-                    suppressNextCanvasTouch = false;
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    imageFilterState = { contrast: 1, brightness: 1 };
-                    runBlueprintUploadStep('syncImageFilterUI', syncImageFilterUI);
-                    runBlueprintUploadStep('applyImageFilter', applyImageFilter);
-                    runBlueprintUploadStep('reset3DView', () => reset3DView(true));
-                    runBlueprintUploadStep('syncCanvasEmptyState', syncCanvasEmptyState);
-                    runBlueprintUploadStep('updateTouchInteractionMode', updateTouchInteractionMode);
-                    runBlueprintUploadStep('syncMobileMeasureModeUI', syncMobileMeasureModeUI);
-                    runBlueprintUploadStep('renderManualMeasurePad', renderManualMeasurePad);
-                    runBlueprintUploadStep('fitBlueprintToViewport', fitBlueprintToViewport);
-                    const qualityReport = runBlueprintUploadStep('updateBlueprintQualityStatus', updateBlueprintQualityStatus);
-                    currentBlueprintUploadState = {
-                        ...(currentBlueprintUploadState || {}),
-                        width: Number(img.naturalWidth) || 0,
-                        height: Number(img.naturalHeight) || 0,
-                        orientation: img.naturalWidth >= img.naturalHeight ? 'landscape' : 'portrait',
-                        sourceType: currentBlueprintUploadState && currentBlueprintUploadState.sourceType
-                            ? currentBlueprintUploadState.sourceType
-                            : detectBlueprintSourceType(file)
-                    };
-                    runBlueprintUploadStep('updateAutoInterpretLearningSummary', () => updateAutoInterpretLearningSummary(`後台學習：已載入 ${currentBlueprintUploadState.sourceType || 'clean-blueprint'}｜待建立任務`, '#d7e9ff'));
-                    if (qualityReport && qualityReport.quality === '待重拍') {
-                        showToast(`圖紙品質偏低（${qualityReport.issues.join('、')}），建議重拍再量測`);
-                    } else if (qualityReport && qualityReport.quality === '可用') {
-                        showToast(`圖紙已載入（${qualityReport.issues.join('、')}，可先量測）`);
-                    } else {
-                        showToast('圖紙載入完成，可拖曳/縮放（雙擊可回適配視圖）');
-                    }
-                    runBlueprintUploadStep('scheduleAutoBlueprintAutoCalcIfEnabled', scheduleAutoBlueprintAutoCalcIfEnabled);
-                } catch (error) {
-                    console.warn('圖紙載入後初始化失敗', error);
-                    showToast('照片已載入，但部分輔助功能暫時無法初始化；仍可手動量測。');
-                }
-            };
+            loadBlueprintDataUrl(dataUrl, file);
         };
         reader.onerror = function() {
             console.warn('照片讀取失敗', reader.error);
@@ -152,8 +194,21 @@
             reader.readAsDataURL(file);
         } catch (error) {
             console.warn('照片上傳啟動失敗', error);
-            showToast('照片上傳失敗，請重新選擇 JPG/PNG 圖片。');
+            showToast('照片上傳失敗，請重新選擇 JPG/PNG/PDF 圖片。');
         }
+    }
+
+    function openBlueprintFilePicker() {
+        const mobileInput = document.getElementById('mobileBlueprintFileInput');
+        const desktopInput = document.getElementById('fileInput');
+        const useMobile = typeof isMobileViewport === 'function' && isMobileViewport() && mobileInput;
+        const target = useMobile ? mobileInput : desktopInput;
+        if (!target) {
+            showToast('找不到圖紙上傳入口，請重新整理頁面。');
+            return;
+        }
+        target.value = '';
+        target.click();
     }
 
     function changeZoom(delta) {
@@ -430,6 +485,9 @@
     let autoInterpretNeedsReview = false;
     let autoInterpretGateReason = '';
     let autoInterpretMemoryCache = null;
+    let autoInterpretSharedMemoryCache = [];
+    let autoInterpretSharedMemoryMeta = { enabled: false, loadedAt: 0, sourceRows: 0, loading: false };
+    const SHARED_POOL_PUBLISH_PREF_KEY = 'bm_69:publish_to_shared_pool';
     let guidedPrecisionReviewCache = null;
     let blueprintLearningAssetCache = null;
     let autoInterpretLearningJobCache = null;
@@ -944,8 +1002,83 @@
         return Math.max(0, Math.min(1, 1 - weightedGap));
     }
 
+    function readPublishToSharedPoolPref() {
+        try {
+            return localStorage.getItem(SHARED_POOL_PUBLISH_PREF_KEY) === '1';
+        } catch (_e) {
+            return false;
+        }
+    }
+
+    function syncPublishToSharedPoolPref() {
+        const el = document.getElementById('publishToSharedOnLearning');
+        if (!el) return;
+        try {
+            localStorage.setItem(SHARED_POOL_PUBLISH_PREF_KEY, el.checked ? '1' : '0');
+        } catch (_e) { /* ignore */ }
+    }
+
+    function applyPublishToSharedPoolPref() {
+        const el = document.getElementById('publishToSharedOnLearning');
+        if (!el || el.dataset.bound === '1') return;
+        el.dataset.bound = '1';
+        el.checked = readPublishToSharedPoolPref();
+        el.addEventListener('change', syncPublishToSharedPoolPref);
+    }
+
+    function getAutoInterpretMatchingStore() {
+        const personal = getAutoInterpretMemoryStore();
+        const shared = (autoInterpretSharedMemoryCache || []).map((item) => ({
+            ...item,
+            memorySource: 'shared'
+        }));
+        return personal.concat(shared);
+    }
+
+    async function reloadAutoInterpretMemoryUi(options) {
+        const silent = !!(options && options.silent);
+        if (!(await ensureFeatureAccess('blueprintAutoInterpret', '共用池僅開放會員3（專家）'))) {
+            return false;
+        }
+        autoInterpretSharedMemoryMeta.loading = true;
+        if (!silent) {
+            const summary = document.getElementById('autoInterpretMemorySummary');
+            if (summary) summary.innerText = '記憶庫：載入共用池向量中…';
+        }
+        try {
+            const payload = await apiRequest('/learning/shared-memory', {
+                method: 'GET',
+                retries: 0,
+                timeoutMs: 15000
+            });
+            autoInterpretSharedMemoryCache = Array.isArray(payload && payload.samples) ? payload.samples.slice(0, 120) : [];
+            autoInterpretSharedMemoryMeta = {
+                enabled: !!(payload && payload.sharedLearningEnabled),
+                loadedAt: Date.now(),
+                sourceRows: Number(payload && payload.sourceRows) || autoInterpretSharedMemoryCache.length,
+                loading: false
+            };
+            renderAutoInterpretMemoryPanel();
+            if (!silent) {
+                if (!autoInterpretSharedMemoryMeta.enabled) {
+                    showToast('共用池尚未開啟（伺服器設定）');
+                } else {
+                    showToast(`已載入共用池 ${autoInterpretSharedMemoryCache.length} 筆向量（不含圖檔）`);
+                }
+            }
+            return true;
+        } catch (error) {
+            autoInterpretSharedMemoryMeta.loading = false;
+            renderAutoInterpretMemoryPanel();
+            if (!silent) {
+                showToast(`共用池載入失敗：${error && error.message ? error.message : '請稍後再試'}`);
+            }
+            return false;
+        }
+    }
+
     function findAutoInterpretMemoryMatch(bounds, qualityReport, preferredType = '') {
-        const store = getAutoInterpretMemoryStore();
+        const store = getAutoInterpretMatchingStore();
         if (!store.length) return null;
         const currentVector = buildBlueprintFeatureVector(bounds, qualityReport);
         const preferred = String(preferredType || '').trim();
@@ -964,7 +1097,11 @@
             similarity: best.score,
             sampleCount: scored.length,
             preferredType: preferred,
-            summary: scored.slice(0, 3).map(entry => `${entry.item.type}/${entry.item.quantity}件/${Math.round(entry.score * 100)}%`).join('｜')
+            fromSharedPool: String(best.item && best.item.memorySource || '') === 'shared',
+            summary: scored.slice(0, 3).map(entry => {
+                const tag = String(entry.item && entry.item.memorySource || '') === 'shared' ? '共用' : '個人';
+                return `${tag}:${entry.item.type}/${entry.item.quantity}件/${Math.round(entry.score * 100)}%`;
+            }).join('｜')
         };
     }
 
@@ -991,7 +1128,7 @@
         body.innerHTML = '';
         autoInterpretMemoryVisibleRows = [];
         if (autoInterpretMemoryHiddenLocally) {
-            body.innerHTML = '<tr><td colspan="6" style="color:#99b2c9;">本機畫面已清空，AI 看圖記憶仍保留；重新整理頁面後可再顯示。</td></tr>';
+            body.innerHTML = '<tr><td colspan="6" style="color:#99b2c9;">本機畫面已清空，智慧看圖記憶仍保留；重新整理頁面後可再顯示。</td></tr>';
             summary.innerText = `記憶庫：本機畫面已清空｜實際保留 ${store.length} 筆`;
             return;
         }
@@ -1013,7 +1150,11 @@
             return acc;
         }, {});
         const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([type, count]) => `${type}:${count}`).join(' / ');
-        summary.innerText = `記憶庫：畫面 ${visibleStore.length} 筆｜實際保留 ${store.length} 筆｜類型分佈 ${topTypes || '無'}${autoInterpretLastReport && autoInterpretLastReport.memoryStoreSize ? `｜最近套用後總數 ${autoInterpretLastReport.memoryStoreSize}` : ''}`;
+        const sharedCount = (autoInterpretSharedMemoryCache || []).length;
+        const sharedNote = autoInterpretSharedMemoryMeta.loading
+            ? '｜共用池載入中…'
+            : (sharedCount ? `｜共用池匹配 ${sharedCount} 筆` : (autoInterpretSharedMemoryMeta.loadedAt ? '｜共用池 0 筆' : '｜共用池未載入'));
+        summary.innerText = `記憶庫：個人 ${visibleStore.length} 筆｜實際保留 ${store.length} 筆${sharedNote}｜類型分佈 ${topTypes || '無'}${autoInterpretLastReport && autoInterpretLastReport.memoryStoreSize ? `｜最近套用後總數 ${autoInterpretLastReport.memoryStoreSize}` : ''}`;
         visibleStore.slice(0, 12).forEach((item, idx) => {
             const tr = document.createElement('tr');
             const ratio = item && item.vector ? Number(item.vector.ratio || 0) : 0;
@@ -1031,10 +1172,10 @@
     }
 
     function clearAutoInterpretMemory() {
-        if (!confirm('確定清空 AI 看圖學習記憶庫嗎？')) return;
+        if (!confirm('確定清空智慧看圖學習記憶庫嗎？')) return;
         autoInterpretMemoryHiddenLocally = true;
         renderAutoInterpretMemoryPanel();
-        showToast('已清空本機畫面，AI 看圖記憶仍保留');
+        showToast('已清空本機畫面，智慧看圖記憶仍保留');
     }
 
     function getGuidedPrecisionReviewStore() {
@@ -1228,6 +1369,9 @@
                 }
                 if (status === 'completed' || status === 'approved_manual') {
                     showToast(`後台學習已完成，最佳分數 ${bestScore} / 99.9`);
+                    if (payload && payload.job && payload.job.publishToSharedOnSuccess) {
+                        await reloadAutoInterpretMemoryUi({ silent: true });
+                    }
                 } else if (status === 'review_required') {
                     showToast(`後台學習已跑完 ${payload.job.maxAttempts} 輪，最佳 ${bestScore} / 99.9，請人工審核`);
                 } else if (status === 'failed') {
@@ -1241,7 +1385,7 @@
     }
 
     async function startBackendAutoInterpretLearning() {
-        if (!ensureCalcAdvancedPageReady('第2頁全功能 AI 看圖區尚未載入')) return;
+        if (!ensureCalcAdvancedPageReady('第2頁全功能智慧看圖區尚未載入')) return;
         if (!(await ensureFeatureAccess('blueprintAutoInterpret', '後台自動學習僅開放會員3（專家）'))) return;
         if (!img.src || !currentBlueprintUploadState || !currentBlueprintUploadState.dataUrl) {
             return showToast('請先上傳手機圖、電腦截圖或正式藍圖，再啟動後台學習');
@@ -1263,7 +1407,11 @@
                 body: {
                     assetId: upload.asset.assetId,
                     thresholdScore: 95,
-                    maxAttempts: 3
+                    maxAttempts: 3,
+                    publishToSharedOnSuccess: !!(
+                        document.getElementById('publishToSharedOnLearning')
+                        && document.getElementById('publishToSharedOnLearning').checked
+                    )
                 },
                 retries: 0,
                 timeoutMs: 15000
@@ -1291,12 +1439,19 @@
                 : '可選填退回原因（例如：尺寸與現場不符）',
             ''
         );
+        let publishToSharedPool = false;
+        if (normalizedDecision === 'approved') {
+            publishToSharedPool = confirm(
+                '是否同意將此案例的判讀向量（不含圖檔）發布至全站共用池？\n\n按「取消」仍會寫入你的個人核心記憶，但不會發布共用。'
+            );
+        }
         try {
             const payload = await apiRequest(`/learning/auto-interpret/jobs/${encodeURIComponent(id)}/review`, {
                 method: 'POST',
                 body: {
                     decision: normalizedDecision,
-                    note: String(note || '').trim()
+                    note: String(note || '').trim(),
+                    publishToSharedPool: publishToSharedPool
                 },
                 retries: 0,
                 timeoutMs: 15000
@@ -1307,7 +1462,14 @@
                 renderAutoInterpretMemoryPanel();
             }
             renderAutoInterpretLearningPanel();
-            showToast(normalizedDecision === 'approved' ? '已人工通過並加入核心記憶' : '已退回此筆後台學習結果');
+            if (payload && payload.publishedToSharedPool) {
+                await reloadAutoInterpretMemoryUi({ silent: true });
+            }
+            showToast(
+                normalizedDecision === 'approved'
+                    ? (payload && payload.publishedToSharedPool ? '已通過並發布至共用池（僅向量）' : '已人工通過並加入核心記憶')
+                    : '已退回此筆後台學習結果'
+            );
         } catch (error) {
             updateAutoInterpretLearningSummary(`後台學習：審核失敗｜${error && error.message ? error.message : '請稍後再試'}`, '#ff9a9a');
             showToast(`後台學習審核失敗：${error && error.message ? error.message : '請稍後再試'}`);
@@ -1460,7 +1622,144 @@
 
     function getAutoInterpretMemoryHint(match) {
         if (!match || !match.best) return '';
-        return `記憶參考 ${match.best.type} / ${match.best.quantity} 件 / 相似度 ${Math.round(match.similarity * 100)}%`;
+        const poolTag = match.fromSharedPool || String(match.best.memorySource || '') === 'shared' ? '共用池' : '個人';
+        return `${poolTag}記憶 ${match.best.type} / ${match.best.quantity} 件 / 相似度 ${Math.round(match.similarity * 100)}%`;
+    }
+
+    function mapCalcTypeToPseudoIfcTypeLocal(calcType) {
+        if (typeof calcTypeToPseudoIfcType === 'function') {
+            return calcTypeToPseudoIfcType(calcType);
+        }
+        const t = String(calcType || '');
+        if (t.includes('WALL') || t === 'M_WALL') return 'IFCWALL';
+        if (t.includes('BEAM')) return 'IFCBEAM';
+        if (t.includes('COL')) return 'IFCCOLUMN';
+        if (t.includes('STAIR')) return 'IFCSTAIR';
+        if (t.includes('FOOTING')) return 'IFCFOOTING';
+        if (t.startsWith('E_')) return 'IFCEXCVOLUME';
+        if (t.startsWith('R_')) return 'IFCREINFORCINGBAR';
+        return 'IFCMEMBER';
+    }
+
+    function buildSimplifiedInterpretExportPayload() {
+        const valueSet = typeof buildCurrentCalcValueSet === 'function' ? buildCurrentCalcValueSet() : {};
+        const report = autoInterpretLastReport && typeof autoInterpretLastReport === 'object' ? autoInterpretLastReport : {};
+        const calcType = String(valueSet.type || report.type || (document.getElementById('calcType') && document.getElementById('calcType').value) || '').trim();
+        if (!calcType) {
+            return { ok: false, msg: '請先完成看圖判讀或選擇計算類型' };
+        }
+        const v1 = Number(valueSet.v1 || (typeof readInputNumber === 'function' ? readInputNumber('v1', 0) : 0)) || 0;
+        const v2 = Number(valueSet.v2 || (typeof readInputNumber === 'function' ? readInputNumber('v2', 0) : 0)) || 0;
+        const v3 = Number(valueSet.v3 || (typeof readInputNumber === 'function' ? readInputNumber('v3', 0) : 0)) || 0;
+        const quantity = Math.max(1, Number(valueSet.qty || report.quantity || (typeof readInputNumber === 'function' ? readInputNumber('qty', 1) : 1)) || 1);
+        const pseudoIfcType = mapCalcTypeToPseudoIfcTypeLocal(calcType);
+        const longM = Number(report.longM) > 0 ? Number(report.longM) : Math.max(v1, v2);
+        const shortM = Number(report.shortM) > 0 ? Number(report.shortM) : Math.min(v1 || longM, v2 || longM);
+        const heightM = Number(v3) > 0 ? Number(v3) : 3;
+        return {
+            ok: true,
+            payload: {
+                schema: 'buildmaster/interpret-export/v1',
+                generatedAt: new Date().toISOString(),
+                disclaimer: '簡化協作匯出，非 Revit 級 BIM；僅供試算/放樣協作參考。',
+                calcType,
+                ifcType: pseudoIfcType,
+                quantity,
+                dimensionsM: { long: longM, short: shortM, height: heightM },
+                qa: {
+                    overallConfidence: Number(report.overallConfidence) || null,
+                    serverQaScore: Number(report.serverQaScore) || null,
+                    serverQaLevel: report.serverQaLevel || '',
+                    precisionMode: report.precisionMode || ''
+                },
+                memory: report.memorySimilarity ? { similarity: Number(report.memorySimilarity) || 0 } : null,
+                blueprint: currentBlueprintUploadState ? {
+                    sourceType: currentBlueprintUploadState.sourceType || '',
+                    width: currentBlueprintUploadState.width || null,
+                    height: currentBlueprintUploadState.height || null
+                } : null
+            }
+        };
+    }
+
+    function downloadTextFile(filename, mimeType, text) {
+        const blob = new Blob([text], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function downloadBlueprintInterpretJson() {
+        const built = buildSimplifiedInterpretExportPayload();
+        if (!built.ok) return showToast(built.msg || '無法匯出');
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        downloadTextFile(
+            `buildmaster-interpret-${stamp}.json`,
+            'application/json;charset=utf-8',
+            JSON.stringify(built.payload, null, 2)
+        );
+        showToast('已匯出判讀 JSON（協作用）');
+    }
+
+    function buildSimplifiedIfcFromInterpretPayload(payload) {
+        const ifcType = String(payload.ifcType || 'IFCMEMBER');
+        const label = String(payload.calcType || 'BuildMaster').replace(/'/g, '');
+        const qty = Math.max(1, Number(payload.quantity) || 1);
+        const longM = Math.max(0.01, Number(payload.dimensionsM && payload.dimensionsM.long) || 1).toFixed(3);
+        const shortM = Math.max(0.01, Number(payload.dimensionsM && payload.dimensionsM.short) || 1).toFixed(3);
+        const heightM = Math.max(0.01, Number(payload.dimensionsM && payload.dimensionsM.height) || 3).toFixed(3);
+        const entityLine = ifcType === 'IFCCOLUMN'
+            ? `#20=IFCCOLUMN('BM-ELEM-1',$,'${label}',$,$,#7,$,$);`
+            : (ifcType === 'IFCBEAM'
+                ? `#20=IFCBEAM('BM-ELEM-1',$,'${label}',$,$,#7,$,$);`
+                : `#20=IFCWALL('BM-ELEM-1',$,'${label}',$,$,#7,$,$);`);
+        return [
+            'ISO-10303-21;',
+            'HEADER;',
+            "FILE_DESCRIPTION(('BuildMaster simplified interpret export - NOT Revit BIM'),'2;1');",
+            `FILE_NAME('${label}.ifc','${payload.generatedAt}',('BuildMaster'),('Construction Master'),'9648','','');`,
+            "FILE_SCHEMA(('IFC4'));",
+            'ENDSEC;',
+            'DATA;',
+            "#1=IFCPROJECT('BM-PRJ',#2,'BuildMaster Interpret',$,$,$,$,(#3),#4);",
+            '#2=IFCOWNERHISTORY(#5,#6,$,.ADDED.,$,$,$,0);',
+            "#3=IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,1.E-05,#7,$);",
+            '#4=IFCUNITASSIGNMENT((#8));',
+            '#5=IFCPERSONANDORGANIZATION(#9,#10,$);',
+            "#6=IFCAPPLICATION(#10,'9648','BuildMaster','Construction Master');",
+            '#7=IFCAXIS2PLACEMENT3D(#11,$,$);',
+            '#8=IFCSIUNIT(*,.LENGTHUNIT.,$,.METRE.);',
+            "#9=IFCPERSON($,'BuildMaster',$,$,$,$,$,$);",
+            "#10=IFCORGANIZATION($,'BuildMaster',$,$,$);",
+            "#11=IFCCARTESIANPOINT((0.,0.,0.));",
+            "#12=IFCBUILDING('BM-BLD',$,'Building',$,$,#7,$,$,.ELEMENT.,$,$,$);",
+            "#13=IFCPROPERTYSET('BM-PS',$,'BuildMasterQTO',$,(#14,#15,#16,#17,#18));",
+            "#14=IFCPROPERTYSINGLEVALUE('CalcType',$,IFCTEXT('${label}'),$);",
+            `#15=IFCPROPERTYSINGLEVALUE('Quantity',$,IFCINTEGER(${qty}),$);`,
+            `#16=IFCPROPERTYSINGLEVALUE('LongM',$,IFCREAL(${longM}),$);`,
+            `#17=IFCPROPERTYSINGLEVALUE('ShortM',$,IFCREAL(${shortM}),$);`,
+            `#18=IFCPROPERTYSINGLEVALUE('HeightM',$,IFCREAL(${heightM}),$);`,
+            entityLine,
+            'ENDSEC;',
+            'END-ISO-10303-21;'
+        ].join('\n');
+    }
+
+    function downloadBlueprintSimplifiedIfc() {
+        const built = buildSimplifiedInterpretExportPayload();
+        if (!built.ok) return showToast(built.msg || '無法匯出');
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        downloadTextFile(
+            `buildmaster-interpret-simplified-${stamp}.ifc`,
+            'text/plain;charset=utf-8',
+            buildSimplifiedIfcFromInterpretPayload(built.payload)
+        );
+        showToast('已匯出簡化 IFC（非 Revit 級，供協作參考）');
     }
 
     function isProPrecisionNativeShell() {
@@ -3473,7 +3772,7 @@
             }
             const useAutoQty = shouldAutoCount
                 ? confirm(
-                    `AI 建議數量 ${pickedQty}（信心 ${(countResult.confidence * 100).toFixed(0)}%）` +
+                    `智慧建議數量 ${pickedQty}（信心 ${(countResult.confidence * 100).toFixed(0)}%）` +
                     `${memoryMatch ? `
 相似案例：${memoryQty}（${Math.round(memoryMatch.similarity * 100)}%）` : ''}` +
                     `
@@ -3583,7 +3882,7 @@
             return;
         }
         if (autoInterpretBusy || edgeAiDetectBusy) {
-            return showToast('AI 流程執行中，請稍候');
+            return showToast('智慧流程執行中，請稍候');
         }
         if (!img.src) {
             return showToast('請先上傳圖紙再執行「看圖／BIM 自動計算」');
@@ -3603,6 +3902,18 @@
         }
 
         if (!bimModelData || !Array.isArray(bimModelData.elements) || !bimModelData.elements.length) {
+            updateBlueprintAutoInterpretStatus('一鍵流程：步驟2/2 看圖估價匯入中...', '#bfe7ff');
+            if (typeof runBlueprintAutoEstimateImport === 'function') {
+                const ok = await runBlueprintAutoEstimateImport({ fromChain: true });
+                if (ok) {
+                    const infoBox = document.getElementById('bimAutoCalcInfo');
+                    if (infoBox && !String(infoBox.innerText || '').includes('看圖估價完成')) {
+                        infoBox.innerText = `一鍵流程完成：看圖判讀 + 看圖估價匯入｜${new Date().toLocaleTimeString('zh-TW')}`;
+                    }
+                    showToast('✅ 一鍵完成：看圖判讀 + 看圖估價匯入（免 IFC）');
+                }
+                return;
+            }
             const infoBox = document.getElementById('bimAutoCalcInfo');
             if (infoBox) infoBox.innerText = '一鍵流程完成：圖紙判讀成功（未載入 BIM 模型，已跳過 BIM 自動計算）';
             return showToast('流程完成：已看圖判讀（未載入 BIM，跳過 BIM 自動計算）');
@@ -5551,7 +5862,7 @@
             if (v3) v3.value = v3Value || numbers[2] || v3.value;
             if (qty && qtyValue) qty.value = qtyValue;
             setTimeout(() => {
-                showToast('✨ AI 代理已幫您填妥尺寸！');
+                showToast('✨ 智慧助理已幫您填妥尺寸！');
                 previewCalc();
             }, 800);
             return;
@@ -5631,14 +5942,14 @@
     let edgeAiSafetyTimer = null;
 
     async function startEdgeAIVision() {
-        if (!(await ensureFeatureAccess('aiVision', 'AI 視覺點料僅開放會員3（專家）'))) return;
+        if (!(await ensureFeatureAccess('aiVision', '智慧視覺點料僅開放會員3（專家）'))) return;
         if (!featureFlags.aiVision) {
-            return showToast('AI 視覺盤點目前已停用（請先到總控開啟）');
+            return showToast('智慧視覺盤點目前已停用（請先到總控開啟）');
         }
-        if (edgeAiVisionRunning) return showToast('AI 視覺已啟動中');
+        if (edgeAiVisionRunning) return showToast('智慧視覺已啟動中');
         edgeAiVisionRunning = true;
         edgeAiDetectBusy = false;
-        showToast('⚙️ 正在呼叫 Google AI 視覺神經網路 (初次載入需數秒)...');
+        showToast('⚙️ 正在載入雲端視覺辨識模型（初次需數秒）...');
 
         // 1. 動態將 TensorFlow.js 與 COCO-SSD 視覺模型注入到你的網頁中
         try {
@@ -5647,7 +5958,7 @@
                 await loadExternalScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd');
             }
 
-            showToast('👁️ AI 模型就緒！正在啟動視覺掃描...');
+            showToast('👁️ 視覺模型就緒！正在啟動掃描...');
 
             // 2. 開啟手機後置鏡頭
             const aiVideo = document.createElement('video');
@@ -5668,7 +5979,7 @@
             overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; background: rgba(156, 39, 176, 0.15); backdrop-filter: blur(2px);';
             overlay.innerHTML = `
                 <div style="border: 3px dashed #e040fb; width: calc(100vw - 24px); height: calc(100vh - 200px); max-height: 82vh; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 30px #e040fb inset; border-radius: 14px; position: relative;">
-                    <div style="position:absolute; top:-15px; background:#e040fb; color:#fff; padding:5px 15px; border-radius:10px; font-weight:bold; letter-spacing:1px;">AI 點料區域</div>
+                    <div style="position:absolute; top:-15px; background:#e040fb; color:#fff; padding:5px 15px; border-radius:10px; font-weight:bold; letter-spacing:1px;">智慧點料區域</div>
                 </div>
                 <button id="captureAIBtn" style="margin-top: 40px; padding: 15px 40px; background: #e040fb; color: #fff; font-size: 1.3em; border-radius: 50px; font-weight:900; border:none; box-shadow: 0 4px 20px rgba(224, 64, 251, 0.6);">📸 鎖定並盤點數量</button>
                 <button onclick="stopEdgeAIVision()" style="margin-top: 20px; padding: 10px 30px; background: rgba(0,0,0,0.6); color: white; border-radius: 50px; border:1px solid #fff;">取消</button>
@@ -5682,10 +5993,10 @@
             const captureBtn = document.getElementById('captureAIBtn');
             if (captureBtn) {
                 captureBtn.onclick = async () => {
-                    if (edgeAiDetectBusy) return showToast('AI 盤點運算中，請稍候...');
+                    if (edgeAiDetectBusy) return showToast('智慧盤點運算中，請稍候...');
                     edgeAiDetectBusy = true;
                     try {
-                        showToast('🧠 本機 AI 算力飆升中，分析畫面...');
+                        showToast('🧠 本機智慧算力分析畫面中...');
                         const predictions = await edgeAiCocoModel.detect(aiVideo);
                         const classFilterInput = document.getElementById('aiVisionClassFilter');
                         const classWhiteList = String(classFilterInput && classFilterInput.value ? classFilterInput.value : '')
@@ -5704,7 +6015,7 @@
                         });
                         const objectCount = filtered.length;
                         if (objectCount > 0) {
-                            showToast(`✅ AI 盤點完成：畫面中共有 ${objectCount} 個物件（門檻 ${EDGE_AI_MIN_SCORE}）！`);
+                            showToast(`✅ 智慧盤點完成：畫面中共有 ${objectCount} 個物件（門檻 ${EDGE_AI_MIN_SCORE}）！`);
                             const qtyInput = document.getElementById('qty');
                             if (qtyInput) qtyInput.value = objectCount;
                             previewCalc();
@@ -5720,7 +6031,7 @@
             if (edgeAiSafetyTimer) clearTimeout(edgeAiSafetyTimer);
             edgeAiSafetyTimer = setTimeout(() => {
                 if (!edgeAiVisionRunning) return;
-                showToast('⚠️ AI 視覺逾時自動關閉，請重試');
+                showToast('⚠️ 智慧視覺逾時自動關閉，請重試');
                 stopEdgeAIVision();
             }, 120000);
         } catch (err) {
@@ -6177,11 +6488,14 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', applyBlueprintAutoCalcAfterUploadPref);
         document.addEventListener('DOMContentLoaded', applyAutoCalcManualInputsPrefFromStorage);
+        document.addEventListener('DOMContentLoaded', applyPublishToSharedPoolPref);
     } else {
         applyBlueprintAutoCalcAfterUploadPref();
         applyAutoCalcManualInputsPrefFromStorage();
+        applyPublishToSharedPoolPref();
     }
 
     window.syncAutoCalcManualInputsPref = syncAutoCalcManualInputsPref;
     window.applyAutoCalcManualInputsToWorkspace = applyAutoCalcManualInputsToWorkspace;
     window.updateAutoCalcManualInputsHint = updateAutoCalcManualInputsHint;
+    window.openBlueprintFilePicker = openBlueprintFilePicker;

@@ -756,6 +756,9 @@
         safeStorage.set(localStorage, USER_LEVEL_KEY, backendSessionState.userLevel);
         applyUserLevel();
         updateBillingStatusChip();
+        if (typeof window.refreshPublicChatAfterLogin === 'function') {
+            window.refreshPublicChatAfterLogin();
+        }
     }
 
     function clearBackendSession(keepVisualState = false) {
@@ -779,6 +782,13 @@
         if (!keepVisualState) safeStorage.set(localStorage, USER_LEVEL_KEY, 'basic');
         applyUserLevel();
         updateBillingStatusChip();
+        stopPublicChatPollingOnLogout();
+    }
+
+    function stopPublicChatPollingOnLogout() {
+        if (typeof window.refreshPublicChatAfterLogin === 'function') {
+            window.refreshPublicChatAfterLogin(true);
+        }
     }
 
     function applyLocalOfflineDemoSession(options = {}) {
@@ -1175,6 +1185,9 @@
             showToast('進階面板腳本載入失敗，請重新整理頁面');
         }
         await loadWorkspaceBootstrap();
+        if (typeof reloadAutoInterpretMemoryUi === 'function' && hasFeatureEntitlement('blueprintAutoInterpret')) {
+            reloadAutoInterpretMemoryUi({ silent: true }).catch(function () { /* ignore */ });
+        }
         applyUserLevel();
         ensureWorkModeSectionOrder();
         applyWorkMode();
@@ -1447,7 +1460,7 @@
         }
 
         const map = [
-            ['btnCtrlAiVision', 'aiVision', 'AI盤點'],
+            ['btnCtrlAiVision', 'aiVision', '智慧盤點'],
             ['btnCtrlVoice', 'voice', '語音助理'],
             ['btnCtrlLaser', 'laser', '雷射尺'],
             ['btnCtrlWarRoom', 'warRoom', '戰情室']
@@ -1530,7 +1543,7 @@
         }
         applyFeatureControlStatus();
         applyWarRoomStatus();
-        const nameMap = { aiVision: 'AI盤點', voice: '語音助理', laser: '雷射尺', warRoom: '戰情室' };
+        const nameMap = { aiVision: '智慧盤點', voice: '語音助理', laser: '雷射尺', warRoom: '戰情室' };
         showToast(`${nameMap[key] || key}功能已${featureFlags[key] ? '啟用' : '停用'}`);
     }
 

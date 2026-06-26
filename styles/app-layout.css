@@ -353,6 +353,15 @@
     .tool-group--status { margin-left: auto; }
     .tool-group-label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: #91d7ff; }
     .toolbar-file-input { width: 170px; color: #b8c7d9; background: rgba(7, 14, 24, 0.88); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 7px 10px; }
+    .toolbar-file-input--native {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
     .toolbar-status-chip { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); color: #dce9f8; font-size: 0.75em; font-weight: 700; box-sizing: border-box; }
     .toolbar-status-chip--accent { border-color: rgba(143, 108, 255, 0.38); background: rgba(143, 108, 255, 0.1); color: #e9dcff; }
     .toolbar-status-chip--warm { border-color: rgba(255, 209, 102, 0.34); background: rgba(255, 209, 102, 0.08); color: #ffe7aa; }
